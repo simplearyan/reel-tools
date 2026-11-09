@@ -1,10 +1,9 @@
 {
   "name": "Reel",
   "url": "https://simplearyan.github.io/reel",
-  "github": "https://github.com/simplearyan/reel",
   "tagline": "Free tools for animation, video and sound",
   "description": "Reel is a family of free, open-source browser tools for animation, video and sound editing. No install, no account.",
-  "github": "https://github.com/YOUR-NAME/reel",
+  "github": "https://github.com/simplearyan/reel",
   "kofi": "https://ko-fi.com/simplearyan",
   "adsenseClient": "",
   "gaId": "",
