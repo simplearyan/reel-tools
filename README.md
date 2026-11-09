@@ -98,4 +98,4 @@ Reel is free and open source. If it helps you make something, you can support it
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MPL-2.0 license. See [LICENSE](LICENSE).
