@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trim — video trimmer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eceff3; --panel:#fff; --ink:#18202b; --muted:#6b7686; --line:#d9dee5;
+  --accent:#0f766e; --accent-ink:#fff; --sel:#f5a524; --stage:#0d1117; --danger:#b42318;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#12161c; --panel:#1b212a; --ink:#e8ecf1; --muted:#8b96a5; --line:#2b3340; --accent:#2dd4bf; --accent-ink:#06201d; --stage:#05070a; --danger:#f97066; color-scheme:dark}
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;min-height:100dvh}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px max(20px,env(safe-area-inset-left))}
+.brand{font-weight:600;font-size:17px;letter-spacing:-.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--panel);padding:9px 16px;border-radius:9px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.link{border:0;background:none;padding:0;color:var(--accent);font-size:inherit;text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{flex:1;width:100%;max-width:880px;margin:0 auto;padding:0 20px 28px;display:flex;flex-direction:column;gap:16px}
+
+.drop{flex:1;display:grid;place-items:center;border:1.5px dashed var(--line);border-radius:16px;text-align:center;padding:40px 24px;transition:border-color .15s,background .15s;min-height:50vh}
+.drop.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.drop h1{font-size:clamp(20px,4vw,26px);margin:0 0 6px;font-weight:600;letter-spacing:-.02em}
+.drop p{margin:0 0 20px;color:var(--muted)}
+
+.editor{display:none;flex-direction:column;gap:14px}
+body.loaded .editor{display:flex}
+body.loaded .drop{display:none}
+
+.stagewrap{position:relative;display:flex;justify-content:center}
+.chip{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:rgba(13,17,23,.78);color:#fff;font-size:12.5px;padding:5px 11px;border-radius:999px;pointer-events:none;white-space:nowrap}
+canvas#view{display:block;margin:0 auto;border-radius:12px;background:var(--stage);max-width:100%;height:auto}
+.meta{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px;align-items:baseline}
+.meta .name{color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.meta .info{white-space:nowrap}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.timeline{position:relative;height:52px;border-radius:8px;touch-action:none;user-select:none;cursor:pointer;margin:0 11px}
+.strip{position:absolute;inset:0;display:flex;border-radius:8px;overflow:hidden;background:var(--line)}
+.strip canvas{flex:1;min-width:0;height:100%;display:block}
+.dim{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--panel) 72%,transparent);pointer-events:none}
+.sel{position:absolute;top:0;bottom:0;border-top:3px solid var(--sel);border-bottom:3px solid var(--sel);pointer-events:none}
+.handle{position:absolute;top:-3px;bottom:-3px;width:22px;margin-left:-11px;background:var(--sel);border-radius:7px;cursor:ew-resize;z-index:2}
+.handle::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:16px;margin:-8px 0 0 -1px;background:#3a2a05;border-radius:2px}
+.head{position:absolute;top:-6px;bottom:-6px;width:2px;margin-left:-1px;background:var(--ink);z-index:1;pointer-events:none;border-radius:1px}
+.ticks{display:flex;justify-content:space-between;margin:10px 0 0;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ticks b{color:var(--ink);font-weight:500}
+.row{display:flex;align-items:center;gap:12px;margin-top:14px}
+.play{flex:none;width:42px;height:42px;border-radius:50%;border:0;background:var(--ink);color:var(--panel);display:grid;place-items:center;padding:0}
+.play svg{width:16px;height:16px;fill:currentColor}
+.now{font-variant-numeric:tabular-nums;font-weight:500}
+.spacer{flex:1}
+.actions{display:flex;gap:10px}
+.hint{color:var(--muted);font-size:12.5px;margin:12px 0 0}
+kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.icon{flex:none;width:40px;height:40px;display:grid;place-items:center;padding:0;border-radius:9px}
+.icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+dialog{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:16px;padding:20px;width:min(380px,calc(100% - 32px));box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h2{margin:0 0 14px;font-size:18px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline}
+dialog h2 span{font-size:13px;font-weight:400;color:var(--muted)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:14px}
+.seg button{border:0;background:none;padding:7px;border-radius:8px;font-weight:500;color:var(--muted)}
+.seg button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.seg button:disabled{opacity:.35;cursor:not-allowed}
+dialog label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px}
+dialog select{display:block;width:100%;margin-top:5px;padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+dialog .chk{display:flex;gap:8px;align-items:center;color:var(--ink)}
+.dfoot{display:flex;justify-content:flex-end;gap:10px;margin-top:6px}
+@media (hover:none){.hint{display:none}}
+
+.toast{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translate(-50%,24px);opacity:0;pointer-events:none;transition:.2s;width:min(460px,calc(100% - 32px));background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.18);z-index:10}
+.toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast .top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
+.toast .top span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:9px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .1s}
+.toast .link{font-size:13px;margin-top:8px;display:none}
+.error{color:var(--danger);font-size:14px;margin:0;display:none;text-align:center}
+.error.on{display:block}
+
+@media (max-width:600px){
+  header{padding:12px 16px} main{padding:0 14px 20px;gap:12px}
+  .panel{padding:14px 12px}
+  .timeline{height:46px}
+  .row{flex-wrap:wrap}
+  .actions{width:100%;order:3}
+  .actions .btn{flex:1}
+  .spacer{display:none}
+  .meta{flex-direction:column;gap:2px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Trim</div>
+  <button class="btn" id="openBtn">Open video</button>
+</header>
+
+<main>
+  <section class="drop" id="drop">
+    <div>
+      <h1>Trim a video in your browser</h1>
+      <p>Drop a file here. It never leaves your device.<br>Broken downloads get repaired automatically.</p>
+      <button class="btn primary" id="openBtn2">Choose video</button>
+    </div>
+  </section>
+
+  <section class="editor">
+    <div class="stagewrap"><canvas id="view" width="16" height="9"></canvas><div class="chip" id="chip" hidden></div></div>
+    <div class="meta"><span class="name" id="fname"></span><span class="info"><span id="finfo"></span> <button class="link" id="saveFixed" hidden>Save fixed copy</button></span></div>
+
+    <div class="panel">
+      <div class="timeline" id="tl" aria-label="Timeline">
+        <div class="strip" id="strip"></div>
+        <div class="dim" id="dimL" style="left:0"></div>
+        <div class="dim" id="dimR" style="right:0"></div>
+        <div class="sel" id="sel"></div>
+        <div class="head" id="head"></div>
+        <div class="handle" id="hS" tabindex="0" role="slider" aria-label="Start"></div>
+        <div class="handle" id="hE" tabindex="0" role="slider" aria-label="End"></div>
+      </div>
+      <div class="ticks"><b id="tStart">0:00.0</b><span><b id="tLen">0:00.0</b> selected</span><b id="tEnd">0:00.0</b></div>
+      <div class="row">
+        <button class="play" id="play" aria-label="Play"><svg viewBox="0 0 16 16" id="playIcon"><path d="M3 1.5v13l11-6.5z"/></svg></button>
+        <span class="now" id="tNow">0:00.0</span>
+        <div class="spacer"></div>
+        <div class="actions">
+          <button class="btn icon" id="frameBtn" title="Save this frame as PNG" aria-label="Save frame"><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+          <button class="btn primary" id="exportBtn">Export</button>
+        </div>
+      </div>
+      <p class="hint"><kbd>Space</kbd> play, <kbd>I</kbd> / <kbd>O</kbd> set start / end, <kbd>←</kbd> <kbd>→</kbd> step a frame</p>
+    </div>
+    <p class="error" id="err" role="alert"></p>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status">
+  <div class="top"><span id="tLabel"></span><span><span id="pct"></span> <button class="link" id="cancelBtn">Cancel</button></span></div>
+  <div class="bar"><i id="barFill"></i></div>
+</div>
+
+<dialog id="dlg">
+  <h2>Export clip <span id="dSub"></span></h2>
+  <div class="seg"><button id="kV" class="on">Video</button><button id="kA">Audio</button></div>
+  <label>Format <select id="fmt"></select></label>
+  <label id="resRow">Size <select id="res"></select></label>
+  <label class="chk" id="muteRow"><input type="checkbox" id="mute"> Remove audio</label>
+  <div class="dfoot"><button class="btn" id="dCancel">Cancel</button><button class="btn primary" id="dGo">Export</button></div>
+</dialog>
+
+<input type="file" id="file" accept="video/*,.mkv,.mov,.mp4,.webm,.m4v" hidden>
+
+<script type="module">
+import {
+  Input, Output, Conversion, ALL_FORMATS, BlobSource, BufferTarget,
+  WebMOutputFormat, Mp4OutputFormat, WavOutputFormat, CanvasSink
+} from 'https://cdn.jsdelivr.net/npm/mediabunny@1.21.1/+esm';
+import * as MB from 'https://cdn.jsdelivr.net/npm/mediabunny@1.21.1/+esm';
+
+const $ = id => document.getElementById(id);
+const T0 = performance.now();
+const log = (...a) => console.log('%c[trim]', 'color:#0f766e;font-weight:600', ((performance.now() - T0) / 1000).toFixed(2) + 's', ...a);
+let lastFrameAt = 0, frameCount = 0, drawnCount = 0, lastCopy = 0, srcW = 16, srcH = 9, vTrackRef = null;
+const snap = () => `t=${video.currentTime.toFixed(2)} ready=${video.readyState} net=${video.networkState} paused=${video.paused} frames=${frameCount} err=${video.error ? video.error.code : '-'}`;
+let recovering = false, deepDone = false;
+function makeVideo() {
+  const v = document.createElement('video');
+  v.playsInline = true; v.preload = 'auto';
+  v.addEventListener('seeked', () => { if (v === video) { draw(); update(); } });
+  ['waiting', 'stalled', 'playing', 'pause', 'ended', 'emptied', 'abort'].forEach(n =>
+    v.addEventListener(n, () => { if (v === video) log('video:' + n, snap()); }));
+  // Counts frames the browser really presented, so a frozen picture is detectable
+  // even while currentTime keeps advancing on the audio clock.
+  if ('requestVideoFrameCallback' in v) {
+    const tick = () => { if (v === video) { frameCount++; lastFrameAt = performance.now(); } v.requestVideoFrameCallback(tick); };
+    v.requestVideoFrameCallback(tick);
+  }
+  v.addEventListener('error', () => {
+    if (v === video) log('video:error', v.error && v.error.code, v.error && v.error.message);
+    if (v === video && document.body.classList.contains('loaded') && !recovering) {
+      recovering = true;
+      onVideoError(!v.paused).finally(() => recovering = false);
+    }
+  });
+  return v;
+}
+let video = makeVideo();
+const view = $('view'), ctx = view.getContext('2d');
+
+let hasAudio = true, file, fixedFile = null, url, input, duration = 0, start = 0, end = 0, conversion = null, loadId = 0;
+
+const fmt = s => { s = Math.max(0, s || 0); const m = Math.floor(s / 60); return `${m}:${(s - m * 60).toFixed(1).padStart(4, '0')}`; };
+const size = b => b > 1e9 ? (b / 1e9).toFixed(2) + ' GB' : (b / 1e6).toFixed(1) + ' MB';
+const showError = m => { $('err').textContent = m || ''; $('err').classList.toggle('on', !!m); };
+const download = (blob, name) => {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+};
+
+/* ---------- toast (progress) ---------- */
+function busy(label, cancellable) {
+  $('tLabel').textContent = label; $('pct').textContent = ''; $('barFill').style.width = '0';
+  $('cancelBtn').style.display = cancellable ? '' : 'none';
+  $('toast').classList.add('on');
+}
+function progress(p) { $('barFill').style.width = (p * 100) + '%'; $('pct').textContent = Math.round(p * 100) + '%'; }
+const idle = () => $('toast').classList.remove('on');
+
+/* ---------- open ---------- */
+$('openBtn').onclick = $('openBtn2').onclick = () => $('file').click();
+$('file').onchange = e => { const f = e.target.files[0]; e.target.value = ''; f && openFile(f); };
+const drop = $('drop');
+['dragenter', 'dragover'].forEach(t => addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(t => addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) openFile(f); });
+
+function attach(f, ms = 10000) {
+  return new Promise(resolve => {
+    video.pause(); video.removeAttribute('src');
+    if (url) URL.revokeObjectURL(url);
+    url = URL.createObjectURL(f);
+    const done = ok => { clearTimeout(t); video.onloadeddata = video.onerror = null; resolve(ok); };
+    const t = setTimeout(() => done(false), ms);
+    video.onloadeddata = () => done(true);
+    video.onerror = () => done(false);
+    video.src = url;
+  });
+}
+function seekWorks() {
+  if (duration < 2) return true;
+  return new Promise(res => {
+    const t = duration * 0.5;
+    const to = setTimeout(() => { video.removeEventListener('seeked', ok); res(false); }, 3000);
+    const ok = () => { clearTimeout(to); res(Math.abs(video.currentTime - t) < 2); };
+    video.addEventListener('seeked', ok, { once: true });
+    video.currentTime = t;
+  });
+}
+async function healthy() {
+  if (!isFinite(video.duration) || Math.abs(video.duration - duration) > 1.5) return false;
+  return seekWorks();
+}
+
+/* Re-mux (fast, lossless) into a clean file with a proper index; if that still
+   isn't seekable, re-encode. This is what fixes broken downloader files. */
+async function repair(f, force) {
+  const webm = /webm/i.test(f.type) || /\.webm$/i.test(f.name);
+  const out = new Output({
+    format: webm ? new WebMOutputFormat() : new Mp4OutputFormat({ fastStart: 'in-memory' }),
+    target: new BufferTarget()
+  });
+  const src = new Input({ source: new BlobSource(f), formats: ALL_FORMATS });
+  const opts = { input: src, output: out };
+  if (force) { opts.video = { forceTranscode: true, hardwareAcceleration: 'prefer-hardware' }; opts.audio = { forceTranscode: true }; }
+  conversion = await Conversion.init(opts);
+  if (!conversion.isValid) { conversion = null; throw new Error('This video can’t be repaired in this browser.'); }
+  conversion.onProgress = progress;
+  try { await conversion.execute(); } finally { conversion = null; }
+  const ext = webm ? 'webm' : 'mp4';
+  return new File([out.target.buffer], f.name.replace(/\.[^.]+$/, '') + `-fixed.${ext}`, { type: webm ? 'video/webm' : 'video/mp4' });
+}
+
+async function openFile(f) {
+  const id = ++loadId;
+  showError(''); video.pause(); setPlayIcon(false);
+  file = f; fixedFile = null; deepDone = false; $('saveFixed').hidden = true;
+  try {
+    input = new Input({ source: new BlobSource(f), formats: ALL_FORMATS });
+    const [dur, vTrack, aTrack] = await Promise.all([input.computeDuration(), input.getPrimaryVideoTrack(), input.getPrimaryAudioTrack()]);
+    if (id !== loadId) return;
+    if (!vTrack) throw new Error('No video track found in this file.');
+    duration = dur; start = 0; end = dur; hasAudio = !!aTrack;
+
+    let ok = await attach(file) && await healthy();
+    if (!ok) {
+      for (const force of [false, true]) {
+        busy(force ? 'Re-encoding to fix the video' : 'Fixing the video index', true);
+        try { fixedFile = await repair(file, force); } catch (e) { if (e?.name === 'ConversionCanceledError') { idle(); return; } throw e; }
+        file = fixedFile;
+        if (id !== loadId) return;
+        ok = await attach(file) && await healthy();
+        if (ok) break;
+      }
+      idle();
+      if (!ok) throw new Error('This video couldn’t be repaired. It may be too damaged or use a codec this browser can’t play.');
+      $('saveFixed').hidden = false;
+    }
+
+    const w = video.videoWidth || 16, h = video.videoHeight || 9, k = Math.min(1, 1280 / Math.max(w, h));
+    srcW = w; srcH = h; vTrackRef = vTrack; setupExport();
+    view.width = Math.round(w * k); view.height = Math.round(h * k);
+    view.style.width = `min(100%, calc(min(62vh, 680px) * ${w / h}))`;
+    $('fname').textContent = f.name;
+    $('finfo').textContent = `${w}×${h}, ${fmt(duration)}, ${size(file.size)}${hasAudio ? '' : ', no audio'}`;
+    lastGood.width = view.width; lastGood.height = view.height; hasGood = false; setChip('');
+    try { previewSink = new CanvasSink(vTrack, { width: view.width }); } catch { previewSink = null; }
+    document.body.classList.add('loaded');
+    seek(0); update();
+    buildStrip(vTrack, id);
+  } catch (e) { idle(); showError(e.message || String(e)); if (!document.body.classList.contains('loaded')) alert(e.message || e); }
+}
+$('saveFixed').onclick = () => fixedFile && download(fixedFile, fixedFile.name);
+
+/* ---------- filmstrip (Mediabunny CanvasSink) ---------- */
+async function buildStrip(track, id) {
+  const strip = $('strip'); strip.innerHTML = '';
+  const n = Math.max(5, Math.min(14, Math.round(strip.clientWidth / 70)));
+  const cells = Array.from({ length: n }, () => strip.appendChild(document.createElement('canvas')));
+  try {
+    const sink = new CanvasSink(track, { width: 160 });
+    const ts = cells.map((_, i) => (duration * (i + .5)) / n);
+    let i = 0;
+    for await (const r of sink.canvasesAtTimestamps(ts)) {
+      if (id !== loadId) return;
+      if (r) { const c = cells[i]; c.width = r.canvas.width; c.height = r.canvas.height; c.getContext('2d').drawImage(r.canvas, 0, 0); }
+      i++;
+    }
+  } catch { /* thumbnails are optional */ }
+}
+
+/* ---------- preview: frame latch, last good frame, recovery ---------- */
+const lastGood = document.createElement('canvas'), lgx = lastGood.getContext('2d');
+let hasGood = false, lastGoodT = 0, seekTok = 0, previewSink = null, lastTick = 0, lastTickT = 0;
+
+const setChip = m => { const c = $('chip'); c.hidden = !m; c.textContent = m || ''; };
+
+// Reset any leftover transform/state so one bad frame can't skew the next ones.
+function paint(src) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.save();
+  try { ctx.drawImage(src, 0, 0, view.width, view.height); } finally { ctx.restore(); }
+}
+function placeholder() {
+  const cs = getComputedStyle(document.documentElement);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = cs.getPropertyValue('--stage'); ctx.fillRect(0, 0, view.width, view.height);
+  ctx.fillStyle = cs.getPropertyValue('--muted'); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = `500 ${Math.max(12, Math.round(view.width / 28))}px "Instrument Sans",system-ui,sans-serif`;
+  ctx.fillText('Preview unavailable', view.width / 2, view.height / 2);
+}
+const showFallback = () => hasGood ? paint(lastGood) : placeholder();
+function draw() {
+  if (video.error || video.readyState < 2) { showFallback(); return false; }
+  try {
+    paint(video);
+    const n = performance.now();
+    if (video.paused || n - lastCopy > 250) { lgx.drawImage(view, 0, 0); lastCopy = n; }
+    hasGood = true; lastGoodT = video.currentTime; return true;
+  }
+  catch { showFallback(); return false; }
+}
+
+// Resolves true only once the seeked frame has actually been presented.
+function frameReady(t, timeout = 700) {
+  return new Promise(res => {
+    let done = false;
+    const fin = ok => { if (!done) { done = true; clearTimeout(to); res(ok); } };
+    const to = setTimeout(() => fin(false), timeout);
+    video.addEventListener('seeked', () => {
+      if ('requestVideoFrameCallback' in video) { video.requestVideoFrameCallback(() => fin(true)); setTimeout(() => fin(true), 250); }
+      else fin(true);
+    }, { once: true });
+    try { video.currentTime = t; } catch { fin(false); }
+  });
+}
+async function seekTo(t) {
+  t = Math.min(Math.max(t, 0), duration);
+  const tok = ++seekTok;
+  let settled = false;
+  // If the <video> is slow to show the frame, show Mediabunny's decoded frame right away.
+  const slow = setTimeout(() => previewSink?.getCanvas(t).then(r => { if (r && tok === seekTok && !settled) paint(r.canvas); }).catch(() => {}), 180);
+  const ok = await frameReady(t);
+  clearTimeout(slow); settled = true;
+  if (tok !== seekTok) return;
+  if (ok && !video.error) { setChip(''); draw(); update(); } else await recover(t, tok);
+}
+const seek = t => seekTo(t);
+
+async function tryRecreateVideo(ms = 4000) {
+  const old = video; old.pause(); old.removeAttribute('src'); old.load();
+  video = makeVideo();
+  return (await attach(file, ms)) && !video.error;
+}
+async function recover(t, tok) {
+  log('recover seek', t.toFixed(2), snap());
+  showFallback(); setChip('Restoring…');
+  // 1. Decode that frame with Mediabunny, independent of the <video> element.
+  try {
+    const r = previewSink && await previewSink.getCanvas(t);
+    if (tok !== seekTok) return;
+    if (r) { log('recover: shown from Mediabunny decoder'); paint(r.canvas); lgx.drawImage(view, 0, 0); hasGood = true; setChip(''); update(); return; }
+  } catch { /* fall through */ }
+  // 2. Decoder died on a bad packet: re-encode the file once; otherwise rebuild the element.
+  if (video.error && video.error.code === 3 && !deepDone && await deepRepair(t, false)) return;
+  // 2b. Rebuild the video element and retry the same spot.
+  if (await tryRecreateVideo()) {
+    if (tok !== seekTok) return;
+    if (await frameReady(t)) { if (tok !== seekTok) return; draw(); setChip(''); update(); return; }
+  }
+  if (tok !== seekTok) return;
+  // 3. Give up at this spot: return to a position that decoded fine, keep the frozen frame.
+  log('recover: gave up, back to last good time', lastGoodT.toFixed(2));
+  showFallback(); setChip('Video unavailable here');
+  try { video.currentTime = lastGoodT; } catch { /* ignore */ }
+  update();
+}
+
+/* The browser's decoder died on a bad packet (PIPELINE_ERROR_DECODE) that VLC would
+   just conceal. Re-encode the whole file with Mediabunny (WebCodecs) into a clean one,
+   swap it in, and resume at the same time. Done at most once per file. */
+async function deepRepair(t, resume) {
+  if (deepDone) return false;
+  deepDone = true;
+  const tok = ++seekTok;
+  log('deep repair: re-encoding with Mediabunny', 'resume at', t.toFixed(2), 'playing=' + resume);
+  video.pause(); setPlayIcon(false); setChip('Repairing damaged video…');
+  const t0 = performance.now();
+  busy('Repairing damaged video', true);
+  try {
+    const f = await repair(file, true);
+    log('deep repair: encoded', size(f.size), 'in ' + ((performance.now() - t0) / 1000).toFixed(1) + 's');
+    file = fixedFile = f; $('saveFixed').hidden = false;
+    video = makeVideo();
+    const ok = await attach(file, 6000);
+    idle();
+    if (!ok) { log('deep repair: new file still not playable'); return false; }
+    setChip(''); log('deep repair: swapped to fixed file', snap());
+    await seekTo(Math.min(t, duration));
+    if (resume) {
+      lastTick = lastFrameAt = performance.now(); lastTickT = video.currentTime;
+      try { await video.play(); } catch (e) { log('play() rejected', e && e.name); }
+      setPlayIcon(!video.paused);
+    }
+    return true;
+  } catch (e) {
+    idle(); setChip('');
+    log('deep repair failed:', e && e.name, e && e.message);
+    return false;
+  }
+}
+async function onVideoError(wasPlaying) {
+  const t = video.currentTime || lastGoodT;
+  if (video.error && video.error.code === 3 && !deepDone && await deepRepair(t, wasPlaying)) return;
+  return wasPlaying ? recoverPlayback() : recover(t, ++seekTok);
+}
+
+// Playback hit a damaged spot: keep the audio/clock moving by hopping past it.
+async function recoverPlayback() {
+  const t = video.currentTime, tok = ++seekTok;
+  log('recoverPlayback start', snap());
+  if (video.error && video.error.code === 3 && !deepDone && await deepRepair(t, true)) return;
+  video.pause(); setChip('Skipping damaged part…');
+  previewSink?.getCanvas(t).then(r => { if (r && tok === seekTok && video.paused) paint(r.canvas); }).catch(e => log('decoder frame failed', e && e.message));
+  let recreated = false;
+  if (video.error) { recreated = await tryRecreateVideo(3000); log('rebuilt dead video element →', recreated); }
+  for (const d of [0, 0.25, 0.6, 1.2, 2.5, 5]) {
+    if (tok !== seekTok) { log('recoverPlayback superseded'); return; }
+    const to = t + d;
+    if (to >= end - 0.05) break;
+    if (d >= 0.6 && !recreated) { recreated = true; log('rebuilding video element'); await tryRecreateVideo(3000); }
+    const ok = await frameReady(to, 600);
+    log(`probe +${d}s →`, ok ? 'frame ok' : 'no frame', snap());
+    if (ok) {
+      if (tok !== seekTok) return;
+      setChip(''); lastTick = lastFrameAt = performance.now(); lastTickT = video.currentTime;
+      try { await video.play(); } catch (e) { log('play() rejected', e && e.name); }
+      setPlayIcon(!video.paused);
+      log('resumed playback', snap());
+      return;
+    }
+  }
+  if (tok !== seekTok) return;
+  setPlayIcon(false);
+  if (t + 0.5 >= end - 0.05) { log('reached end of selection'); setChip(''); seekTo(end); return; }
+  log('gave up: video unavailable here', snap());
+  showFallback(); setChip('Video unavailable here');
+}
+
+(function loop(now) {
+  if (!video.paused) {
+    if (video.currentTime >= end - 0.03) { video.pause(); seekTo(end); setPlayIcon(false); }
+    else {
+      const hasRVFC = 'requestVideoFrameCallback' in video;
+      if (!hasRVFC || frameCount !== drawnCount) { drawnCount = frameCount; draw(); }
+      update();
+      if (!hasRVFC && video.currentTime !== lastTickT) { lastTickT = video.currentTime; lastTick = now; }
+      const idleSince = hasRVFC ? lastFrameAt : lastTick;
+      if (now - idleSince > 900 && !video.seeking && !recovering) {
+        log('stall detected: no new frame for ' + Math.round(now - idleSince) + 'ms', snap());
+        lastFrameAt = lastTick = now; recovering = true;
+        recoverPlayback().finally(() => recovering = false);
+      } else if (now - (loop.hb || 0) > 2000) { loop.hb = now; log('playing', snap()); }
+    }
+  }
+  requestAnimationFrame(loop);
+})(performance.now());
+
+const PLAY = 'M3 1.5v13l11-6.5z', PAUSE = 'M3 1.5h3.5v13H3zM9.5 1.5H13v13H9.5z';
+const setPlayIcon = p => $('playIcon').innerHTML = `<path d="${p ? PAUSE : PLAY}"/>`;
+function toggle() {
+  if (!duration) return;
+  if (video.paused) {
+    if (video.currentTime < start || video.currentTime >= end - 0.05) seek(start);
+    lastTick = lastFrameAt = performance.now(); lastTickT = video.currentTime; setPlayIcon(true);
+    video.play().catch(() => { if (!recovering) { recovering = true; recoverPlayback().finally(() => recovering = false); } });
+  } else { video.pause(); setPlayIcon(false); }
+}
+$('play').onclick = toggle;
+view.onclick = toggle;
+
+/* ---------- timeline ---------- */
+const tl = $('tl'), MIN = 0.1;
+const pct = t => (duration ? (t / duration) * 100 : 0) + '%';
+function update() {
+  const t = video.currentTime, r = (100 - (end / duration) * 100) + '%';
+  $('hS').style.left = pct(start); $('hE').style.left = pct(end); $('head').style.left = pct(t);
+  $('sel').style.left = pct(start); $('sel').style.right = r;
+  $('dimL').style.width = pct(start); $('dimR').style.width = r;
+  $('tNow').textContent = fmt(t); $('tStart').textContent = fmt(start); $('tEnd').textContent = fmt(end); $('tLen').textContent = fmt(end - start);
+}
+const timeAt = e => { const r = tl.getBoundingClientRect(); return Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1) * duration; };
+
+function drag(el, kind) {
+  el.addEventListener('pointerdown', e => {
+    e.stopPropagation(); el.setPointerCapture(e.pointerId); video.pause(); setPlayIcon(false);
+    const move = ev => {
+      const t = timeAt(ev);
+      if (kind === 'start') start = Math.min(t, end - MIN); else end = Math.max(t, start + MIN);
+      seek(kind === 'start' ? start : end); update();
+    };
+    const up = () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); };
+    el.addEventListener('pointermove', move); el.addEventListener('pointerup', up);
+  });
+  el.addEventListener('keydown', e => {
+    const d = (e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0) * (e.shiftKey ? 1 : 0.1);
+    if (!d) return; e.preventDefault();
+    if (kind === 'start') start = Math.min(Math.max(start + d, 0), end - MIN); else end = Math.max(Math.min(end + d, duration), start + MIN);
+    seek(kind === 'start' ? start : end); update();
+  });
+}
+drag($('hS'), 'start'); drag($('hE'), 'end');
+
+tl.addEventListener('pointerdown', e => {
+  if (e.target.classList.contains('handle')) return;
+  tl.setPointerCapture(e.pointerId);
+  const go = ev => { seek(timeAt(ev)); update(); };
+  go(e); tl.addEventListener('pointermove', go);
+  tl.addEventListener('pointerup', () => tl.removeEventListener('pointermove', go), { once: true });
+});
+
+addEventListener('keydown', e => {
+  if (!duration || $('dlg').open || e.target.closest?.('button,select') || e.target.classList?.contains('handle')) return;
+  if (e.code === 'Space') { e.preventDefault(); toggle(); }
+  else if (e.key === 'i' || e.key === 'I') { start = Math.min(video.currentTime, end - MIN); update(); }
+  else if (e.key === 'o' || e.key === 'O') { end = Math.max(video.currentTime, start + MIN); update(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault(); video.pause(); setPlayIcon(false);
+    seekTo(video.currentTime + (e.key === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 1 : 1 / 30));
+  }
+});
+
+/* ---------- export (Mediabunny Conversion) ---------- */
+const F = (id, label, ext, mime, make) => make ? { id, label, ext, mime, make } : null;
+const FORMATS = {
+  video: [
+    F('webm', 'WebM', 'webm', 'video/webm', () => new WebMOutputFormat()),
+    F('mp4', 'MP4', 'mp4', 'video/mp4', () => new Mp4OutputFormat({ fastStart: 'in-memory' })),
+    F('mkv', 'MKV', 'mkv', 'video/x-matroska', MB.MkvOutputFormat && (() => new MB.MkvOutputFormat())),
+    F('mov', 'MOV', 'mov', 'video/quicktime', MB.MovOutputFormat && (() => new MB.MovOutputFormat()))
+  ].filter(Boolean),
+  audio: [
+    F('wav', 'WAV (lossless)', 'wav', 'audio/wav', () => new WavOutputFormat()),
+    F('ogg', 'Ogg', 'ogg', 'audio/ogg', MB.OggOutputFormat && (() => new MB.OggOutputFormat())),
+    F('m4a', 'M4A', 'm4a', 'audio/mp4', () => new Mp4OutputFormat({ fastStart: 'in-memory' })),
+    F('weba', 'WebM audio', 'webm', 'audio/webm', () => new WebMOutputFormat())
+  ].filter(Boolean)
+};
+let kind = 'video';
+function fillFormats() {
+  $('fmt').innerHTML = ''; FORMATS[kind].forEach(f => $('fmt').add(new Option(f.label, f.id)));
+  $('resRow').hidden = $('muteRow').hidden = kind !== 'video';
+  $('muteRow').hidden = kind !== 'video' || !hasAudio;
+  $('kV').classList.toggle('on', kind === 'video'); $('kA').classList.toggle('on', kind === 'audio');
+}
+function setupExport() {
+  $('kA').disabled = !hasAudio; kind = 'video'; $('mute').checked = false;
+  $('res').innerHTML = ''; $('res').add(new Option('Original', 0));
+  [1080, 720, 480, 360].filter(v => v < Math.min(srcW, srcH)).forEach(v => $('res').add(new Option(v + 'p', v)));
+  fillFormats();
+}
+$('kV').onclick = () => { kind = 'video'; fillFormats(); };
+$('kA').onclick = () => { kind = 'audio'; fillFormats(); };
+$('exportBtn').onclick = () => { $('dSub').textContent = fmt(end - start); $('dlg').showModal(); };
+$('dCancel').onclick = () => $('dlg').close();
+$('dGo').onclick = () => { $('dlg').close(); exportClip({ kind, fmt: $('fmt').value, short: +$('res').value, mute: $('mute').checked }); };
+
+async function exportClip(o) {
+  if (conversion) return;
+  showError(''); video.pause(); setPlayIcon(false);
+  const f = FORMATS[o.kind].find(x => x.id === o.fmt);
+  const out = new Output({ format: f.make(), target: new BufferTarget() });
+  const src = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+  const opts = { input: src, output: out, trim: { start, end } };
+  if (o.kind === 'audio') opts.video = { discard: true };
+  else {
+    if (o.short) opts.video = srcW < srcH ? { width: o.short } : { height: o.short };
+    if (o.mute) opts.audio = { discard: true };
+  }
+  log('export', o, 'trim', start.toFixed(2), end.toFixed(2));
+  busy(o.kind === 'video' ? `Exporting ${f.label}` : `Extracting ${f.label}`, true);
+  try {
+    conversion = await Conversion.init(opts);
+    if (!conversion.isValid) throw new Error('This browser can’t encode that format (' + conversion.discardedTracks.map(d => d.reason).join(', ') + '). Try another format.');
+    conversion.onProgress = progress;
+    await conversion.execute();
+    download(new Blob([out.target.buffer], { type: f.mime }), `${file.name.replace(/\.[^.]+$/, '')}-trim.${f.ext}`);
+  } catch (e) {
+    if (e?.name !== 'ConversionCanceledError') { log('export failed', e); showError(e.message || String(e)); }
+  } finally { conversion = null; idle(); }
+}
+$('cancelBtn').onclick = () => conversion?.cancel();
+
+/* ---------- save frame (full resolution via Mediabunny) ---------- */
+$('frameBtn').onclick = async () => {
+  const t = video.currentTime; let c = null;
+  try { const sink = new CanvasSink(vTrackRef, {}); const r = await sink.getCanvas(t); c = r && r.canvas; } catch { /* use preview */ }
+  c = c || view;
+  const blob = c.convertToBlob ? await c.convertToBlob({ type: 'image/png' }) : await new Promise(r => c.toBlob(r, 'image/png'));
+  download(blob, `${file.name.replace(/\.[^.]+$/, '')}-${fmt(t).replace(':', 'm')}s.png`);
+};
+</script>
+</body>
+</html>

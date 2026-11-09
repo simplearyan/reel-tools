@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reel Dev</title>
+<script>try{var t=localStorage.getItem('reel-admin-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='17' fill='%2314121B'/%3E%3Cpath d='M16.5 13.5l11 6.5-11 6.5z' fill='%2300E0A4' stroke='%2300E0A4' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#F6ECE2;--card:#FBF6EE;--ink:#14110D;--mut:#5F584D;--line:rgba(20,17,13,.14);--acc:#0A7A5C;--mint:#00E0A4;--red:#B3261E;--t1:#F8D9C9;--t2:#D6D8F0;--t3:#C9F4E4;--t4:#EDD0DB;--t5:#E6DFD3;--f:'Hanken Grotesk',system-ui,sans-serif;--m:'JetBrains Mono',ui-monospace,monospace;color-scheme:light}
+:root[data-theme=dark]{--bg:#14121B;--card:#241F2E;--ink:#F4EFE5;--mut:#B6AFC0;--line:rgba(244,239,229,.16);--acc:#3FE9BB;--red:#FF8A80;--t1:#3A2A3F;--t2:#2B2A4D;--t3:#12372F;--t4:#392640;--t5:#2B2538;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--f)}
+.wrap{max-width:1000px;margin:0 auto;padding:20px clamp(16px,4vw,32px) 80px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800}
+.pill{font:500 11px var(--m);letter-spacing:.08em;border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--mut)}
+.sp{flex:1}
+button,.btn{font:600 14px var(--f);min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+button:hover,.btn:hover{border-color:color-mix(in srgb,var(--ink) 35%,var(--line))}
+button.p{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button.d{color:var(--red)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tab{border:0;background:transparent;color:var(--mut)}.tab[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+input,select,textarea{font:400 15px var(--f);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;width:100%}
+.bar input{max-width:300px;border-radius:999px;min-height:40px;padding:0 16px}
+.chip{border:0;background:transparent;color:var(--mut)}.chip[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.list{display:flex;flex-direction:column;gap:10px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
+.row.off{opacity:.62}
+.ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;grid-row:1/3}
+.nm{font-size:18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.nm b{font-weight:800}
+.nm code,.b{font:500 11px var(--m);color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:3px 8px}
+.tg{margin:0;color:var(--mut);font-size:14px}.tg i{color:var(--red)}
+.acts{grid-column:1/3;display:flex;gap:6px;flex-wrap:wrap;padding-top:6px}
+.acts button,.acts .btn{min-height:34px;padding:0 12px;font-size:13px}
+.empty{text-align:center;color:var(--mut);padding:48px 0}
+form.grid,.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mut);font-weight:600}
+label.w{grid-column:1/-1}label.c{flex-direction:row;align-items:center;gap:10px;color:var(--ink)}label.c input{width:auto}
+pre{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;overflow:auto;font:13px/1.6 var(--m);white-space:pre-wrap}
+dialog{border:1px solid var(--line);border-radius:26px;background:var(--bg);color:var(--ink);padding:24px;width:min(560px,94vw);max-height:92vh}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h2{margin:0 0 12px;font-size:22px}
+.foot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;max-width:92vw;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.mn{position:relative}.mn summary{list-style:none;cursor:pointer}.mn summary::-webkit-details-marker{display:none}.mn summary::after{content:"▾"}.menu{position:absolute;right:0;top:calc(100% + 6px);z-index:5;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px;display:flex;flex-direction:column;min-width:190px;box-shadow:0 12px 30px -12px rgba(0,0,0,.35)}.acts .menu button{border:0;justify-content:flex-start;border-radius:12px;min-height:38px;width:100%;background:transparent}.acts .menu button:hover{background:var(--bg)}
+.ib{width:40px;padding:0;justify-content:center}.moon{display:none}:root[data-theme=dark] .sun{display:none}:root[data-theme=dark] .moon{display:block}
+.sec{margin-bottom:26px}.sec h3{font:500 12px var(--m);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 12px}label small{font-weight:400;color:var(--mut);font-size:12px}label.c span{display:flex;flex-direction:column;gap:2px}.mut{color:var(--mut)}
+.sum{display:flex;gap:12px;margin-bottom:16px}.sum div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 18px;display:flex;flex-direction:column}.sum b{font-size:28px;font-weight:800;line-height:1.1}.sum span{color:var(--mut);font-size:13px}
+.gh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.gh h3{margin:0}.iss{list-style:none;margin:0 0 4px;padding:0;display:flex;flex-direction:column;gap:6px}.iss li{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--mut);border-radius:14px;padding:10px 14px;font-size:14px}.iss li.error{border-left-color:var(--red)}.iss li.warn{border-left-color:#C98A00}details.sec summary{cursor:pointer;font-weight:600;padding:10px 0}
+@media (min-width:760px){.row{grid-template-columns:auto 1fr auto}.acts{grid-column:auto;padding:0;justify-content:flex-end;max-width:420px}.ic{grid-row:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="logo"><svg viewBox="0 0 40 40" width="32" height="32" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="3.2"/><path d="M16.5 13.5l11 6.5-11 6.5z" fill="#00E0A4" stroke="#00E0A4" stroke-width="3" stroke-linejoin="round"/></svg>Reel</span><span class="pill">DEV</span>
+  <span class="sp"></span>
+  <button class="ib" id="themeBtn" aria-label="Switch light or dark theme" title="Light / dark"><svg class="sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg></button>
+  <a class="btn" href="/" target="_blank" rel="noopener">Open site</a>
+  <button class="p" id="newBtn">+ New app</button>
+</header>
+<nav class="tabs" id="tabs"></nav>
+<main id="main"></main>
+</div>
+<dialog id="dlg"></dialog>
+<div id="toast" role="status"></div>
+<script>
+const T='{{TOKEN}}';
+const $=(s,r=document)=>r.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const api=(p,b)=>fetch('/__api/'+p,{method:b?'POST':'GET',headers:{'x-reel-token':T,'content-type':'application/json'},body:b?JSON.stringify(b):undefined}).then(async r=>{const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.statusText);return j});
+const kb=b=>b>=1048576?(b/1048576).toFixed(1)+' MB':Math.round(b/1024)+' KB';
+let S=null,tab='apps',flt='all',q='',tt;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2800)}
+async function run(fn,ok){try{const r=await fn();if(ok)toast(typeof ok=='function'?ok(r):ok);await load()}catch(e){toast('Error: '+e.message)}}
+async function load(){const [st,ck]=await Promise.all([api('state'),api('check',{})]);S=st;S.check=ck;draw()}
+function ask(title,text,label,danger){return new Promise(res=>{const d=$('#dlg');d.innerHTML=`<h2>${esc(title)}</h2><p style="color:var(--mut);margin:0">${text}</p><div class="foot"><button value="no">Cancel</button><button class="${danger?'d':'p'}" value="yes">${esc(label)}</button></div>`;d.onclose=()=>res(d.returnValue=='yes');d.querySelectorAll('button').forEach(b=>b.onclick=()=>d.close(b.value));d.returnValue='no';d.showModal()})}
+function draw(){
+  const nTrash=S.trash.length,ce=S.check.errors.length,cw=S.check.warns.length;
+  $('#tabs').innerHTML=[['apps',`Apps (${S.apps.length})`],['site','Site'],['trash',`Trash${nTrash?' ('+nTrash+')':''}`],['check','Check'+(ce?' · '+ce+' error'+(ce>1?'s':''):cw?' · '+cw:'')]].map(([k,l])=>`<button class="tab" aria-pressed="${tab==k}" data-tab="${k}">${l}</button>`).join('');
+  ({apps:drawApps,site:drawSite,trash:drawTrash,check:drawCheck})[tab]();
+}
+function drawApps(){
+  const miss=a=>!a.meta.tagline||/^TODO/.test(a.meta.tagline);
+  const all=S.apps,list=all.filter(a=>(flt=='all'||(flt=='hidden'&&a.meta.listed===false)||(flt=='todo'&&miss(a)))&&(a.slug+' '+(a.meta.name||'')+' '+(a.meta.tagline||'')).toLowerCase().includes(q));
+  const free=flt=='all'&&!q;
+  $('#main').innerHTML=`<div class="bar"><input id="q" type="search" placeholder="Search apps" value="${esc(q)}" aria-label="Search apps">${[['all','All'],['hidden','Hidden'],['todo','Needs tagline']].map(([k,l])=>`<button class="chip" aria-pressed="${flt==k}" data-flt="${k}">${l}</button>`).join('')}<span class="sp"></span><button data-go="init" title="Fill missing app.json fields from each app">Auto-fill app.json</button></div>
+  <div class="list">${list.map((a,i)=>{const m=a.meta,hid=m.listed===false,n=all.indexOf(a);return `<article class="row ${hid?'off':''}"><span class="ic" style="background:var(--t${n%5+1})"><svg viewBox="0 0 40 40" width="26" height="26" fill="none"><circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="3.2"/><path d="M16.5 13.5l11 6.5-11 6.5z" fill="#00E0A4" stroke="#00E0A4" stroke-width="3" stroke-linejoin="round"/></svg></span>
+  <div><div class="nm"><span>${esc(m.name||a.slug)}</span><code>${esc(a.slug)}</code>${hid?'<span class="b">hidden</span>':''}${m.ads===false?'<span class="b">no ads</span>':''}${a.hasIndex?'':'<span class="b" style="color:var(--red)">no index.html</span>'}</div>
+  <p class="tg">${miss(a)?'<i>No tagline yet</i>':esc(m.tagline)} · v${a.versions+1} · ${kb(a.size)}${(m.tags||[]).length?' · '+esc(m.tags.join(', ')):''}</p></div>
+  <div class="acts" data-slug="${esc(a.slug)}"><button data-act="up" ${free&&n>0?'':'disabled'} aria-label="Move up">↑</button><button data-act="down" ${free&&n<all.length-1?'':'disabled'} aria-label="Move down">↓</button><a class="btn" href="/${esc(a.slug)}/" target="_blank" rel="noopener">Preview</a><button data-act="edit">Edit</button><details class="mn"><summary class="btn">More</summary><div class="menu"><button data-act="vis">${hid?'Show on home page':'Hide from home page'}</button><button data-act="arch" title="Save the current file as an older version">Save version</button><button class="d" data-act="del">Delete</button></div></details></div></article>`}).join('')||'<p class="empty">No apps match.</p>'}</div>`;
+}
+function drawSite(){
+  const s=S.site,f=(k,l,ph='',h='')=>`<label>${l}<input name="${k}" value="${esc(s[k])}" placeholder="${esc(ph)}">${h?`<small>${h}</small>`:''}</label>`,
+  c=(k,l,h,def=true)=>`<label class="c w"><input type="checkbox" name="${k}" ${(s[k]??def)?'checked':''}><span>${l}<small>${h}</small></span></label>`,
+  sec=(t,x)=>`<section class="sec"><h3>${t}</h3><div class="grid">${x}</div></section>`;
+  $('#main').innerHTML=`<form id="siteForm">${sec('Basics',f('name','Site name')+f('tagline','Tagline','Free tools for animation, video and sound','Shown in the browser tab and search results')+f('url','Public URL','https://you.github.io/reel','Used for canonical links and the sitemap')+f('themeColor','Browser theme colour','#14121B')+`<label class="w">Site description<textarea name="description" rows="3">${esc(s.description)}</textarea><small>Search-result text for the home page</small></label>`)}
+  ${sec('Links',f('github','GitHub repo URL')+f('kofi','Ko-fi URL')+f('twitter','Twitter / X handle','@name'))}
+  ${sec('Ads and analytics',f('adsenseClient','AdSense client','ca-pub-1234567890123456','Leave empty for no ads. Also writes ads.txt')+f('gaId','Google Analytics ID','G-XXXXXXXXXX')+c('adsOnHome','Show ads on the home page','Turn off to keep the home page ad free. Each app can still turn ads on or off in its own settings.'))}
+  ${sec('Search and sharing',f('ogImage','Social preview image','og.png or a full URL','Used when a link is shared')+f('cname','Custom domain (CNAME)','tools.example.com')+c('noindex','Hide the whole site from search engines','Adds noindex everywhere and blocks crawlers in robots.txt. Handy for a private preview.',false))}
+  ${sec('Home page and versions',f('heroId','Hero banner id','hero-v1','Change it to show the banner again to visitors who closed it')+`<label>Published older versions per app<input name="maxVersions" type="number" min="0" value="${esc(s.maxVersions||0)}"><small>0 publishes all. Set 2 to keep the site small.</small></label>`+c('publishVersions','Publish older versions','They are hidden from search and carry no ads.'))}
+  <button class="p" type="submit">Save site settings</button></form>`;
+}
+function drawTrash(){
+  $('#main').innerHTML=S.trash.length?`<div class="list">${S.trash.map(t=>`<article class="row" style="grid-template-columns:1fr auto"><div><div class="nm"><span>${esc(t.slug)}</span></div><p class="tg">Deleted ${esc(t.when.replace(/^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d).*/,'$1-$2-$3 $4:$5'))}</p></div><div class="acts" style="grid-column:auto;padding:0" data-id="${esc(t.id)}"><button class="p" data-act="restore">Restore</button><button class="d" data-act="purge">Delete forever</button></div></article>`).join('')}</div>`:'<p class="empty">Trash is empty. Deleted apps wait here until you restore or remove them.</p>';
+}
+function groupIssues(){const g={},add=(t,m)=>{const k=/^apps\/([a-z0-9-]+)/.exec(m)?.[1]||'site';(g[k]=g[k]||[]).push({t,m})};S.check.errors.forEach(m=>add('error',m));S.check.warns.forEach(m=>add('warn',m));return g}
+function reportText(){
+  const c=S.check,apps=S.apps,listed=apps.filter(a=>a.meta.listed!==false).length,L=[],mk=a=>{const m=a.meta,h=S.check.hints[a.slug]||{};return `- ${a.slug}: tagline=${JSON.stringify(/^TODO/.test(m.tagline||'')?'':m.tagline||'')}, tags=${JSON.stringify(m.tags||[])}; page title=${JSON.stringify(h.title||'')}; meta description=${JSON.stringify(h.description||'')}; first heading=${JSON.stringify(h.h1||'')}`};
+  L.push('# Reel repo check report',`Generated by Reel Dev on ${new Date().toISOString().slice(0,10)}`,'','## Context','This is a static site built from single-file HTML apps. Each app is apps/<slug>/index.html with metadata in apps/<slug>/app.json (name, tagline, description, tags, status, listed, ads, order). Older versions live in apps/<slug>/versions/vN.html. Site settings are in site.json. `node scripts/build.mjs` builds dist/ and a GitHub Action deploys it to GitHub Pages.','','## Summary',`- ${apps.length} apps (${listed} listed, ${apps.length-listed} hidden), ${kb(apps.reduce((n,a)=>n+a.size,0))} in latest files`,`- ${c.errors.length} errors, ${c.warns.length} warnings`,'');
+  if(c.errors.length)L.push('## Errors',...c.errors.map(x=>'- '+x),'');
+  if(c.warns.length)L.push('## Warnings',...c.warns.map(x=>'- '+x),'');
+  const need=apps.filter(a=>S.check.hints[a.slug]);
+  if(need.length)L.push('## Apps missing a tagline, description or tags',...need.map(mk),'');
+  L.push('## site.json',JSON.stringify(S.site,null,2),'','## What I need help with','1. Explain how to fix each error and warning above.','2. For every app under "Apps missing a tagline, description or tags", suggest a tagline (max 90 characters), a description (max 160 characters) and 2 to 4 lowercase tags.','3. Reply with one JSON object I can paste back: {"<slug>": {"tagline": "...", "description": "...", "tags": ["..."]}}');
+  return L.join('\n');
+}
+function drawCheck(){
+  const c=S.check,g=groupIssues(),keys=Object.keys(g).sort((a,b)=>a=='site'?-1:b=='site'?1:a.localeCompare(b)),ok=!c.errors.length&&!c.warns.length;
+  $('#main').innerHTML=`<div class="sum"><div><b>${c.errors.length}</b><span>errors</span></div><div><b>${c.warns.length}</b><span>warnings</span></div><div><b>${c.checked}</b><span>apps checked</span></div></div>
+  <div class="bar"><button class="p" id="copyAI">Copy results for AI</button><button id="rerun">Re-run checks</button><span class="sp"></span><small class="mut">Checks run automatically after every change</small></div>
+  ${ok?'<p class="empty">All good. Nothing to fix.</p>':keys.map(k=>{const app=S.apps.find(a=>a.slug==k);return `<section class="sec"><div class="gh"><h3>${k=='site'?'Site and repo':esc(app?.meta.name||k)}</h3>${k=='site'?'<button data-tab="site">Open site settings</button>':app?`<span class="acts" data-slug="${esc(k)}" style="padding:0"><button data-act="edit">Fix in Edit</button></span>`:''}</div><ul class="iss">${g[k].map(i=>`<li class="${i.t}">${esc(i.m.replace(/^apps\/[a-z0-9-]+[^:]*:\s*/,''))}</li>`).join('')}</ul></section>`}).join('')}
+  <details class="sec"><summary>Preview the text that gets copied</summary><pre>${esc(reportText())}</pre></details>
+  <details class="sec"><summary>Paste the AI's answer to apply it</summary><p class="tg mut">Paste JSON like {"cutout-studio":{"tagline":"...","description":"...","tags":["animation"]}}. Only tagline, description, tags, name and title are applied.</p><textarea id="aiIn" rows="6" placeholder="Paste JSON here"></textarea><div class="foot" style="justify-content:flex-start"><button class="p" id="aiApply">Apply to app.json files</button></div></details>`;
+}
+async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch{const a=document.createElement('textarea');a.value=t;document.body.append(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch{}a.remove();return ok}}
+function editDlg(slug){
+  const a=S.apps.find(x=>x.slug==slug),m=a.meta,d=$('#dlg'),v=(k)=>esc(m[k]);
+  d.innerHTML=`<h2>Edit ${esc(m.name||slug)}</h2><form class="grid" id="editForm"><label>Name<input name="name" value="${v('name')}"></label><label>Status<select name="status">${['stable','beta','new','lab','draft'].map(s=>`<option ${m.status==s?'selected':''}>${s}</option>`).join('')}</select></label><label class="w">Tagline (one line on the home page)<input name="tagline" value="${/^TODO/.test(m.tagline||'')?'':v('tagline')}"></label><label class="w">Description (search results)<textarea name="description" rows="3">${/^TODO/.test(m.description||'')?'':v('description')}</textarea></label><label class="w">Tags (comma separated)<input name="tags" value="${esc((m.tags||[]).join(', '))}"></label><label class="w">Search title (optional)<input name="title" value="${v('title')}"><small>Leave empty to build it from the name and tagline</small></label><label>Social preview image<input name="image" value="${v('image')}" placeholder="og.png or a URL"></label><label>Icon<input name="icon" value="${v('icon')}" placeholder="icon.svg"></label><label class="c"><input type="checkbox" name="listed" ${m.listed!==false?'checked':''}>Listed on the home page</label><label class="c"><input type="checkbox" name="ads" ${m.ads!==false?'checked':''}>Show ads on this app</label><div class="foot w" style="grid-column:1/-1"><button type="button" id="cx">Cancel</button><button class="p" type="submit">Save</button></div></form>`;
+  $('#cx').onclick=()=>d.close();
+  $('#editForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);d.close();run(()=>api('app',{slug,patch:{name:f.get('name'),status:f.get('status'),tagline:f.get('tagline'),description:f.get('description'),tags:f.get('tags'),title:f.get('title'),image:f.get('image'),icon:f.get('icon'),listed:f.has('listed'),ads:f.has('ads')}}),'Saved')};
+  d.onclose=null;d.showModal();
+}
+function newDlg(){
+  const d=$('#dlg');d.innerHTML=`<h2>New app</h2><form class="grid" id="newForm"><label>Name<input name="name" placeholder="My Tool" required></label><label>Folder name<input name="slug" placeholder="my-tool" pattern="[a-z0-9][a-z0-9\\-]*" required></label><div class="foot w" style="grid-column:1/-1"><button type="button" id="cx">Cancel</button><button class="p" type="submit">Create</button></div></form>`;
+  const n=$('[name=name]',d),s=$('[name=slug]',d);n.oninput=()=>{if(!s.dataset.t)s.value=n.value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')};s.oninput=()=>s.dataset.t=1;
+  $('#cx').onclick=()=>d.close();$('#newForm').onsubmit=e=>{e.preventDefault();d.close();run(()=>api('new',{slug:s.value,name:n.value}),'Created. Edit apps/'+s.value+'/index.html');};d.onclose=null;d.showModal();
+}
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-tab]');if(t){tab=t.dataset.tab;draw();return}
+  const f=e.target.closest('[data-flt]');if(f){flt=f.dataset.flt;draw();return}
+  if(e.target.closest('#newBtn')){newDlg();return}
+  if(e.target.closest('#themeBtn')){const r=document.documentElement,n=r.dataset.theme=='dark'?'light':'dark';r.dataset.theme=n;try{localStorage.setItem('reel-admin-theme',n)}catch(x){}return}
+  if(e.target.closest('#copyAI')){toast(await copyText(reportText())?'Copied. Paste it into your AI chat.':'Could not copy. Open the preview below and copy it by hand.');return}
+  if(e.target.closest('#rerun')){run(async()=>{},'Checked again');return}
+  if(e.target.closest('#aiApply')){let o;try{o=JSON.parse($('#aiIn').value.replace(/^\s*```(?:json)?|```\s*$/g,'').trim())}catch{toast('That is not valid JSON');return}
+    const ks=Object.keys(o).filter(k=>S.apps.some(a=>a.slug==k));if(!ks.length){toast('No matching app names in that JSON');return}
+    if(!await ask('Apply to '+ks.length+' apps?','This updates tagline, description and tags in their app.json files.','Apply'))return;
+    run(async()=>{for(const k of ks){const p={};for(const f of ['name','title','tagline','description','tags'])if(f in o[k])p[f]=o[k][f];await api('app',{slug:k,patch:p})}},'Updated '+ks.length+' apps');return}
+  if(e.target.closest('#runCheck')){$('#out').textContent='Checking...';try{$('#out').textContent=(await api('validate',{})).output}catch(er){toast('Error: '+er.message)}return}
+  if(e.target.closest('[data-go=init]')){run(()=>api('init',{}),r=>'Auto-fill done');return}
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const box=b.closest('[data-slug],[data-id]'),slug=box.dataset.slug,id=box.dataset.id,act=b.dataset.act,a=slug&&S.apps.find(x=>x.slug==slug);
+  if(act=='edit')return editDlg(slug);
+  if(act=='vis')return run(()=>api('app',{slug,patch:{listed:a.meta.listed===false}}),a.meta.listed===false?'Now shown on the home page':'Hidden from the home page');
+  if(act=='arch')return run(()=>api('archive',{slug}),r=>r.message);
+  if(act=='up'||act=='down'){const s=S.apps.map(x=>x.slug),i=s.indexOf(slug),j=act=='up'?i-1:i+1;[s[i],s[j]]=[s[j],s[i]];return run(()=>api('reorder',{slugs:s}),null)}
+  if(act=='del'&&await ask('Delete '+(a.meta.name||slug)+'?','It moves to the Trash tab, so you can restore it later. It disappears from the site on the next build.','Move to trash',true))return run(()=>api('delete',{slug}),'Moved to trash');
+  if(act=='restore')return run(()=>api('restore',{id}),'Restored');
+  if(act=='purge'&&await ask('Delete forever?','This permanently removes the files. It cannot be undone.','Delete forever',true))return run(()=>api('purge',{id}),'Deleted forever');
+});
+document.addEventListener('input',e=>{if(e.target.id=='q'){q=e.target.value.trim().toLowerCase();const p=e.target.selectionStart;drawApps();const n=$('#q');n.focus();n.setSelectionRange(p,p)}});
+document.addEventListener('submit',e=>{if(e.target.id=='siteForm'){e.preventDefault();const f=new FormData(e.target),p={};for(const [k,v] of f)p[k]=v;for(const k of ['publishVersions','adsOnHome','noindex'])p[k]=f.has(k);run(()=>api('site',{patch:p}),'Site settings saved')}});
+load().catch(e=>{$('#main').innerHTML='<p class="empty">Could not load: '+esc(e.message)+'</p>'});
+</script>
+</body>
+</html>

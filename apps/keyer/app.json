@@ -1,0 +1,14 @@
+{
+  "name": "Keyer",
+  "slug": "keyer",
+  "tagline": "remove video backgrounds",
+  "description": "remove video backgrounds",
+  "icon": "icon.svg",
+  "tags": [
+    "video",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

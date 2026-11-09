@@ -1,0 +1,16 @@
+{
+  "name": "Reel",
+  "url": "https://YOUR-NAME.github.io/reel",
+  "tagline": "Free tools for animation, video and sound",
+  "description": "Reel is a family of free, open-source browser tools for animation, video and sound editing. No install, no account.",
+  "github": "https://github.com/YOUR-NAME/reel",
+  "kofi": "https://ko-fi.com/simplearyan",
+  "adsenseClient": "",
+  "gaId": "",
+  "ogImage": "",
+  "twitter": "",
+  "cname": "",
+  "themeColor": "#14121B",
+  "heroId": "hero-v1",
+  "publishVersions": true
+}

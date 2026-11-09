@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voice Match</title>
+<style>
+:root{--bg:#f6f7f5;--card:#fff;--ink:#1b2321;--mute:#6b7773;--line:#dfe4e1;--accent:#0f7b6c;--ok:#c2410c;--btn:#0f7b6c;--btnink:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121816;--card:#1a2220;--ink:#e8eeec;--mute:#93a19c;--line:#2b3733;--accent:#4fd1b8;--ok:#fb923c;--btn:#4fd1b8;--btnink:#08201b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121816;--card:#1a2220;--ink:#e8eeec;--mute:#93a19c;--line:#2b3733;--accent:#4fd1b8;--ok:#fb923c;--btn:#4fd1b8;--btnink:#08201b;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif}
+main{max-width:820px;margin:0 auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+h1{font-size:1.35rem;margin:0;font-weight:650;letter-spacing:-.01em}
+button,select,input[type=text]{font:inherit;color:inherit}
+.ic{background:none;border:1px solid var(--line);border-radius:10px;width:40px;height:40px;cursor:pointer}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tabs button{background:none;border:0;padding:10px 14px;cursor:pointer;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--ink);border-color:var(--accent);font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.zone{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:14px}
+.zone label{display:block;cursor:pointer}.zone b{display:block}.zone span{color:var(--mute);font-size:.9rem;word-break:break-all}
+audio{width:100%;margin-top:10px;height:36px}
+.btn{background:var(--btn);color:var(--btnink);border:0;border-radius:10px;padding:11px 18px;font-weight:600;cursor:pointer;margin:14px 0 6px}
+.btn:disabled{opacity:.4;cursor:not-allowed}.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line);margin:0}
+.mute{color:var(--mute);font-size:.9rem;min-height:1.4em}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+canvas{width:100%;height:190px;display:block}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--mute);margin-top:6px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.stats{display:flex;gap:20px;flex-wrap:wrap;margin:12px 0}.stats div{font-size:.85rem;color:var(--mute)}.stats strong{display:block;font-size:1.15rem;color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+input[type=text],select{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0;flex:1}
+details{margin-top:14px;font-size:.92rem}summary{cursor:pointer;color:var(--mute)}
+.opt{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-top:10px}
+@media(max-width:600px){.opt{grid-template-columns:1fr}}
+.opt label{display:flex;flex-direction:column;gap:2px;font-size:.88rem;color:var(--mute)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+table{border-collapse:collapse;margin-top:8px;font-size:.85rem}td,th{padding:3px 14px 3px 0;text-align:left}th{color:var(--mute);font-weight:500}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style></head><body><main>
+<header><h1>Voice Match</h1><button class="ic" id="th" aria-label="Toggle theme">◐</button></header>
+<div class="tabs"><button class="on" data-t="learn">Learn</button><button data-t="apply">Apply</button></div>
+
+<section id="learn">
+<div class="grid"><div class="zone" id="zA"></div><div class="zone" id="zB"></div></div>
+<button class="btn" id="go" disabled>Match voices</button>
+<div class="mute" id="st">Import the same script spoken by two voices.</div>
+<div class="panel" id="res" hidden>
+<canvas id="cv"></canvas>
+<div class="leg"><span><i style="background:var(--accent)"></i>Reference pitch</span><span><i style="background:var(--mute)"></i>Source pitch</span><span><i style="background:var(--ok)"></i>Result pitch</span></div>
+<div class="stats" id="stats"></div>
+<audio id="au1" controls></audio>
+<div class="row"><a id="dl1" download="matched.wav"><button class="btn ghost">Download WAV</button></a>
+<input type="text" id="pn" placeholder="Profile name"><button class="btn ghost" id="sv">Save profile</button></div>
+<details><summary>Alignment table</summary><table id="tb"></table></details>
+</div></section>
+
+<section id="apply" hidden>
+<div class="row"><select id="ps"></select></div>
+<div class="zone" id="zC" style="margin-top:12px"></div>
+<label class="mute" style="display:block;margin-top:12px"><input type="checkbox" id="nat"> De-robotize AI voice (natural pitch and timing drift)</label>
+<button class="btn" id="go2" disabled>Convert</button>
+<div class="mute" id="st2">Works with any recording, including AI-generated voices.</div>
+<div class="panel" id="res2" hidden><div class="stats" id="stats2"></div><audio id="au2" controls></audio>
+<div class="row"><a id="dl2" download="converted.wav"><button class="btn ghost">Download WAV</button></a></div></div>
+</section>
+
+<details><summary>Options</summary><div class="opt">
+<label>Pitch match <input type="range" id="pm" value="100"></label>
+<label>Tone match <input type="range" id="tm" value="100"></label>
+<label>Human realism <input type="range" id="hu" value="40"></label>
+<label>Room <input type="range" id="rm" value="15"></label>
+<label>Leveling &amp; de-ess <input type="range" id="lv" value="50"></label>
+<label><span><input type="checkbox" id="tim" checked> Match timing</span></label></div></details>
+</main>
+<script>
+const $=s=>document.querySelector(s),tick=()=>new Promise(r=>setTimeout(r,15));
+const AC=new(window.AudioContext||window.webkitAudioContext)(),NB=16,S={};let last=null,lastProf=null;
+// ---------- UI ----------
+$('#th').onclick=()=>{const r=document.documentElement,d=(r.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))==='dark';r.dataset.theme=d?'light':'dark';draw()};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));$('#learn').hidden=b.dataset.t!=='learn';$('#apply').hidden=b.dataset.t!=='apply'});
+function zone(id,title,key,cb){const z=$(id);z.innerHTML=`<label><b>${title}</b><span>Tap to import audio</span><input type="file" accept="audio/*" hidden></label><audio controls hidden></audio>`;
+z.querySelector('input').onchange=async e=>{const f=e.target.files[0];if(!f)return;const sp=z.querySelector('span');sp.textContent='Decoding…';
+try{const ab=await AC.decodeAudioData(await f.arrayBuffer()),ch=ab.numberOfChannels,n=Math.min(ab.length,ab.sampleRate*45),x=new Float32Array(n);
+for(let c=0;c<ch;c++){const d=ab.getChannelData(c);for(let i=0;i<n;i++)x[i]+=d[i]/ch}
+S[key]={x,sr:ab.sampleRate};sp.textContent=`${f.name} · ${(n/ab.sampleRate).toFixed(1)}s`;const a=z.querySelector('audio');a.src=URL.createObjectURL(f);a.hidden=false;cb()}catch(err){sp.textContent='Could not read this file. Try WAV, MP3 or M4A.'}}}
+zone('#zA','Reference voice','A',chk);zone('#zB','Source voice','B',chk);zone('#zC','Audio to convert','C',()=>$('#go2').disabled=false);
+function chk(){$('#go').disabled=!(S.A&&S.B)}
+const opt=()=>({p:$('#pm').value/100,t:$('#tm').value/100,h:$('#hu').value/100,r:$('#rm').value/100,tim:$('#tim').checked,lv:$('#lv').value/100,nat:$('#nat').checked});
+// ---------- DSP ----------
+function fft(re,im){const n=re.length;for(let i=1,j=0;i<n;i++){let b=n>>1;for(;j&b;b>>=1)j^=b;j^=b;if(i<j){[re[i],re[j]]=[re[j],re[i]];[im[i],im[j]]=[im[j],im[i]]}}
+for(let l=2;l<=n;l<<=1){const a=-2*Math.PI/l,wr=Math.cos(a),wi=Math.sin(a),h=l>>1;for(let i=0;i<n;i+=l){let cr=1,ci=0;for(let k=0;k<h;k++){const u=i+k,v=u+h,tr=re[v]*cr-im[v]*ci,ti=re[v]*ci+im[v]*cr;re[v]=re[u]-tr;im[v]=im[u]-ti;re[u]+=tr;im[u]+=ti;const t=cr*wr-ci*wi;ci=cr*wi+ci*wr;cr=t}}}}
+const hann=n=>Float32Array.from({length:n},(_,i)=>.5-.5*Math.cos(2*Math.PI*i/n));
+const edges=sr=>Array.from({length:NB+1},(_,i)=>100*Math.pow(Math.min(14000,sr*.47)/100,i/NB));
+function yin(y,s,sr2){const W=512,t0=Math.floor(sr2/400),t1=Math.ceil(sr2/70);if(s<0||s+W+t1>=y.length)return 0;const d=new Float32Array(t1+2);let run=0;
+for(let t=1;t<=t1;t++){let a=0;for(let i=0;i<W;i+=2){const q=y[s+i]-y[s+i+t];a+=q*q}run+=a;d[t]=a*t/(run||1)}
+for(let t=Math.max(2,t0);t<t1;t++)if(d[t]<.15){while(t+1<t1&&d[t+1]<d[t])t++;const a=d[t-1],b=d[t],c=d[t+1],den=2*(a-2*b+c);return sr2/(t+(den?(a-c)/den:0))}return 0}
+function analyze(x,sr){const N=2048,hop=Math.round(sr*.02),nf=Math.max(2,Math.floor((x.length-N)/hop)),ed=edges(sr),re=new Float32Array(N),im=new Float32Array(N),hw=hann(N),feat=[],rms=new Float32Array(nf);
+for(let f=0;f<nf;f++){let s=0;for(let i=0;i<N;i++){const q=x[f*hop+i]||0;re[i]=q*hw[i];im[i]=0;s+=q*q}rms[f]=Math.sqrt(s/N);fft(re,im);const v=new Float32Array(NB);
+for(let b=0;b<NB;b++){const lo=Math.max(1,Math.floor(ed[b]*N/sr)),hi=Math.max(lo+1,Math.floor(ed[b+1]*N/sr));let e=0;for(let k=lo;k<hi;k++)e+=re[k]*re[k]+im[k]*im[k];v[b]=10*Math.log10(e/(hi-lo)+1e-9)}feat.push(v)}
+const th=.12*Math.max(...rms),act=Array.from(rms,v=>v>th),avg=new Float32Array(NB);let ac=0;
+act.forEach((a,f)=>{if(a){ac++;for(let b=0;b<NB;b++)avg[b]+=feat[f][b]}});for(let b=0;b<NB;b++)avg[b]/=Math.max(1,ac);
+const d=Math.max(1,Math.round(sr/11025)),y=new Float32Array(Math.floor(x.length/d));for(let i=0;i<y.length;i++){let s=0;for(let k=0;k<d;k++)s+=x[i*d+k];y[i]=s/d}
+const f0=new Float32Array(nf);for(let f=0;f<nf;f++)if(act[f])f0[f]=yin(y,Math.floor((f*hop+N/2)/d)-256,sr/d);
+const lf=Array.from(f0).filter(v=>v>0).map(Math.log).sort((a,b)=>a-b),m=lf.length?lf[lf.length>>1]:Math.log(150),sd=Math.sqrt(lf.reduce((s,v)=>s+(v-m)**2,0)/Math.max(1,lf.length))||.1;
+return{feat,rms,act,ac,nf,hop,f0,avg,med:Math.exp(m),sd}}
+function dtw(fa,fb){const n=fa.length,m=fb.length,W=m+1,D=new Float32Array((n+1)*W).fill(Infinity),T=new Uint8Array((n+1)*W);D[0]=0;
+for(let i=1;i<=n;i++)for(let j=1;j<=m;j++){let c=0;const a=fa[i-1],b=fb[j-1];for(let k=0;k<NB;k++)c+=Math.abs(a[k]-b[k]);c/=NB;let t=0,v=D[(i-1)*W+j-1];const u=D[(i-1)*W+j],l=D[i*W+j-1];if(u<v){v=u;t=1}if(l<v){v=l;t=2}D[i*W+j]=c+v;T[i*W+j]=t}
+const p=[];let i=n,j=m;while(i>0&&j>0){p.push([i-1,j-1]);const t=T[i*W+j];if(t==0){i--;j--}else if(t==1)i--;else j--}return p.reverse()}
+function fillSmooth(a,def){const n=a.length,k=[];for(let i=0;i<n;i++)if(!isNaN(a[i]))k.push(i);const o=new Float32Array(n);if(!k.length)return o.fill(def);let p=0;
+for(let i=0;i<n;i++){while(p<k.length-1&&k[p+1]<=i)p++;const l=k[p],r=k[Math.min(p+1,k.length-1)];o[i]=i<=k[0]?a[k[0]]:i>=k[k.length-1]?a[k[k.length-1]]:a[l]+(a[r]-a[l])*(i-l)/Math.max(1,r-l)}
+return smooth(o,5)}
+function smooth(o,w){const n=o.length,s=new Float32Array(n);for(let i=0;i<n;i++){let t=0;for(let j=-w;j<=w;j++)t+=o[Math.min(n-1,Math.max(0,i+j))];s[i]=t/(2*w+1)}return s}
+const at=(a,i)=>{i=Math.max(0,Math.min(a.length-1,i));const k=Math.floor(i);return a[k]+(a[Math.min(a.length-1,k+1)]-a[k])*(i-k)}, mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+function eqFrom(a,b){const g=Array.from(a,(v,k)=>v-b[k]),m=mean(g);return Array.from(smooth(Float32Array.from(g.map(v=>Math.max(-9,Math.min(9,v-m)))),1))}
+function score(p,q){const mp=mean(p),mq=mean(q);let s=0;for(let k=0;k<NB;k++)s+=Math.abs(p[k]-mp-(q[k]-mq));return Math.max(0,Math.round(100-s/NB*6))}
+// TD-PSOLA: 2-period grains keep each voice's formants while pitch moves; unvoiced speech is copied at 8 ms hops
+function psola(x,sr,o){const out=new Float32Array(o.outLen+4096);let t=0,jit=0;
+while(t<o.outLen){const ts=o.srcAt(t/sr),f=o.f0At(ts),r=f?o.ratioAt(ts):1,T=f?sr/f:sr*.008,ti=Math.round(t);let c=Math.round(ts*sr);
+if(f){let b=-1e9,bi=c;for(let i=Math.round(-T/2);i<=T/2;i++){const v=x[c+i];if(v>b){b=v;bi=c+i}}c=bi}
+jit=Math.max(-.003,Math.min(.003,jit*.9+(Math.random()-.5)*.001*o.h));const L=Math.max(8,Math.round(T)),g=(1+(Math.random()-.5)*.03*o.h)/r;
+for(let i=-L;i<L;i++){const p=c+i,q=ti+i;if(p>=0&&p<x.length&&q>=0)out[q]+=x[p]*g*(.5+.5*Math.cos(Math.PI*i/L))}
+t+=T/r*(1+jit)}return out}
+// time-varying tone matching: STFT, per-band dB gain for each frame
+function shape(y,sr,gainAt,t){if(!t)return;const N=1024,H=512,w=Float32Array.from({length:N},(_,i)=>Math.sin(Math.PI*i/N)),ed=edges(sr),re=new Float32Array(N),im=new Float32Array(N),out=new Float32Array(y.length),pos=new Float32Array(N/2+1);let end=0;
+for(let k=0;k<=N/2;k++)pos[k]=Math.max(0,Math.min(NB-1,Math.log(Math.max(k*sr/N,100)/100)/Math.log(ed[NB]/100)*NB-.5));
+for(let o=0;o+N<=y.length;o+=H){const g=gainAt((o+N/2)/sr);for(let i=0;i<N;i++){re[i]=y[o+i]*w[i];im[i]=0}fft(re,im);
+for(let k=0;k<=N/2;k++){const p=pos[k],a=Math.floor(p),f=Math.pow(10,t*(g[a]+(g[Math.min(NB-1,a+1)]-g[a])*(p-a))/20);re[k]*=f;im[k]*=f;if(k>0&&k<N/2){re[N-k]*=f;im[N-k]*=f}}
+for(let i=0;i<N;i++)im[i]=-im[i];fft(re,im);for(let i=0;i<N;i++)out[o+i]+=re[i]/N*w[i];end=o+N}
+for(let i=end;i<y.length;i++)out[i]=y[i];y.set(out)}
+// slow automatic leveling toward the median speech loudness
+function level(y,sr,s){if(!s)return;const B=Math.round(sr*.02),nb=Math.floor(y.length/B),e=new Float32Array(nb);for(let b=0;b<nb;b++){let q=0;for(let i=0;i<B;i++)q+=y[b*B+i]**2;e[b]=Math.sqrt(q/B)}
+const mx=Math.max(...e),act=Array.from(e).filter(v=>v>.1*mx).sort((a,b)=>a-b),tg=act[act.length>>1]||mx,sg=smooth(Float32Array.from(e,v=>v>.1*mx?Math.pow(Math.max(.5,Math.min(2,tg/v)),s):1),5);
+for(let b=0;b<nb;b++)for(let i=0;i<B;i++)y[b*B+i]*=sg[b]}
+// de-esser: compress only the band above ~5 kHz when it spikes
+function deess(y,sr,s){if(!s)return;const n=y.length,a=Math.exp(-2*Math.PI*5500/sr),hp=new Float32Array(n),env=new Float32Array(n);let l1=0,l2=0,e=0,sum=0,c=0;
+for(let i=0;i<n;i++){l1=(1-a)*y[i]+a*l1;l2=(1-a)*l1+a*l2;hp[i]=y[i]-l2;e=e*.99+Math.abs(hp[i])*.01;env[i]=e;if(e>1e-4){sum+=e;c++}}
+const thr=2.5*sum/Math.max(1,c);for(let i=0;i<n;i++){const g=env[i]>thr?thr/env[i]:1;y[i]=y[i]-hp[i]*(1-g)*s}}
+// room estimate: slowest speech-offset decays set the reverb time
+function rt60(rms){const db=Array.from(rms,v=>20*Math.log10(v+1e-6)),sl=[];for(let i=0;i<db.length-8;i++){let j=i;while(j+1<db.length&&db[j+1]<db[j])j++;const d=db[i]-db[j];if(j-i>=5&&d>=8&&d<=40)sl.push(d/((j-i)*.02));i=j}
+sl.sort((a,b)=>a-b);return Math.max(.15,Math.min(1.4,60/(sl.length?sl[sl.length>>2]:200)))}
+const wob=A=>{const p=[0,1,2].map(()=>Math.random()*6.283),f=[.35,.8,1.6];return t=>A*(Math.sin(6.283*f[0]*t+p[0])+Math.sin(6.283*f[1]*t+p[1])+Math.sin(6.283*f[2]*t+p[2]))/3};
+function plan(an,o,srcAt,rs,gainAt,rt,outLen,sr){const c0=1024/sr,hopT=an.hop/sr,nw=o.nat?wob(1):()=>0,tw=o.nat?wob(.03):()=>0;
+return{outLen,srcAt:t=>srcAt(t)+tw(t),f0At:ts=>{const i=Math.round((ts-c0)/hopT);return an.f0[i]||an.f0[i-1]||an.f0[i+1]||0},ratioAt:ts=>Math.max(.5,Math.min(2,Math.exp(o.p*at(rs,(ts-c0)/hopT))*Math.pow(2,nw(ts)/12))),gainAt,t:o.t,h:o.h,r:o.r,lv:o.lv,rt}}
+function humanize(y,sr,h){const B=Math.round(sr*.01),nb=Math.floor(y.length/B),env=new Float32Array(nb);
+for(let b=0;b<nb;b++){let s=0;for(let i=0;i<B;i++)s+=y[b*B+i]**2;env[b]=Math.sqrt(s/B)}const mx=Math.max(...env),th=.03*mx,noise=new Float32Array(y.length);let pv=0;
+for(let i=0;i<y.length;i++){const n=Math.random()-.5;noise[i]=n-pv;pv=n}
+let e=0;for(let i=0;i<y.length;i++){e=e*.995+Math.abs(y[i])*.005;y[i]+=noise[i]*e*.25*h}
+let st=-1;for(let b=0;b<=nb;b++){const q=b<nb&&env[b]<th;if(q&&st<0)st=b;if(!q&&st>=0){const len=b-st;
+if(st>0&&len>=25){const bl=Math.min(len-8,40),s0=(b-8-bl)*B;let l1=0,l2=0;for(let i=0;i<bl*B;i++){const n=Math.random()-.5;l1+=.4*(n-l1);l2+=.03*(n-l2);const sn=Math.sin(Math.PI*i/(bl*B));y[s0+i]+=(l1-l2)*3*mx*h*sn*sn}}
+if(st>0&&len>=8)for(let i=0;i<sr*.003;i++)y[b*B+i]+=(Math.random()-.5)*.25*mx*h*Math.exp(-i/(sr*.0008));st=-1}}}
+async function render(x,sr,o){let y=psola(x,sr,o);if(o.h>0)humanize(y,sr,o.h);shape(y,sr,o.gainAt,o.t);level(y,sr,o.lv);deess(y,sr,o.lv);
+const L=y.length+Math.round(sr*Math.min(1.6,o.rt*1.2+.05)),oc=new OfflineAudioContext(1,L,sr),b=oc.createBuffer(1,L,sr);b.copyToChannel(y,0);const s=oc.createBufferSource();s.buffer=b;let node=s;const ed=edges(sr);
+
+node.connect(oc.destination);if(o.r>0){const il=Math.floor(sr*Math.min(1.6,o.rt*1.2)),ir=oc.createBuffer(1,il,sr),d=ir.getChannelData(0);for(let i=0;i<il;i++)d[i]=(Math.random()*2-1)*Math.pow(10,-3*i/(sr*o.rt));
+const cv=oc.createConvolver();cv.buffer=ir;const gw=oc.createGain();gw.gain.value=o.r*.6;node.connect(cv);cv.connect(gw);gw.connect(oc.destination)}
+s.start();const r=await oc.startRendering(),d=r.getChannelData(0);let pk=0;for(let i=0;i<d.length;i++)pk=Math.max(pk,Math.abs(d[i]));for(let i=0;i<d.length;i++)d[i]*=.89/(pk||1);return r}
+function wav24(buf){const x=buf.getChannelData(0),n=x.length,b=new DataView(new ArrayBuffer(44+n*3)),w=(o,s)=>[...s].forEach((c,i)=>b.setUint8(o+i,c.charCodeAt(0)));
+w(0,'RIFF');b.setUint32(4,36+n*3,true);w(8,'WAVEfmt ');b.setUint32(16,16,true);b.setUint16(20,1,true);b.setUint16(22,1,true);b.setUint32(24,buf.sampleRate,true);b.setUint32(28,buf.sampleRate*3,true);b.setUint16(32,3,true);b.setUint16(34,24,true);w(36,'data');b.setUint32(40,n*3,true);
+for(let i=0;i<n;i++){const v=Math.round(Math.max(-1,Math.min(1,x[i]))*8388607);b.setUint8(44+i*3,v&255);b.setUint8(45+i*3,(v>>8)&255);b.setUint8(46+i*3,(v>>16)&255)}return new Blob([b],{type:'audio/wav'})}
+// ---------- Learn ----------
+const stat=(el,items)=>el.innerHTML=items.map(([l,v])=>`<div>${l}<strong>${v}</strong></div>`).join('');
+const show=(au,dl,buf)=>{const u=URL.createObjectURL(wav24(buf));au.src=u;dl.href=u};
+$('#go').onclick=async()=>{const A=S.A,B=S.B,o=opt(),st=$('#st');$('#go').disabled=true;
+try{st.textContent='Analyzing both voices…';await tick();const a=analyze(A.x,A.sr),b=analyze(B.x,B.sr),c0=1024/A.sr,hopT=a.hop/A.sr;
+const nrm=(q,av)=>q.feat.map(v=>v.map((z,k)=>z-av[k])),fa=nrm(a,a.avg),fb=nrm(b,b.avg);
+st.textContent='Aligning timing (DTW)…';await tick();const path=dtw(fa,fb);
+const sm=new Float64Array(a.nf),ct=new Float64Array(a.nf),ls=new Float64Array(b.nf),lc=new Float64Array(b.nf);
+path.forEach(([i,j])=>{sm[i]+=j;ct[i]++;if(a.f0[i]>0&&b.f0[j]>0){ls[j]+=Math.log(a.f0[i]/b.f0[j]);lc[j]++}});
+let mp=smooth(Float32Array.from(sm,(v,i)=>ct[i]?v/ct[i]:0),3);for(let i=1;i<mp.length;i++)mp[i]=Math.max(mp[i],mp[i-1]);
+const rs=fillSmooth(Float32Array.from(ls,(v,j)=>lc[j]?v/lc[j]:NaN),Math.log(a.med/b.med)),eq=eqFrom(a.avg,b.avg);
+st.textContent='Rendering…';await tick();
+const srcAt=o.tim?t=>at(mp,(t-c0)/hopT)*hopT+c0:t=>t,outLen=o.tim?A.x.length:B.x.length;
+const gm=a.feat.map((v,i)=>{const bv=b.feat[Math.round(mp[i])],g=Array.from(v,(q,k)=>q-bv[k]),m=mean(g);return g.map(z=>Math.max(-9,Math.min(9,z-m)))});
+for(let k=0;k<NB;k++){const col=smooth(Float32Array.from(gm,r=>r[k]),6);gm.forEach((r,i)=>r[k]=col[i])}
+const rt=rt60(a.rms),res=await render(B.x,B.sr,plan(b,o,srcAt,rs,o.tim?t=>gm[Math.max(0,Math.min(gm.length-1,Math.round((t-c0)/hopT)))]:()=>eq,rt,outLen,B.sr));
+const ra=analyze(res.getChannelData(0),res.sampleRate),sB=score(a.avg,b.avg),sR=score(a.avg,ra.avg);
+lastProf={rt,medA:a.med,medB:b.med,k:Math.max(.5,Math.min(1.8,a.sd/b.sd)),eq,speed:Math.max(.6,Math.min(1.6,a.ac/b.ac))};
+const bf=new Float32Array(a.nf);for(let i=0;i<a.nf;i++)bf[i]=b.f0[Math.round(mp[i])]||0;
+last={med:a.med,lines:[[a.f0,'--accent'],[bf,'--mute'],[ra.f0,'--ok']]};$('#res').hidden=false;draw();
+stat($('#stats'),[['Timing',((outLen/B.x.length-1)*100).toFixed(1)+'%'],['Pitch shift',(a.med-b.med>0?'+':'')+(a.med-b.med).toFixed(0)+' Hz'],['Tone match',sB+' → '+sR]]);
+show($('#au1'),$('#dl1'),res);$('#pn').value=$('#pn').value||'Voice '+(loadP().length+1);
+const rows=[0,1,2,3,4,5].map(k=>{const i=Math.round(k*(a.nf-1)/5);return`<tr><td>${(i*hopT).toFixed(2)}s</td><td>${(mp[i]*hopT).toFixed(2)}s</td></tr>`}).join('');
+$('#tb').innerHTML='<tr><th>Reference</th><th>Source</th></tr>'+rows;st.textContent='Done. Save the profile to reuse it on other recordings.'}
+catch(e){st.textContent='Something went wrong: '+e.message}$('#go').disabled=false};
+function draw(){if(!last)return;const c=$('#cv'),r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;const g=c.getContext('2d');g.scale(d,d);const W=r.width,H=r.height,cs=getComputedStyle(document.documentElement),sc=(H/2-8)/14;
+g.strokeStyle=cs.getPropertyValue('--line');g.lineWidth=1;[-12,-6,0,6,12].forEach(k=>{g.beginPath();g.moveTo(0,H/2-k*sc);g.lineTo(W,H/2-k*sc);g.stroke()});
+last.lines.forEach(([a,col])=>{g.strokeStyle=cs.getPropertyValue(col).trim();g.lineWidth=2;g.beginPath();let pen=false;a.forEach((v,i)=>{if(!v){pen=false;return}const x=i/(a.length-1)*W,y=H/2-Math.max(-14,Math.min(14,12*Math.log2(v/last.med)))*sc;pen?g.lineTo(x,y):g.moveTo(x,y);pen=true});g.stroke()})}
+addEventListener('resize',draw);
+// ---------- Profiles ----------
+function loadP(){try{return JSON.parse(localStorage.getItem('vm_profiles')||'[]')}catch(e){return[]}}
+function fillSel(){const s=$('#ps'),p=loadP();s.innerHTML='<option value="-1">No profile (realism only)</option>'+p.map((q,i)=>`<option value="${i}">${q.name}</option>`).join('');if(p.length)s.value=p.length-1}
+$('#sv').onclick=()=>{if(!lastProf)return;const p=loadP();p.push({...lastProf,name:$('#pn').value||'Voice'});try{localStorage.setItem('vm_profiles',JSON.stringify(p))}catch(e){$('#st').textContent='Storage is unavailable in this browser.';return}fillSel();$('#st').textContent='Profile saved. Open Apply to use it.'};
+fillSel();
+// ---------- Apply ----------
+$('#go2').onclick=async()=>{const C=S.C,o=opt(),p=loadP()[+$('#ps').value],st=$('#st2');$('#go2').disabled=true;
+try{st.textContent='Processing…';await tick();const a=analyze(C.x,C.sr),c0=1024/C.sr,hopT=a.hop/C.sr,sp=p&&o.tim?p.speed:1;let eq=new Array(NB).fill(0),rs=new Float32Array(a.nf);
+if(p){eq=p.eq;const lr=Float32Array.from(a.f0,f=>f>0?Math.log(p.medA*Math.exp(p.k*(Math.log(f)-Math.log(p.medB)))/f):NaN);rs=fillSmooth(lr,Math.log(p.medA/p.medB))}
+const outLen=Math.round(C.x.length*sp),res=await render(C.x,C.sr,plan(a,o,t=>t/sp,rs,()=>eq,p&&p.rt?p.rt:.3,outLen,C.sr));
+const ra=analyze(res.getChannelData(0),res.sampleRate);$('#res2').hidden=false;
+stat($('#stats2'),[['Timing',((sp-1)*100).toFixed(1)+'%'],['Pitch shift',(ra.med-a.med>0?'+':'')+(ra.med-a.med).toFixed(0)+' Hz'],['Realism',Math.round(o.h*100)+'%']]);
+show($('#au2'),$('#dl2'),res);st.textContent='Done.'}catch(e){st.textContent='Something went wrong: '+e.message}$('#go2').disabled=false};
+</script></body></html>

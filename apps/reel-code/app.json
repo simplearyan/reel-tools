@@ -1,0 +1,15 @@
+{
+  "name": "Reel Code",
+  "slug": "reel-code",
+  "tagline": "make videos with code",
+  "description": "make videos with code",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

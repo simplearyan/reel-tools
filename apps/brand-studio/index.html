@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Brand Studio · Logo, favicon and social image maker</title>
+<meta name="description" content="Design a logo, favicon set and social share image with full control over text, fonts, colors and layout. Download as PNG, WebP, JPG or SVG.">
+<link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+<script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={darkMode:['selector','[data-theme="dark"]'],theme:{extend:{colors:{bg:'var(--bg)',sf:'var(--sf)',sc:'var(--sc)',sch:'var(--sch)',tx:'var(--tx)',dim:'var(--dim)',ol:'var(--ol)',olv:'var(--olv)',pr:'var(--pr)',onpr:'var(--onpr)',sec:'var(--sec)',onsec:'var(--onsec)'}}}}</script>
+<style type="text/tailwindcss">
+  @layer components{
+    .card{@apply rounded-[20px] border border-olv bg-sf overflow-hidden}
+    .card>summary{@apply flex h-14 cursor-pointer list-none items-center justify-between px-4 text-[15px] font-medium;font-family:'Google Sans Flex',Roboto,system-ui,sans-serif}
+    .card>summary::-webkit-details-marker{display:none}
+    .card[open]>summary svg{transform:rotate(180deg)}
+    .cbody{@apply grid gap-5 px-4 pb-5 pt-2}
+    .tf{@apply relative block}
+    .tf input,.tf select{@apply h-12 w-full rounded border border-ol bg-transparent px-4 text-base text-tx outline-none focus:border-pr focus:ring-1 focus:ring-pr}
+    .tf span{@apply pointer-events-none absolute -top-2 left-3 bg-sf px-1 text-xs text-dim}
+    .rl{@apply mb-1 flex justify-between text-sm text-dim}
+    .clr{@apply flex h-12 items-center gap-3 rounded border border-olv px-3 text-sm text-dim}
+    .swl{@apply flex items-center justify-between gap-3 text-sm text-tx}
+    .lb{@apply mb-2 text-sm text-dim}
+    .chip{@apply h-8 rounded-lg border border-ol px-3 text-sm text-dim hover:bg-sc aria-pressed:border-transparent aria-pressed:bg-sec aria-pressed:text-onsec}
+    .thumb{@apply rounded-xl border-2 border-olv bg-sch p-1.5 aria-pressed:border-pr}
+    .swatch{@apply h-9 w-9 rounded-full border-2 border-transparent aria-pressed:ring-2 aria-pressed:ring-pr aria-pressed:ring-offset-2 aria-pressed:ring-offset-sf}
+    .tabb{@apply h-12 flex-1 rounded-t-lg border-b-[3px] border-transparent text-sm font-medium text-dim hover:bg-sc aria-pressed:border-pr aria-pressed:text-pr aria-pressed:bg-sc sm:flex-none sm:px-7;font-family:'Google Sans Flex',Roboto,system-ui,sans-serif}
+    .seg{@apply flex overflow-hidden rounded-full border border-ol}
+    .seg button{@apply h-10 border-r border-ol px-4 text-sm text-dim last:border-r-0 aria-pressed:bg-sec aria-pressed:text-onsec}
+    .btn{@apply inline-flex h-11 items-center gap-2 rounded-full px-6 text-sm font-medium hover:opacity-90 active:scale-[.98] transition;font-family:'Google Sans Flex',Roboto,system-ui,sans-serif}
+  }
+</style>
+<style>
+  :root{--bg:#f8f9ff;--sf:#ffffff;--sc:#e9edf9;--sch:#dde2f4;--tx:#1a1c22;--dim:#44464e;--ol:#75767f;--olv:#c6c6d1;--pr:#0b57d0;--onpr:#ffffff;--sec:#d8e2ff;--onsec:#001b3e;--err:#b3261e;--succ:#146c2e}
+  :root[data-theme="dark"]{--bg:#0e1013;--sf:#15171c;--sc:#1c1f26;--sch:#262a33;--tx:#e2e2e9;--dim:#c4c6d0;--ol:#8e9099;--olv:#43474e;--pr:#a8c8ff;--onpr:#00315c;--sec:#284777;--onsec:#d8e2ff;--err:#f2b8b5;--succ:#8bd5a1}
+  html{scroll-padding-top:120px}
+  body{margin:0;background:var(--bg);color:var(--tx);font-family:Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+  .gsf{font-family:'Google Sans Flex',Roboto,system-ui,sans-serif}
+  .mono{font-family:'Roboto Mono',ui-monospace,Menlo,monospace}
+  [hidden]{display:none!important}
+  :focus-visible{outline:3px solid var(--pr);outline-offset:2px}
+  button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
+  input[type=range]{width:100%;accent-color:var(--pr)}
+  input[type=color]{width:32px;height:32px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer}
+  .m3sw{appearance:none;width:52px;height:32px;border-radius:16px;border:2px solid var(--ol);background:var(--sch);position:relative;cursor:pointer;flex:none;transition:.2s}
+  .m3sw::after{content:"";position:absolute;top:50%;left:6px;width:16px;height:16px;border-radius:50%;background:var(--ol);transform:translateY(-50%);transition:.2s}
+  .m3sw:checked{background:var(--pr);border-color:var(--pr)}
+  .m3sw:checked::after{left:22px;width:24px;height:24px;background:var(--onpr)}
+  .sun{display:none}[data-theme="dark"] .sun{display:block}[data-theme="dark"] .moon{display:none}
+  .g{display:flex;flex-wrap:wrap;gap:8px}.g.thumbs{display:grid;grid-template-columns:repeat(4,1fr)}.g.lay{display:grid;grid-template-columns:repeat(3,1fr)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="sticky top-0 z-30 bg-sf" style="padding-top:env(safe-area-inset-top,0)">
+  <div class="mx-auto flex h-16 max-w-[1320px] items-center gap-3 px-4 sm:px-8">
+    <span class="grid h-9 w-9 place-items-center rounded-xl bg-pr text-onpr">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.1 2.9a1 1 0 0 1 1.8 0l1.6 3.9c.2.5.6.9 1.1 1.1l3.9 1.6a1 1 0 0 1 0 1.8l-3.9 1.6c-.5.2-.9.6-1.1 1.1l-1.6 3.9a1 1 0 0 1-1.8 0l-1.6-3.9a2 2 0 0 0-1.1-1.1l-3.9-1.6a1 1 0 0 1 0-1.8l3.9-1.6a2 2 0 0 0 1.1-1.1z"/><path d="M18.5 15.2l.7 1.7 1.7.7-1.7.7-.7 1.7-.7-1.7-1.7-.7 1.7-.7z" opacity=".65"/></svg>
+    </span>
+    <h1 class="gsf m-0 flex-1 text-[21px] font-semibold tracking-[-0.01em]">Brand Studio</h1>
+    <button id="ui-theme" class="grid h-11 w-11 place-items-center rounded-full text-dim hover:bg-sc" aria-label="Toggle light and dark theme">
+      <svg class="moon h-[22px] w-[22px]" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.5a8.5 8.5 0 1 1-9-11.9 7 7 0 0 0 9 11.9z"/></svg>
+      <svg class="sun h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.2M12 19.3v2.2M4.4 4.4l1.6 1.6M18 18l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.4 19.6 6 18M18 6l1.6-1.6"/></svg>
+    </button>
+  </div>
+  <nav class="border-b border-olv"><div id="tabs" class="mx-auto flex max-w-[1320px] gap-1 px-2 sm:px-8" role="group" aria-label="Asset type"></div></nav>
+</header>
+
+<main class="mx-auto grid max-w-[1320px] gap-6 px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_400px]" style="padding-bottom:calc(3rem + env(safe-area-inset-bottom,0px))">
+  <section class="grid content-start gap-4 lg:sticky lg:top-[136px] lg:max-h-[calc(100vh-152px)] lg:self-start lg:overflow-auto" aria-label="Preview and export">
+    <div id="frame" class="grid min-h-[280px] place-items-center rounded-3xl border border-olv p-6 sm:p-10"><img id="prev" alt="Asset preview" class="max-h-[50vh] max-w-full"></div>
+    <div id="extra" class="rounded-2xl border border-olv bg-sf p-5" hidden></div>
+    <div class="card p-4"><div class="grid gap-4">
+      <div class="flex flex-wrap items-end gap-4">
+        <div><div class="lb">Format</div><div id="fmt" class="seg" role="group" aria-label="Download format"></div></div>
+        <label class="tf min-w-[120px] flex-1"><select id="sz"></select><span>Size</span></label>
+        <label class="swl gap-3"><span>Transparent</span><input type="checkbox" id="tr" role="switch" class="m3sw"></label>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="dl" class="btn bg-pr text-onpr"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>Download</button>
+        <button id="dl-all" class="btn bg-sec text-onsec" hidden>All favicon sizes</button>
+        <span id="info" class="text-sm text-dim" role="status"></span>
+      </div>
+    </div></div>
+  </section>
+  <aside id="ctl" class="grid content-start gap-3" aria-label="Design controls"></aside>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PAL=[['Indigo','#4338ca','#a5a3ff','#d9f24b'],['Teal','#0f766e','#5eead4','#fbbf24'],['Rose','#be123c','#fda4af','#22d3ee'],['Amber','#b45309','#fcd34d','#4338ca'],['Slate','#334155','#cbd5e1','#f97316'],['Violet','#7e22ce','#d8b4fe','#a3e635']];
+const SS="system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
+const FONTS=[['System sans','',[400,500,700,800],SS],['Bricolage Grotesque','Bricolage Grotesque',[400,600,800],SS],['Inter','Inter',[400,500,700,800],SS],['Poppins','Poppins',[400,500,600,700,800],SS],['Space Grotesk','Space Grotesk',[400,500,700],SS],['Sora','Sora',[400,600,800],SS],['Montserrat','Montserrat',[400,600,800],SS],['Playfair Display','Playfair Display',[400,700,900],'Georgia,serif'],['DM Serif Display','DM Serif Display',[400],'Georgia,serif'],['Lora','Lora',[400,500,700],'Georgia,serif'],['JetBrains Mono','JetBrains Mono',[400,500,800],'ui-monospace,Menlo,monospace'],['Bebas Neue','Bebas Neue',[400],'Impact,sans-serif'],['Pacifico','Pacifico',[400],'cursive']];
+const WN={400:'Regular',500:'Medium',600:'Semibold',700:'Bold',800:'Extra bold',900:'Black'};
+const SIZES=[['1200x630','1.91:1'],['1200x675','16:9'],['1080x1080','1:1'],['1080x1350','4:5'],['1080x1920','9:16'],['1500x500','3:1']];
+const MARKS=[['play','Play'],['text','Text'],['sigma','Sigma'],['pi','Pi'],['root','Root'],['inf','Infinity'],['int','Integral'],['frac','Divide']];
+const PX=[16,32,48,64,128,180,192,256,512,1024];
+const S={tab:'logo',name:'Mathlet',tag:'Math in 15 seconds',title:'Math problems in 15-second shorts',sub:'Worked out step by step, then animated.',markText:'M',font:1,weight:800,case:'none',nameSize:120,tagSize:100,titleSize:100,subSize:100,ls:0,
+  mark:'play',shape:'rounded',radius:26,gs:100,rot:0,border:0,markScale:100,gap:40,bleed:false,shadow:false,
+  pal:0,theme:'light',cp:'',ca:'',cg:'',ct:'',cbg:'',cs:'',grad:false,ang:135,
+  lockup:'horizontal',layout:'left',size:'1200x630',pad:9,bg:'solid',bgAng:135,showMark:true,showName:true,showChip:true,ghost:false,ytTitle:'Solve *ANY* Probability Problem FAST',ytSub:'Step by step in 15 seconds',badge:'NEW',emoji:'🤯',strk:14,ytbg:'burst',rays:18,chl:'',cst:'',img:'',imgMode:'frame',imgSide:'right',imgScale:100,dim:35,ytAlign:'start',ytPos:'middle',ytRot:-3,showBadge:true,arrow:false,vig:true,ytBrand:true,fmt:'png',px:512,mult:1,tr:true};
+const isImg=()=>S.tab==='og'||S.tab==='yt';
+const SEC=[
+ ['Text',true,[
+  {k:'name',t:'text',l:'Brand name',max:24},{k:'tag',t:'text',l:'Tagline',max:40,on:'logo,og'},
+  {k:'title',t:'text',l:'Headline',on:'og'},{k:'sub',t:'text',l:'Subtitle',on:'og'},
+  {k:'font',t:'font',l:'Font'},{k:'weight',t:'chips',l:'Weight'},
+  {k:'case',t:'chips',l:'Letter case',o:[['none','As typed'],['upper','UPPER'],['lower','lower']]},
+  {k:'nameSize',t:'rng',l:'Name size',min:60,max:220,on:'logo'},{k:'tagSize',t:'rng',l:'Tagline size',min:50,max:200,u:'%',on:'logo,og'},
+  {k:'ytTitle',t:'text',l:'Headline (put *stars* around words to highlight)',max:70,on:'yt'},{k:'ytSub',t:'text',l:'Subtitle',max:60,on:'yt'},{k:'badge',t:'text',l:'Badge text',max:14,on:'yt',show:s=>s.showBadge},{k:'emoji',t:'text',l:'Emoji or symbol',max:4,on:'yt'},{k:'titleSize',t:'rng',l:'Headline size',min:50,max:150,u:'%',on:'og,yt'},{k:'subSize',t:'rng',l:'Subtitle size',min:50,max:180,u:'%',on:'og,yt'},{k:'strk',t:'rng',l:'Text outline',min:0,max:30,on:'yt'},
+  {k:'ls',t:'rng',l:'Letter spacing',min:-5,max:25}]],
+ ['Mark',true,[
+  {k:'mark',t:'thumbs',l:'Mark style',o:MARKS},{k:'markText',t:'text',l:'Mark text (1–3 characters)',max:3,show:s=>s.mark==='text'},
+  {k:'shape',t:'chips',l:'Shape',o:[['rounded','Rounded'],['circle','Circle'],['hex','Hexagon'],['none','None']]},
+  {k:'radius',t:'rng',l:'Corner radius',min:0,max:50,u:'%',show:s=>s.shape==='rounded'},
+  {k:'gs',t:'rng',l:'Symbol size',min:30,max:140,u:'%'},{k:'rot',t:'rng',l:'Symbol rotation',min:-45,max:45,u:'°'},
+  {k:'border',t:'rng',l:'Border width',min:0,max:40},
+  {k:'markScale',t:'rng',l:'Mark scale',min:50,max:160,u:'%',on:'logo'},{k:'gap',t:'rng',l:'Gap to text',min:0,max:140,on:'logo'},
+  {k:'bleed',t:'sw',l:'Full-bleed square (Apple / maskable)',on:'favicon'},{k:'shadow',t:'sw',l:'Drop shadow',on:'logo,og'}]],
+ ['Colors',false,[
+  {k:'pal',t:'pal',l:'Palette'},{k:'theme',t:'chips',l:'Preview theme',o:[['light','Light'],['dark','Dark']]},
+  {k:'cp',t:'clr',l:'Primary'},{k:'ca',t:'clr',l:'Accent (dot, chip, border)'},{k:'cg',t:'clr',l:'Symbol'},
+  {k:'ct',t:'clr',l:'Text',on:'logo,og'},{k:'cbg',t:'clr',l:'Background',on:'og'},{k:'chl',t:'clr',l:'Highlight word',on:'yt'},{k:'cst',t:'clr',l:'Text outline',on:'yt'},
+  {k:'grad',t:'sw',l:'Gradient mark'},{k:'cs',t:'clr',l:'Gradient end',show:s=>s.grad},{k:'ang',t:'rng',l:'Gradient angle',min:0,max:360,u:'°',show:s=>s.grad}]],
+ ['Layout',true,[
+  {k:'lockup',t:'chips',l:'Logo layout',on:'logo',o:[['horizontal','Horizontal'],['stacked','Stacked'],['text','Text only'],['mark','Mark only']]},
+  {k:'layout',t:'lay',l:'Layout',on:'og',o:[['left','Left'],['center','Centered'],['split','Split']]},
+  {k:'size',t:'chips',l:'Aspect ratio',on:'og',o:SIZES},{k:'pad',t:'rng',l:'Margin',min:4,max:16,u:'%',on:'og'},
+  {k:'bg',t:'chips',l:'Background',on:'og',o:[['solid','Solid'],['gradient','Gradient'],['dots','Dots'],['grid','Grid']]},
+  {k:'bgAng',t:'rng',l:'Background angle',min:0,max:360,u:'°',on:'og,yt',show:s=>s.tab==='og'?s.bg==='gradient':s.ytbg==='gradient'},
+  {k:'showMark',t:'sw',l:'Show mark',on:'og'},{k:'showName',t:'sw',l:'Show brand name',on:'og'},{k:'showChip',t:'sw',l:'Show tagline chip',on:'og'},{k:'ghost',t:'sw',l:'Large background symbol',on:'og'},
+  {k:'ytbg',t:'chips',l:'Thumbnail background',on:'yt',o:[['burst','Sunburst'],['gradient','Gradient'],['split','Split'],['solid','Solid']]},
+  {k:'rays',t:'rng',l:'Ray count',min:8,max:40,on:'yt',show:s=>s.ytbg==='burst'},
+  {k:'img',t:'file',l:'Photo or cutout (PNG with transparency works best)',on:'yt'},
+  {k:'imgMode',t:'chips',l:'Photo style',on:'yt',show:s=>!!s.img,o:[['frame','Framed'],['cutout','Cutout'],['cover','Full background']]},
+  {k:'imgSide',t:'chips',l:'Photo side',on:'yt',show:s=>!!s.img&&s.imgMode!=='cover',o:[['right','Right'],['left','Left']]},
+  {k:'imgScale',t:'rng',l:'Photo size',min:60,max:130,u:'%',on:'yt',show:s=>!!s.img&&s.imgMode!=='cover'},
+  {k:'dim',t:'rng',l:'Darken photo',min:0,max:80,u:'%',on:'yt',show:s=>!!s.img&&s.imgMode==='cover'},
+  {k:'ytAlign',t:'chips',l:'Text alignment',on:'yt',o:[['start','Left'],['middle','Center'],['end','Right']]},
+  {k:'ytPos',t:'chips',l:'Text position',on:'yt',o:[['top','Top'],['middle','Middle'],['bottom','Bottom']]},
+  {k:'ytRot',t:'rng',l:'Text tilt',min:-12,max:12,u:'°',on:'yt'},
+  {k:'showBadge',t:'sw',l:'Show badge',on:'yt'},{k:'arrow',t:'sw',l:'Show arrow',on:'yt'},{k:'vig',t:'sw',l:'Dark edges (vignette)',on:'yt'},{k:'ytBrand',t:'sw',l:'Show brand mark',on:'yt'}]]];
+
+/* ---------- color, text, font ---------- */
+const cv=document.createElement('canvas').getContext('2d');
+const hex=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
+const mix=(a,b,t)=>'#'+hex(a).map((v,i)=>Math.round(v+(hex(b)[i]-v)*t).toString(16).padStart(2,'0')).join('');
+const lum=h=>{const[r,g,b]=hex(h);return(.299*r+.587*g+.114*b)/255};
+const uri=s=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
+function col(){const P=PAL[S.pal],d=S.theme==='dark',p=S.cp||P[d?2:1],a=S.ca||P[3],bg=S.cbg||(d?mix(p,'#000000',.9):mix(p,'#ffffff',.95)),fg=S.ct||(d?'#f2f2ff':'#16162b');
+  return{tf:S.ct||'#ffffff',hl:S.chl||a,st:S.cst||'#0a0a0a',p,a,s:S.cs||mix(p,a,.6),gl:S.cg||(lum(p)>.6?'#14132b':'#fff'),bg,fg,dim:mix(fg,bg,.4)}}
+const FAM=()=>{const f=FONTS[S.font];return(f[1]?`'${f[1]}',`:'')+f[3]};
+const cs=t=>S.case==='upper'?t.toUpperCase():S.case==='lower'?t.toLowerCase():t;
+function M(t,fs,wt){cv.font=`${wt} ${fs}px ${FAM()}`;if('letterSpacing' in cv)cv.letterSpacing=(S.ls/100*fs)+'px';return cv.measureText(t).width}
+const txt=(x,y,t,fs,wt,fill,an='start')=>`<text x="${x}" y="${y}" font-family="${FAM().replace(/"/g,'')}" font-weight="${wt}" font-size="${fs}" letter-spacing="${(S.ls/100*fs).toFixed(2)}" fill="${fill}" text-anchor="${an}" dominant-baseline="central">${esc(t)}</text>`;
+function wrap(t,fs,mw){const o=[];let cur='';for(const w of t.split(/\s+/)){const c=(cur+' '+w).trim();if(!cur||M(c,fs,S.weight)<=mw)cur=c;else{o.push(cur);cur=w}}o.push(cur);return o}
+const FC={};
+function fkey(){const f=FONTS[S.font],t=[...new Set((S.name+S.tag+S.title+S.sub+S.markText+S.ytTitle+S.ytSub+S.badge+'∑π√∞∫').split(''))];return[f[1]+S.weight+t.join(''),f,[...new Set(t.concat(t.join('').toUpperCase().split(''),t.join('').toLowerCase().split('')))].join('')]}
+async function loadFont(){const[key,f,text]=fkey();if(!f[1]||key in FC)return false;
+  try{const css=await(await fetch(`https://fonts.googleapis.com/css2?family=${f[1].replace(/ /g,'+')}:wght@${S.weight}&text=${encodeURIComponent(text)}`)).text();
+    const b=await(await fetch(css.match(/url\((https:[^)]+)\)/)[1])).blob();
+    const d=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)});
+    const ff=new FontFace(f[1],`url(${d})`,{weight:String(S.weight)});await ff.load();document.fonts.add(ff);
+    FC[key]=`@font-face{font-family:'${f[1]}';font-weight:${S.weight};src:url(${d}) format('woff2')}`}catch(e){FC[key]=''}return true}
+const fstyle=()=>{const c=FC[fkey()[0]];return c?`<style>${c}</style>`:''};
+const wrapSvg=(w,h,body,solid,c)=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${fstyle()}${solid?`<rect width="${w}" height="${h}" fill="${c.bg}"/>`:''}${body}</svg>`;
+
+/* ---------- mark ---------- */
+function mark(x,y,s,c,style=S.mark,o={}){
+  const b=o.bleed?0:S.border,R=o.bleed?0:S.radius/100*512,fill=S.grad?'url(#mg)':c.p,st=b?` stroke="${c.a}" stroke-width="${b}"`:'',sh=o.bleed?'rounded':S.shape;
+  const shape=sh==='rounded'?`<rect x="${b/2}" y="${b/2}" width="${512-b}" height="${512-b}" rx="${R}" fill="${fill}"${st}/>`:sh==='circle'?`<circle cx="256" cy="256" r="${256-b/2}" fill="${fill}"${st}/>`:sh==='hex'?`<polygon points="256,8 471,132 471,380 256,504 41,380 41,132" fill="${fill}" stroke-linejoin="round"${st}/>`:'';
+  const g=sh==='none'?c.p:c.gl;
+  const T=(t,fs)=>`<text x="256" y="266" font-family="${FAM().replace(/"/g,'')}" font-weight="${S.weight}" font-size="${fs}" fill="${g}" text-anchor="middle" dominant-baseline="central">${esc(t)}</text>`;
+  const gl={play:`<path d="M200 146v220l178-110z" fill="${g}"/><circle cx="384" cy="136" r="42" fill="${c.a}"/>`,text:T(esc(cs((S.markText||'M').slice(0,3))),(S.markText||'M').length>2?200:(S.markText||'M').length>1?260:320),sigma:T('∑',300),pi:T('π',300),root:T('√',300),inf:T('∞',300),int:T('∫',330),
+    frac:`<circle cx="256" cy="150" r="34" fill="${c.a}"/><rect x="130" y="232" width="252" height="48" rx="24" fill="${g}"/><circle cx="256" cy="362" r="34" fill="${c.a}"/>`}[style];
+  const defs=(S.grad?`<linearGradient id="mg" gradientTransform="rotate(${S.ang} .5 .5)"><stop offset="0" stop-color="${c.p}"/><stop offset="1" stop-color="${c.s}"/></linearGradient>`:'')+(S.shadow&&!o.ns?`<filter id="ms" x="-25%" y="-25%" width="150%" height="160%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity=".35"/></filter>`:'');
+  return `<g transform="translate(${x} ${y}) scale(${s/512})"><defs>${defs}</defs><g${S.shadow&&!o.ns?' filter="url(#ms)"':''}>${shape}</g><g transform="translate(256 256) rotate(${S.rot}) scale(${S.gs/100}) translate(-256 -256)">${gl}</g></g>`}
+
+/* ---------- logo ---------- */
+function logo(c,solid){const L=S.lockup,tg=S.tag.trim(),ns=S.nameSize,ts=ns*.33*S.tagSize/100,nm=cs(S.name),P=S.shadow?56:28,ms=200*S.markScale/100*(L==='stacked'?1.2:1);
+  const nw=M(nm,ns,S.weight),tw=tg?M(tg,ts,500):0,tb=ns+(tg?ts*1.7:0),tW=Math.ceil(Math.max(nw,tw));
+  const N=(x,y,an)=>txt(x,y,nm,ns,S.weight,c.fg,an)+(tg?txt(x,y+ns*.5+ts*1.05,tg,ts,500,c.dim,an):'');
+  if(L==='mark'){const m=512*S.markScale/100,w=Math.ceil(m+2*P);return{svg:wrapSvg(w,w,mark(P,P,m,c),solid,c),w,h:w}}
+  if(L==='text'){const w=tW+2*P,h=Math.ceil(tb+2*P);return{svg:wrapSvg(w,h,N(P,P+ns/2,'start'),solid,c),w,h}}
+  if(L==='horizontal'){const w=Math.ceil(2*P+ms+S.gap+tW),h=Math.ceil(2*P+Math.max(ms,tb)),cy=h/2;return{svg:wrapSvg(w,h,mark(P,cy-ms/2,ms,c)+N(P+ms+S.gap,cy-tb/2+ns/2,'start'),solid,c),w,h}}
+  const w=Math.ceil(2*P+Math.max(ms,tW)),h=Math.ceil(2*P+ms+S.gap+tb);return{svg:wrapSvg(w,h,mark(w/2-ms/2,P,ms,c)+N(w/2,P+ms+S.gap+ns/2,'middle'),solid,c),w,h}}
+
+/* ---------- social image ---------- */
+function og(c,W,H,lay){const u=Math.min(W,H),m=u*S.pad/100,land=W>=H,tg=S.tag.trim(),nm=cs(S.name);let b='',bf=c.bg;
+  if(S.bg==='gradient'){b+=`<defs><linearGradient id="bgg" gradientTransform="rotate(${S.bgAng} .5 .5)"><stop offset="0" stop-color="${mix(c.bg,c.p,.32)}"/><stop offset="1" stop-color="${c.bg}"/></linearGradient></defs>`;bf='url(#bgg)'}
+  b+=`<rect width="${W}" height="${H}" fill="${bf}"/>`;
+  if(S.bg==='dots')b+=`<defs><pattern id="bp" width="36" height="36" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="2" fill="${c.p}" opacity=".25"/></pattern></defs><rect width="${W}" height="${H}" fill="url(#bp)"/>`;
+  if(S.bg==='grid')b+=`<defs><pattern id="bp" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="${c.p}" stroke-opacity=".2"/></pattern></defs><rect width="${W}" height="${H}" fill="url(#bp)"/>`;
+  if(S.ghost)b+=`<g opacity=".1">${mark(W-u*.75,H-u*.7,u*1.05,c,S.mark,{ns:1})}</g>`;
+  const T=(x,an,mw,fs,bot)=>{fs*=S.titleSize/100;const ch=fs*.62,cy=H-m-ch,ls=wrap(cs(S.title),fs,mw),sf=fs*.34*S.subSize/100,hs=!!S.sub.trim(),ch2=tg&&S.showChip,lh=fs*1.12,tot=ls.length*lh+(hs?sf*1.6:0),y0=(ch2?cy-fs*.5:H-m)-tot;
+    let s=ls.map((l,i)=>txt(x,y0+i*lh+fs*.56,l,fs,S.weight,c.fg,an)).join('');
+    if(hs)s+=txt(x,y0+ls.length*lh+sf*.9,S.sub,sf,500,c.dim,an);
+    if(ch2){const cf=fs*.36*S.tagSize/100,cw=M(tg,cf,700)+cf*1.6,cx=an==='middle'?x-cw/2:x;s+=`<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="${ch/2}" fill="${c.a}"/>`+txt(cx+cw/2,cy+ch/2,tg,cf,700,lum(c.a)>.6?'#14132b':'#fff','middle')}return s};
+  const fs=land?W*.075:W*.09,mk=(x,y,s)=>S.showMark?mark(x,y,s,c):'';
+  if(lay==='left'){const ms=u*.14;b+=mk(m,m,ms)+(S.showName?txt(m+(S.showMark?ms*1.25:0),m+ms/2,nm,ms*.5,S.weight,c.fg):'')+T(m,'start',W-2*m,fs)}
+  else if(lay==='center'){const ms=u*.22;b+=mk((W-ms)/2,m*1.2,ms)+(S.showName&&!S.showMark?txt(W/2,m*1.2+ms/2,nm,ms*.4,S.weight,c.fg,'middle'):'')+T(W/2,'middle',W-2*m,fs*.9)}
+  else if(land){const ms=H*.56;b+=mk(W-m-ms,(H-ms)/2,ms)+T(m,'start',W-3*m-(S.showMark?ms:0),W*.062)}
+  else{const ms=W*.42;b+=mk((W-ms)/2,m*1.5,ms)+T(m,'start',W-2*m,fs)}
+  return wrapSvg(W,H,b,false,c)}
+
+/* ---------- YouTube thumbnail ---------- */
+function yt(c){const W=1280,H=720,m=64,al=S.ytAlign,right=S.imgSide==='right',mode=S.img?S.imgMode:'none',sub=mode==='frame'||mode==='cutout',fw=Math.min(W*.5,W*.38*S.imgScale/100),fh=H*.86,fx=right?W-fw-40:40,fy=(H-fh)/2;
+  let b=`<defs><filter id="ts" x="-10%" y="-10%" width="130%" height="140%"><feDropShadow dx="6" dy="9" stdDeviation="0" flood-color="#000" flood-opacity=".65"/></filter><filter id="is" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity=".55"/></filter><clipPath id="cf"><rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" rx="36"/></clipPath><radialGradient id="vg"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".62"/></radialGradient><linearGradient id="yg" gradientTransform="rotate(${S.bgAng} .5 .5)"><stop offset="0" stop-color="${c.p}"/><stop offset="1" stop-color="${c.s}"/></linearGradient></defs><rect width="${W}" height="${H}" fill="${S.ytbg==='gradient'?'url(#yg)':c.p}"/>`;
+  if(S.ytbg==='burst'){const n=S.rays,cx=sub?fx+fw/2:al==='end'?W*.3:W*.7,R=W*1.4;for(let i=0;i<n;i++){const a=i*2*Math.PI/n,e=a+Math.PI/n;b+=`<polygon points="${cx},${H/2} ${cx+R*Math.cos(a)},${H/2+R*Math.sin(a)} ${cx+R*Math.cos(e)},${H/2+R*Math.sin(e)}" fill="${c.s}" opacity=".45"/>`}}
+  if(S.ytbg==='split')b+=`<polygon points="${W*.58},0 ${W},0 ${W},${H} ${W*.44},${H}" fill="${c.s}"/>`;
+  if(mode==='cover')b+=`<image href="${S.img}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/><rect width="${W}" height="${H}" fill="#000" opacity="${S.dim/100}"/>`;
+  if(mode==='frame')b+=`<g filter="url(#is)"><rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" rx="36" fill="#fff"/></g><image href="${S.img}" x="${fx}" y="${fy}" width="${fw}" height="${fh}" clip-path="url(#cf)" preserveAspectRatio="xMidYMid slice"/><rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" rx="36" fill="none" stroke="#fff" stroke-width="12"/>`;
+  if(mode==='cutout')b+=`<image href="${S.img}" x="${fx}" y="${fy}" width="${fw}" height="${fh}" preserveAspectRatio="xMidYMax meet" filter="url(#is)"/>`;
+  if(S.vig)b+=`<rect width="${W}" height="${H}" fill="url(#vg)"/>`;
+  const er=!sub&&S.emoji.trim()&&al!=='middle'?340:0,tw=sub?W-fw-90-m:W-2*m-er,xL=sub?(right?m:W-m-tw):al==='end'?m+er:m,ax=al==='start'?xL:al==='middle'?xL+tw/2:xL+tw,an=al;
+  const words=S.ytTitle.trim().split(/\s+/).map(w=>[cs(w.replace(/\*/g,'')),/^\*|\*$/.test(w)]);
+  const lay=f=>{const o=[];let cur=[];for(const w of words){if(cur.length&&M(cur.concat([w]).map(x=>x[0]).join(' '),f,S.weight)>tw){o.push(cur);cur=[w]}else cur.push(w)}o.push(cur);return o};
+  let fs=150*S.titleSize/100,ls=lay(fs);while((ls.length*fs*1.04>H*.6||ls.some(l=>M(l.map(x=>x[0]).join(' '),fs,S.weight)>tw*1.02))&&fs>40){fs*=.93;ls=lay(fs)}
+  const sf=fs*.3*S.subSize/100,hs=!!S.ytSub.trim(),lh=fs*1.04,tot=ls.length*lh+(hs?sf*2:0),y0=S.ytPos==='top'?(S.showBadge?m+110:m):S.ytPos==='bottom'?H-m-tot:(H-tot)/2;
+  const T=(y,inner,f)=>`<text x="${ax}" y="${y}" font-family="${FAM().replace(/"/g,'')}" font-weight="${S.weight}" font-size="${f}" text-anchor="${an}" dominant-baseline="central" stroke="${c.st}" stroke-width="${f===fs?S.strk:S.strk*.5}" paint-order="stroke" stroke-linejoin="round" letter-spacing="${(S.ls/100*f).toFixed(2)}">${inner}</text>`;
+  let t=ls.map((l,i)=>T(y0+i*lh+lh/2,l.map(([w,h],j)=>`<tspan fill="${h?c.hl:c.tf}">${j?' ':''}${esc(w)}</tspan>`).join(''),fs)).join('');
+  if(hs)t+=T(y0+ls.length*lh+sf,`<tspan fill="${c.tf}">${esc(S.ytSub)}</tspan>`,sf);
+  b+=`<g transform="rotate(${S.ytRot} ${W/2} ${H/2})" filter="url(#ts)">${t}</g>`;
+  if(S.emoji.trim()){const e=sub?[right?fx+40:fx+fw-40,fy+fh-30,190]:al==='middle'?[W-150,H-140,240]:[al==='end'?W*.14:W*.86,H*.5,380];b+=`<text x="${e[0]}" y="${e[1]}" font-size="${e[2]}" text-anchor="middle" dominant-baseline="central" transform="rotate(8 ${e[0]} ${e[1]})" filter="url(#is)" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif">${esc(S.emoji)}</text>`}
+  if(S.arrow){const dir=(sub?right:al!=='end')?1:-1,x=sub?(right?fx-80:fx+fw+80):(al==='middle'?W-150:al==='end'?W*.22:W*.78),ay=sub?H*.82:H*.9,sc=sub?1:.75;b+=`<g transform="translate(${x} ${ay}) scale(${dir*sc} ${sc}) rotate(-8) translate(-90 -55)" filter="url(#is)"><path d="M0 35H110V0L180 55L110 110V75H0Z" fill="${c.a}" stroke="#000" stroke-width="8" stroke-linejoin="round"/></g>`}
+  if(S.showBadge&&S.badge.trim()){const bt=S.badge.toUpperCase(),bf=64,bw=M(bt,bf,S.weight)+70,bx=sub&&!right?W-m-bw:m;b+=`<g transform="rotate(-6 ${bx} ${m})" filter="url(#ts)"><rect x="${bx}" y="${m-8}" width="${bw}" height="${bf+44}" rx="18" fill="${c.a}" stroke="#000" stroke-width="8"/>${txt(bx+bw/2,m-8+(bf+44)/2,bt,bf,S.weight,lum(c.a)>.6?'#111':'#fff','middle')}</g>`}
+  if(S.ytBrand)b+=mark(W-m-70,m-10,70,c,S.mark,{ns:1});
+  return wrapSvg(W,H,b,false,c)}
+
+function build(solid){const c=col();
+  if(S.tab==='yt')return{svg:yt(c),w:1280,h:720};
+  if(S.tab==='og'){const[W,H]=S.size.split('x').map(Number);return{svg:og(c,W,H,S.layout),w:W,h:H}}
+  if(S.tab==='favicon')return{svg:wrapSvg(512,512,mark(0,0,512,c,S.mark,{ns:1,bleed:S.bleed}),solid,c),w:512,h:512};
+  return logo(c,solid)}
+
+/* ---------- UI ---------- */
+const NUM=new Set(['weight','pal']),ITEMS=[];
+const CM={cp:'p',ca:'a',cg:'gl',ct:'fg',cbg:'bg',cs:'s',chl:'hl',cst:'st'};
+const btn=(k,v,l,cls,extra='')=>`<button type="button" class="${cls}" data-k="${k}" data-v="${v}" ${extra}>${l}</button>`;
+function field(it){const k=it.k,l=it.l;switch(it.t){
+  case'text':return`<label class="tf"><input data-k="${k}" maxlength="${it.max||80}"><span>${l}</span></label>`;
+  case'font':return`<label class="tf"><select data-k="font">${FONTS.map((f,i)=>`<option value="${i}">${f[0]}</option>`).join('')}</select><span>${l}</span></label>`;
+  case'rng':return`<label class="rl" for="r-${k}"><span>${l}</span><output></output></label><input id="r-${k}" type="range" data-k="${k}" min="${it.min}" max="${it.max}">`;
+  case'clr':return`<label class="clr"><input type="color" data-k="${k}" aria-label="${l}"><span>${l}</span></label>`;
+  case'sw':return`<label class="swl"><span>${l}</span><input type="checkbox" role="switch" class="m3sw" data-k="${k}"></label>`;
+  case'file':return`<div class="lb">${l}</div><div class="flex flex-wrap gap-2"><label class="btn cursor-pointer bg-sec text-onsec">Upload image<input id="imgf" type="file" accept="image/*" class="sr-only"></label><button type="button" class="chip" id="imgc">Remove</button></div>`;
+  case'pal':return`<div class="lb">${l}</div><div class="g">${PAL.map((p,i)=>btn(k,i,'','swatch',`aria-label="${p[0]}" title="${p[0]}" style="background:linear-gradient(135deg,${p[1]} 50%,${p[3]} 50%)"`)).join('')}</div>`;
+  case'thumbs':case'lay':return`<div class="lb">${l}</div><div class="g ${it.t==='lay'?'lay':'thumbs'}">${it.o.map(([v,n])=>btn(k,v,'<img alt="" class="block w-full">','thumb',`aria-label="${n}" title="${n}"`)).join('')}</div>`;
+  default:return`<div class="lb">${l}</div><div class="g">${(it.o||[]).map(([v,n])=>btn(k,v,n,'chip')).join('')}</div>`}}
+const SECICON={Text:'<path d="M5 5h14v3h-6v11h-2V8H5V5z"/>',Mark:'<path d="M12 2 3 7v6c0 5 4 8.5 9 9 5-.5 9-4 9-9V7l-9-5z" opacity=".18"/><path d="M12 2 3 7v6c0 5 4 8.5 9 9 5-.5 9-4 9-9V7l-9-5zm0 2.2 7 3.9v4.9c0 4-3.1 6.7-7 7.3-3.9-.6-7-3.3-7-7.3V8.1l7-3.9z"/>',Colors:'<circle cx="12" cy="12" r="9" opacity=".18"/><path d="M12 2a10 10 0 1 0 3.2 19.5c1-.3 1.5-1.2 1.3-2.1-.1-.5-.4-.9-.4-1.4 0-.8.7-1.5 1.5-1.5H19a3 3 0 0 0 3-3c0-6-4.9-11.5-10-11.5zM6.5 12a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4.3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4.3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>',Layout:'<rect x="3" y="4" width="8" height="7" rx="1.5"/><rect x="13" y="4" width="8" height="4" rx="1.5" opacity=".55"/><rect x="13" y="10" width="8" height="10" rx="1.5" opacity=".55"/><rect x="3" y="13" width="8" height="7" rx="1.5" opacity=".85"/>'};
+SEC.forEach(([title,open,items])=>{const d=document.createElement('details');d.className='card';d.open=open;
+  const ic=SECICON[title]||'';
+  d.innerHTML=`<summary>${ic?`<svg class="h-5 w-5 mr-3 text-pr flex-none" viewBox="0 0 24 24" fill="currentColor">${ic}</svg>`:''}<span class="flex-1">${title}</span><svg class="h-6 w-6 text-dim transition" viewBox="0 0 24 24" fill="currentColor"><path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg></summary><div class="cbody"></div>`;
+  items.forEach(it=>{const w=document.createElement('div');w.innerHTML=field(it);d.lastChild.append(w);ITEMS.push({...it,el:w})});$('#ctl').append(d)});
+$('#tabs').innerHTML=[['logo','Logo'],['favicon','Favicon'],['og','Social image'],['yt','YouTube thumbnail']].map(([v,l])=>btn('tab',v,l,'tabb')).join('');
+$('#fmt').innerHTML=[['png','PNG'],['webp','WebP'],['jpg','JPG'],['svg','SVG']].map(([v,l])=>btn('fmt',v,l,'')).join('');
+
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;const k=b.dataset.k;S[k]=NUM.has(k)?+b.dataset.v:b.dataset.v;if(k==='pal')Object.assign(S,{cp:'',ca:'',cg:'',ct:'',cbg:'',cs:'',chl:'',cst:''});render()});
+document.addEventListener('input',e=>{const i=e.target.closest('input[data-k],select[data-k]');if(!i)return;const k=i.dataset.k;
+  S[k]=i.type==='checkbox'?i.checked:i.type==='range'||k==='font'?+i.value:i.value;
+  if(k==='font'){const ws=FONTS[S.font][2];if(!ws.includes(S.weight))S.weight=ws.reduce((a,b)=>Math.abs(b-S.weight)<Math.abs(a-S.weight)?b:a)}render()});
+$('#tr').onchange=e=>{S.tr=e.target.checked;render()};
+$('#sz').onchange=e=>{if(isImg())S.mult=+e.target.value;else S.px=+e.target.value;render()};
+$('#ui-theme').onclick=()=>{const r=document.documentElement,n=r.dataset.theme==='dark'?'light':'dark';r.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}};
+
+let lastTab='',ft;
+const target=(w,h)=>{const pw=isImg()?Math.round(w*S.mult):S.px;return[pw,Math.round(h*pw/w)]};
+function render(){const c=col(),{svg,w,h}=build(false);
+  ITEMS.forEach(it=>{const on=(!it.on||it.on.split(',').includes(S.tab))&&(!it.show||it.show(S));it.el.hidden=!on;if(!on)return;const k=it.k,i=it.el.querySelector('input,select');
+    if(it.t==='rng'){i.value=S[k];it.el.querySelector('output').textContent=S[k]+(it.u||'')}
+    else if(it.t==='text'||it.t==='font')i.value=S[k];
+    else if(it.t==='sw')i.checked=S[k];
+    else if(it.t==='file'){}
+    else if(it.t==='clr'){if(document.activeElement!==i)i.value=c[CM[k]]}
+    else{const g=it.el.querySelector('.g');
+      if(k==='weight'&&g.dataset.f!==String(S.font)){g.dataset.f=S.font;g.innerHTML=FONTS[S.font][2].map(v=>btn('weight',v,WN[v],'chip')).join('')}}
+    it.el.querySelectorAll('button[data-k]').forEach(b=>{b.setAttribute('aria-pressed',String(S[k])===b.dataset.v);const im=b.querySelector('img');if(!im)return;
+      if(k==='mark')im.src=uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">${fstyle()}${mark(0,0,512,c,b.dataset.v,{ns:1})}</svg>`);
+      else{const[W,H]=S.size.split('x').map(Number);im.src=uri(og(c,W,H,b.dataset.v));im.style.aspectRatio=`${W}/${H}`}})});
+  document.querySelectorAll('#tabs button,#fmt button').forEach(b=>b.setAttribute('aria-pressed',String(S[b.dataset.k])===b.dataset.v));
+  $('#frame').style.background=isImg()?'transparent':c.bg;
+  const p=$('#prev');p.src=uri(svg);p.style.aspectRatio=`${w}/${h}`;p.style.width=S.tab==='favicon'?'256px':isImg()?'100%':Math.min(w,620)+'px';
+  p.style.maxWidth=S.tab==='og'&&h>w?`min(100%,${Math.round(50*w/h)}vh)`:'100%';
+  if(lastTab!==S.tab){lastTab=S.tab;S.mult=1;$('#sz').innerHTML=isImg()?(S.tab==='yt'?[[1,'1280×720'],[1.5,'1920×1080'],[2,'2560×1440']]:[[.5,'0.5×'],[1,'1×'],[2,'2×']]).map(([v,l])=>`<option value="${v}" ${v===S.mult?'selected':''}>${l}</option>`).join(''):PX.map(v=>`<option value="${v}" ${v===S.px?'selected':''}>${v} px</option>`).join('')}
+  const canTr=S.fmt!=='jpg'&&!isImg();$('#tr').checked=S.tr;$('#tr').disabled=!canTr;$('#tr').parentElement.style.opacity=canTr?1:.5;
+  $('#dl-all').hidden=S.tab!=='favicon'||S.fmt==='svg';
+  const[pw,ph]=target(w,h);$('#info').textContent=S.fmt==='svg'?`Vector · ${w}×${h}`:`${pw}×${ph} px`+(S.tab==='yt'?' · YouTube limit 2 MB (JPG is smallest)':'');
+  const x=$('#extra');x.hidden=S.tab!=='favicon';
+  if(S.tab==='favicon'){const u=uri(svg);x.innerHTML=`<div class="flex flex-wrap items-end gap-6">${[16,32,48,64,128].map(s=>`<figure class="m-0 text-center text-xs text-dim"><img src="${u}" width="${s}" height="${s}" alt="" class="mx-auto mb-1">${s}px</figure>`).join('')}</div><div class="mt-5 flex w-64 max-w-full items-center gap-2 rounded-t-xl border border-olv px-3 py-2 text-sm" style="background:${c.bg};color:${c.fg}"><img src="${u}" width="16" height="16" alt=""><span class="truncate">${esc(S.name)}</span></div>`}
+  clearTimeout(ft);ft=setTimeout(async()=>{if(await loadFont())render()},250)}
+
+/* ---------- export ---------- */
+const save=(b,n)=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)};
+async function dl(px){await loadFont();const fmt=S.fmt,tr=S.tr&&fmt!=='jpg'&&!isImg(),{svg,w,h}=build(!tr),base=`${(S.name.trim()||'brand').toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${S.tab}`;
+  if(fmt==='svg')return save(new Blob([svg],{type:'image/svg+xml'}),base+'.svg');
+  const pw=px||target(w,h)[0],ph=Math.round(h*pw/w),img=new Image();img.src=uri(svg);await img.decode();
+  const cn=document.createElement('canvas');cn.width=pw;cn.height=ph;const x=cn.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(img,0,0,pw,ph);
+  await new Promise(r=>cn.toBlob(b=>{save(b,`${base}-${pw}x${ph}.${fmt}`);r()},{png:'image/png',webp:'image/webp',jpg:'image/jpeg'}[fmt],.92))}
+$('#dl').onclick=()=>dl();
+$('#dl-all').onclick=async()=>{for(const s of[16,32,48,180,192,512]){await dl(s);await new Promise(r=>setTimeout(r,350))}};
+$('#imgc').onclick=()=>{S.img='';$('#imgf').value='';render()};
+$('#imgf').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{const k=Math.min(1,1400/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  S.img=f.type==='image/png'||f.type==='image/webp'?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.88);URL.revokeObjectURL(im.src);render()};im.src=URL.createObjectURL(f)};
+render();
+</script>
+</body>
+</html>

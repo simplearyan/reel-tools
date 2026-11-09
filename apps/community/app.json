@@ -1,0 +1,15 @@
+{
+  "name": "Community",
+  "slug": "community",
+  "tagline": "Browse videos made with Reel Studio. Watch a project, then remix it in one click to learn how it was built.",
+  "description": "Browse videos made with Reel Studio. Watch a project, then remix it in one click to learn how it was built.",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

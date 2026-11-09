@@ -1,0 +1,16 @@
+{
+  "name": "Reel Lab",
+  "slug": "reel-lab",
+  "tagline": "TODO: one-line summary",
+  "description": "TODO: two or three sentences for search results",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

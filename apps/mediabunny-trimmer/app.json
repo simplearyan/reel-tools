@@ -1,0 +1,16 @@
+{
+  "name": "mediabunny-trimmer",
+  "slug": "mediabunny-trimmer",
+  "tagline": "video trimmer",
+  "description": "video trimmer",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

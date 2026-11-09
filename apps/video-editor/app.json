@@ -1,0 +1,16 @@
+{
+  "name": "video-editor",
+  "slug": "video-editor",
+  "tagline": "Video Editor",
+  "description": "Video Editor",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

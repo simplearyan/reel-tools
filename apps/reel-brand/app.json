@@ -1,0 +1,15 @@
+{
+  "name": "reel-brand",
+  "slug": "reel-brand",
+  "tagline": "design your channel's play icon and brand kit",
+  "description": "design your channel's play icon and brand kit",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

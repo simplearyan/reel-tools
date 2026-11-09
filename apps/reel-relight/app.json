@@ -1,0 +1,16 @@
+{
+  "name": "Reel Relight",
+  "slug": "reel-relight",
+  "tagline": "Relight photos and clips",
+  "description": "Relight photos and clips",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

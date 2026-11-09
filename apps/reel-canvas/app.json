@@ -1,0 +1,16 @@
+{
+  "name": "Reel Canvas",
+  "slug": "reel-canvas",
+  "tagline": "Write motion as HTML, CSS and JavaScript, preview it live and export it as a WebM video. A free tool from Reel Studio.",
+  "description": "Write motion as HTML, CSS and JavaScript, preview it live and export it as a WebM video. A free tool from Reel Studio.",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

@@ -1,0 +1,34 @@
+{
+  "latest": {
+    "file": "Keyer – remove video backgrounds (28).html",
+    "size": 6710662,
+    "modified": "2026-10-28"
+  },
+  "versions": [
+    {
+      "id": "v1",
+      "file": "Keyer – remove video backgrounds (5).html",
+      "size": 72990,
+      "modified": "2026-10-16"
+    },
+    {
+      "id": "v2",
+      "file": "Keyer – remove video backgrounds (22).html",
+      "size": 6683546,
+      "modified": "2026-10-21"
+    },
+    {
+      "id": "v3",
+      "file": "Keyer – remove video backgrounds (23).html",
+      "size": 6686576,
+      "modified": "2026-10-24"
+    },
+    {
+      "id": "v4",
+      "file": "Keyer – remove video backgrounds (27).html",
+      "size": 6706176,
+      "modified": "2026-10-26"
+    }
+  ],
+  "duplicates": []
+}

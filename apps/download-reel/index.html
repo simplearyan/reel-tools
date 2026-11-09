@@ -1,0 +1,207 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Download Reel</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Kalam:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FBFBFD;--card:#fff;--ink:#14161F;--mute:#636879;--line:#E6E8F0;--p:#6965DB;--pi:#4B47B5;--tint:#EFEEFC;--yel:#FFD84D;--pink:#FF4D8D;--mint:#1E9E6A;--ease:cubic-bezier(.2,0,0,1);--eo:cubic-bezier(.05,.7,.1,1);--rs:8px;--rm:12px;--rl:20px;--rx:28px}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 'Bricolage Grotesque',system-ui,sans-serif;overflow-x:hidden;padding-top:env(safe-area-inset-top,0)}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--p);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}.mute{color:var(--mute)}.mono{font-family:'JetBrains Mono',ui-monospace,monospace}.hand{font-family:'Kalam',cursive}
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav-in{height:68px;display:flex;align-items:center;gap:32px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+.nav nav{display:flex;gap:4px;margin-right:auto}.nav nav a{padding:8px 14px;border-radius:var(--rs);font-weight:600;font-size:15px;color:var(--mute);transition:background .15s,color .15s}.nav nav a:hover{background:rgba(20,22,31,.05);color:var(--ink)}.nav nav a.on{color:var(--ink)}
+.btn{position:relative;overflow:hidden;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:15px}
+.btn::before{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s;z-index:-1}.btn:hover::before{opacity:.08}.btn:active::before{opacity:.14}
+.dark{background:var(--ink);color:#fff}.pri{background:var(--p);color:#fff}.out{border:1px solid #C9CCDB}.tonal{background:var(--tint);color:var(--pi)}
+.ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.16;transform:scale(0);animation:rip .55s var(--ease) forwards;pointer-events:none}@keyframes rip{to{transform:scale(1);opacity:0}}
+/* hero */
+.hero{text-align:center;padding:84px 0 56px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:var(--tint);color:var(--pi);font-size:13px;font-weight:600}.badge i{width:7px;height:7px;border-radius:50%;background:var(--mint);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+h1{font-size:clamp(42px,7.4vw,80px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin-top:22px}
+.hl{position:relative;display:inline-block;white-space:nowrap}
+.hl svg{position:absolute;left:0;bottom:-.14em;width:100%;height:.26em;overflow:visible;fill:none;stroke:var(--yel);stroke-width:7;stroke-linecap:round}.hl path{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1s var(--eo) .5s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.sub{max-width:520px;margin:26px auto 0;color:var(--mute);font-size:18px;line-height:28px}
+.cta{margin-top:36px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.big{padding:17px 30px;font-size:17px;gap:12px}.big svg{flex:none}
+.meta{font-size:14px;color:var(--mute)}.meta a{color:var(--pi);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.pill{display:inline-flex;gap:6px;align-items:center}
+/* app preview */
+.prev{margin:64px auto 0;max-width:880px;background:var(--card);border:1px solid var(--line);border-radius:var(--rx);padding:12px}
+.dots{display:flex;gap:7px;padding:2px 6px 10px}.dots i{width:11px;height:11px;border-radius:50%;background:#E3E5EE}
+.vid{position:relative;aspect-ratio:16/8;border-radius:var(--rl);overflow:hidden;background:linear-gradient(180deg,#171B4F 0%,#4B3AA0 28%,#B24A9A 55%,#FF7F6B 78%,#FFB36B 100%)}
+.sun{position:absolute;width:12%;aspect-ratio:1;right:18%;top:15%;border-radius:50%;background:radial-gradient(circle at 40% 40%,#FFF6D0,#FFE29A 55%,#FFC873);box-shadow:0 0 60px 20px rgba(255,205,130,.4);animation:bob 6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(12px)}}
+.hill{position:absolute;border-radius:50%;bottom:-34%}.h1{left:-10%;width:70%;height:60%;background:linear-gradient(180deg,#4A3B8C,#1B1F4A 35%,#14173A)}.h2{right:-15%;width:80%;height:50%;background:linear-gradient(180deg,#2A2468,#0F1233 40%)}
+.vid svg{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke-linecap:round;stroke-linejoin:round}.vid path{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.1s var(--eo) forwards}
+.trk{margin-top:10px;position:relative;height:38px;border-radius:var(--rm);background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.clip{position:absolute;top:5px;bottom:5px;border-radius:7px;color:#fff;font-size:11px;font-weight:600;padding:5px 10px}.ph{position:absolute;top:0;bottom:0;width:2px;background:var(--pink);animation:play 8s linear infinite}@keyframes play{from{left:0}to{left:100%}}
+/* sections */
+.sec{padding:84px 0 0}h2{font-size:clamp(28px,3.8vw,42px);line-height:1.1;letter-spacing:-.025em;font-weight:800}
+.shead{display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px}.shead p{color:var(--mute);margin-top:8px}
+.grid{display:grid;gap:20px}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.os{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:var(--rl);padding:24px;transition:border-color .2s,background .2s}
+.os:hover{border-color:#CFCDF0;background:#FCFCFF}.os.me{border-color:var(--p);box-shadow:inset 0 0 0 1px var(--p)}
+.os .ic{width:52px;height:52px;border-radius:var(--rm);background:var(--tint);color:var(--pi);display:grid;place-items:center}
+.os h3{font-size:22px;letter-spacing:-.01em;margin-top:18px}.os .v{font-size:14px;color:var(--mute);margin-top:2px}
+.os .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.os .btn{padding:10px 18px;font-size:14px}
+.tag{font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 9px;border-radius:var(--rs);background:var(--p);color:#fff;margin-left:8px;vertical-align:3px}
+.cmd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:var(--rm);background:#0D0C12;color:#E8E6F2;font:500 13px 'JetBrains Mono',monospace;margin-top:16px;width:100%;text-align:left;position:relative;overflow:hidden}
+.cmd span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cmd:hover{background:#17161E}
+/* tabs + requirements */
+.seg{display:inline-flex;border:1px solid #C9CCDB;border-radius:999px;overflow:hidden;background:#fff}
+.seg button{position:relative;padding:9px 20px;font-size:14px;font-weight:600;transition:background .15s,color .15s}.seg button+button{border-left:1px solid #C9CCDB}.seg button:hover{background:rgba(20,22,31,.04)}.seg button.on{background:var(--tint);color:var(--pi)}
+.panel{margin-top:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.req{background:var(--card);border:1px solid var(--line);border-radius:var(--rl);padding:20px}.req small{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);font-weight:600}.req b{display:block;font-size:20px;letter-spacing:-.01em;margin-top:6px}.req p{font-size:14px;color:var(--mute);margin-top:2px}
+/* release */
+.rel{background:var(--card);border:1px solid var(--line);border-radius:var(--rl);overflow:hidden}
+.rh{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}.rh b{font-size:20px;letter-spacing:-.01em}
+.chip{display:inline-flex;padding:4px 11px;border-radius:var(--rs);background:var(--tint);color:var(--pi);font-size:12px;font-weight:700}
+.rl{padding:8px 24px 20px}.ri{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}.ri:last-child{border:0}
+.ri .k{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding-top:2px}.k.a{color:var(--mint)}.k.i{color:var(--p)}.k.f{color:#C2410C}
+/* verify */
+.ver{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rl);padding:24px}.card h3{font-size:20px;letter-spacing:-.01em}.card p{color:var(--mute);margin-top:6px;font-size:15px}
+.hash span{min-width:0}.hash{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding:12px 14px;border-radius:var(--rm);background:var(--bg);border:1px solid var(--line);font:500 12px 'JetBrains Mono',monospace;color:var(--mute)}.hash span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp{flex:none;padding:5px 12px;border-radius:var(--rs);font:600 12px 'Bricolage Grotesque',sans-serif;color:var(--pi);position:relative;overflow:hidden}.cp:hover{background:var(--tint)}
+/* faq */
+.fq{border-bottom:1px solid var(--line)}.fq:first-child{border-top:1px solid var(--line)}
+.fq button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 0;text-align:left;font-size:18px;font-weight:600;position:relative;overflow:hidden}
+.fa{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s var(--ease)}.fa>div{overflow:hidden}.fa p{color:var(--mute);padding-bottom:20px;max-width:620px}.fq.open .fa{grid-template-rows:1fr}
+.pl{width:20px;height:20px;position:relative;flex:none}.pl:before,.pl:after{content:"";position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px 0 0 -7px;background:var(--ink);border-radius:2px;transition:transform .3s var(--ease)}.pl:after{transform:rotate(90deg)}.fq.open .pl:after{transform:rotate(0)}
+/* footer */
+footer{margin-top:96px;background:#0A0B0F;color:#F2F3F8}.ft{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;padding:56px 24px 40px;max-width:1080px;margin:0 auto}
+footer h4{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8A90A5;font-weight:600;margin-bottom:18px}footer li{list-style:none;margin-bottom:11px;font-size:15px}footer ul{padding:0}footer li a:hover{text-decoration:underline;text-underline-offset:4px}
+.fb{max-width:1080px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid rgba(255,255,255,.12);color:#8A90A5;font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.snack{position:fixed;left:50%;bottom:28px;transform:translate(-50%,24px);background:var(--ink);color:#fff;padding:13px 20px;border-radius:var(--rs);font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:all .3s var(--eo);z-index:90;max-width:calc(100% - 32px);text-align:center}.snack.show{opacity:1;transform:translate(-50%,0)}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .7s var(--eo),transform .7s var(--eo)}.rv.in{opacity:1;transform:none}
+.mo{display:none}
+@media (max-width:900px){.g3{grid-template-columns:minmax(0,1fr)}.panel{grid-template-columns:repeat(2,minmax(0,1fr))}.ver{grid-template-columns:minmax(0,1fr)}.nav nav{display:none}.nav-in{margin-left:0;justify-content:space-between}.ft{grid-template-columns:1fr 1fr 1fr}.ft>div:first-child{grid-column:1/-1}.hero{padding-top:56px}.sec{padding-top:64px}}
+@media (max-width:600px){.wrap{padding:0 16px}.panel{grid-template-columns:minmax(0,1fr)}.big{width:100%}.cta{width:100%}.ri{grid-template-columns:1fr;gap:4px}.rl,.rh{padding-left:18px;padding-right:18px}.prev{margin-top:44px;padding:8px;border-radius:var(--rl)}.vid{aspect-ratio:16/10}.hero{padding-bottom:40px}.ft{padding:44px 16px 32px}.fb{padding:20px 16px 28px;flex-direction:column}.seg button{padding:9px 14px}.mo{display:block}.fq button{font-size:17px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.hl path,.vid path{stroke-dashoffset:0}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap nav-in">
+  <a class="logo" href="#"><svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="10" fill="#6965DB"/><path d="M12.6 9.8L23 16l-10.4 6.2z" fill="#fff" stroke="#fff" stroke-width="2.8" stroke-linejoin="round"/><circle cx="24.6" cy="7.6" r="2.6" fill="#FFD84D"/></svg>Reel</a>
+  <nav><a href="#">Features</a><a href="#">Reel Code</a><a href="#">Docs</a><a href="#" class="on">Download</a></nav>
+  <a class="btn dark" href="#all" style="padding:10px 20px;font-size:14px">All downloads</a>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="badge"><i></i>Version 2.4 is out</span>
+    <h1>Download <span class="hl">Reel.<svg viewBox="0 0 300 20" preserveAspectRatio="none"><path pathLength="1" d="M3 12C60 4 120 16 180 8s90 6 117 2"/></svg></span></h1>
+    <p class="sub">Edit video and mark it up in one app. Free for personal use on Mac, Windows and Linux.</p>
+    <div class="cta">
+      <a class="btn pri big" id="main" href="#" data-dl><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg><span id="mainl">Download for Mac</span></a>
+      <p class="meta" id="mainm">Version 2.4 · macOS 12 or later · 148 MB</p>
+      <p class="meta mo" id="mob" style="display:none">Reel is a desktop app. <a href="#" id="mlink">Copy the link</a> to open on your computer.</p>
+      <p class="meta"><a href="#all">Other platforms</a> · <a href="#notes">Release notes</a></p>
+    </div>
+    <div class="prev rv" aria-hidden="true">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="vid"><div class="sun"></div><div class="hill h1"></div><div class="hill h2"></div>
+        <svg viewBox="0 0 800 400"><path stroke="#FFD84D" stroke-width="5" pathLength="1" style="animation-delay:1s" d="M610 52C540 46 500 90 512 130c10 40 80 58 134 42 54-14 86-56 66-94-14-26-52-34-100-24"/><path stroke="#fff" stroke-width="4" pathLength="1" style="animation-delay:2s" d="M520 240C470 268 430 280 370 278M370 278l22-20M370 278l20 22"/></svg>
+      </div>
+      <div class="trk"><div class="clip" style="left:1%;width:32%;background:#6965DB">Intro</div><div class="clip" style="left:34%;width:28%;background:#8D55B8">Drone</div><div class="clip" style="left:63%;width:36%;background:#E0603F">Interview</div><div class="ph"></div></div>
+    </div>
+  </section>
+
+  <section class="sec" id="all">
+    <div class="shead rv"><div><h2>Pick your platform</h2><p>One app, three platforms. Your projects open anywhere.</p></div></div>
+    <div class="grid g3">
+      <div class="os rv" data-os="mac"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3>macOS</h3><p class="v">macOS 12 or later · Apple silicon and Intel</p><div class="row"><a class="btn dark" href="#" data-dl>Apple silicon</a><a class="btn out" href="#" data-dl>Intel</a></div><button class="cmd" data-copy="brew install --cask reel"><span>brew install --cask reel</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button></div>
+      <div class="os rv" data-os="win" style="transition-delay:.08s"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5l7-1v7H3zM12 4.3l9-1.3v8.5h-9zM3 13h7v7l-7-1zM12 13h9v8.2l-9-1.3z"/></svg></div><h3>Windows</h3><p class="v">Windows 10 or 11 · 64-bit and ARM</p><div class="row"><a class="btn dark" href="#" data-dl>64-bit</a><a class="btn out" href="#" data-dl>ARM</a></div><button class="cmd" data-copy="winget install Reel.Reel"><span>winget install Reel.Reel</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button></div>
+      <div class="os rv" data-os="linux" style="transition-delay:.16s"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-5-5-5M12 19h8"/></svg></div><h3>Linux</h3><p class="v">Ubuntu 20.04+, Fedora, Arch · x64 and ARM</p><div class="row"><a class="btn dark" href="#" data-dl>.deb</a><a class="btn out" href="#" data-dl>.rpm</a><a class="btn out" href="#" data-dl>AppImage</a></div><button class="cmd" data-copy="sudo snap install reel"><span>sudo snap install reel</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="shead rv"><div><h2>System requirements</h2><p>Reel runs well on most computers from the last few years.</p></div>
+      <div class="seg" id="seg" role="tablist"><button class="on" data-t="mac">macOS</button><button data-t="win">Windows</button><button data-t="linux">Linux</button></div></div>
+    <div class="panel rv" id="req"></div>
+  </section>
+
+  <section class="sec" id="notes">
+    <div class="shead rv"><div><h2>What's new in 2.4</h2><p>Released October 6, 2026</p></div><a class="btn out" href="#" style="padding:10px 18px;font-size:14px">Full changelog</a></div>
+    <div class="rel rv">
+      <div class="rh"><b>Version 2.4</b><span class="chip">Latest</span></div>
+      <div class="rl">
+        <div class="ri"><span class="k a">Added</span><span>Reel Code: write scenes as code and edit them on the timeline.</span></div>
+        <div class="ri"><span class="k a">Added</span><span>Text emphasis tools: underline, circle, box and highlight.</span></div>
+        <div class="ri"><span class="k i">Improved</span><span>Marks now pin to the timeline at the moment you draw them.</span></div>
+        <div class="ri"><span class="k i">Improved</span><span>Faster background export for 4K projects.</span></div>
+        <div class="ri"><span class="k f">Fixed</span><span>Playhead drifting out of sync after trimming a clip.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="shead rv"><div><h2>Verify your download</h2><p>Check the file matches the one we published.</p></div></div>
+    <div class="ver">
+      <div class="card rv"><h3>SHA-256 checksum</h3><p>Compare this value with the checksum of the file you downloaded.</p><div class="hash"><span id="hv">9f2c4e7a1b0d83c6e5a4f1d2b7c9083e46a1f5d0c2b8e7a39d4c61f0a8b2e357</span><button class="cp" data-cp>Copy</button></div></div>
+      <div class="card rv" style="transition-delay:.08s"><h3>Signed and notarized</h3><p>Every build is code-signed. Your system will show "Reel" as the verified publisher when you open it.</p><div class="hash"><span>Publisher: Reel, Inc.</span><span class="chip" style="background:#E5F6EE;color:#14744E">Verified</span></div></div>
+    </div>
+  </section>
+
+  <section class="sec" style="max-width:760px;margin-left:auto;margin-right:auto">
+    <div class="shead rv" style="justify-content:center;text-align:center"><div><h2>Questions</h2></div></div>
+    <div class="rv" id="faq">
+      <div class="fq open"><button aria-expanded="true">Is Reel really free?<span class="pl"></span></button><div class="fa"><div><p>Yes. Reel is free for personal projects. Pro and Team plans add shared libraries, review links and priority support.</p></div></div></div>
+      <div class="fq"><button aria-expanded="false">Will my projects open on another computer?<span class="pl"></span></button><div class="fa"><div><p>Yes. Project files work the same on Mac, Windows and Linux, including all annotations and Reel Code scenes.</p></div></div></div>
+      <div class="fq"><button aria-expanded="false">Does Reel need an internet connection?<span class="pl"></span></button><div class="fa"><div><p>No. Editing and exporting run on your machine. You only need to be online for updates and AI animation.</p></div></div></div>
+      <div class="fq"><button aria-expanded="false">How do I update?<span class="pl"></span></button><div class="fa"><div><p>Reel updates itself in the background. You can also download the latest version from this page at any time.</p></div></div></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="ft">
+  <div><a class="logo" href="#"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="10" fill="#6965DB"/><path d="M12.6 9.8L23 16l-10.4 6.2z" fill="#fff" stroke="#fff" stroke-width="2.8" stroke-linejoin="round"/><circle cx="24.6" cy="7.6" r="2.6" fill="#FFD84D"/></svg>Reel</a><p style="margin-top:16px;max-width:260px;color:#8A90A5">The video editor with annotation built in, and now motion as code.</p></div>
+  <div><h4>Product</h4><ul><li><a href="#">Editor</a></li><li><a href="#">Reel Code</a></li><li><a href="#">Download</a></li></ul></div>
+  <div><h4>Resources</h4><ul><li><a href="#">Docs</a></li><li><a href="#">Changelog</a></li><li><a href="#">Support</a></li></ul></div>
+  <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#">Contact</a></li></ul></div>
+</div><div class="fb"><span>© 2026 Reel. All rights reserved.</span><span>Privacy · Terms</span></div></footer>
+<div class="snack" id="snack" role="status"></div>
+
+<script>
+const $=id=>document.getElementById(id),$$=s=>[...document.querySelectorAll(s)];
+let snT;const snack=t=>{const s=$('snack');s.textContent=t;s.classList.add('show');clearTimeout(snT);snT=setTimeout(()=>s.classList.remove('show'),2600)};
+const copy=async t=>{try{await navigator.clipboard.writeText(t)}catch(e){}};
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});$$('.rv').forEach(e=>io.observe(e));
+// platform detection
+const ua=(navigator.userAgentData&&navigator.userAgentData.platform||navigator.platform||'')+' '+navigator.userAgent;
+const mobile=/iPhone|iPad|iPod|Android/i.test(ua);
+let os=/Win/i.test(ua)?'win':/Linux|X11|CrOS/i.test(ua)&&!/Android/i.test(ua)?'linux':'mac';
+const INFO={mac:['Download for Mac','Version 2.4 · macOS 12 or later · 148 MB'],win:['Download for Windows','Version 2.4 · Windows 10 or 11 · 132 MB'],linux:['Download for Linux','Version 2.4 · Ubuntu 20.04 or later · 119 MB']};
+function setOS(o){os=o;$('mainl').textContent=INFO[o][0];$('mainm').textContent=INFO[o][1];$$('.os').forEach(c=>c.classList.toggle('me',c.dataset.os===o&&!mobile))}
+setOS(os);
+if(mobile){$('main').style.display='none';$('mainm').style.display='none';$('mob').style.display='block';$('mlink').onclick=e=>{e.preventDefault();copy(location.href);snack('Link copied. Open it on your computer.')}}
+// download (demo)
+$$('[data-dl]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();snack('Your download would start now (demo)')}));
+$$('[data-copy]').forEach(b=>b.onclick=()=>{copy(b.dataset.copy);snack('Copied: '+b.dataset.copy)});
+$$('[data-cp]').forEach(b=>b.onclick=()=>{copy($('hv').textContent);b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1600)});
+// requirements
+const R={mac:[['System','macOS 12+','Monterey or newer'],['Chip','Apple or Intel','M1 or later recommended'],['Memory','8 GB','16 GB for 4K projects'],['Storage','2 GB','Plus space for media']],
+win:[['System','Windows 10+','64-bit or ARM'],['Processor','4 cores','Intel 8th gen or Ryzen 3000'],['Memory','8 GB','16 GB for 4K projects'],['Graphics','DirectX 12','Dedicated GPU recommended']],
+linux:[['System','Ubuntu 20.04+','Fedora 36+, Arch'],['Processor','4 cores','x64 or ARM64'],['Memory','8 GB','16 GB for 4K projects'],['Graphics','Vulkan 1.2','Mesa 22 or newer']]};
+function showReq(t){$$('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('req').innerHTML=R[t].map(r=>`<div class="req"><small>${r[0]}</small><b>${r[1]}</b><p>${r[2]}</p></div>`).join('')}
+$$('#seg button').forEach(b=>b.onclick=()=>showReq(b.dataset.t));showReq(os);
+// faq
+$$('.fq button').forEach(b=>b.onclick=()=>{const f=b.parentElement,o=f.classList.toggle('open');b.setAttribute('aria-expanded',o)});
+// ripple
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches)document.addEventListener('pointerdown',e=>{const t=e.target.closest('.btn,.cp,.cmd,.seg button,.fq button');if(!t)return;const r=t.getBoundingClientRect(),d=Math.max(r.width,r.height)*2.2,x=document.createElement('span');x.className='ripple';x.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;t.appendChild(x);x.addEventListener('animationend',()=>x.remove())});
+</script>
+</body>
+</html>
+
+</body></html>

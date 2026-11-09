@@ -1,0 +1,13 @@
+{
+  "name": "Reel_Vault",
+  "slug": "reel-vault",
+  "tagline": "TODO: one-line summary",
+  "description": "TODO: two or three sentences for search results",
+  "icon": "icon.svg",
+  "tags": [
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

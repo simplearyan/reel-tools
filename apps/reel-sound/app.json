@@ -1,0 +1,16 @@
+{
+  "name": "Reel Sound",
+  "slug": "reel-sound",
+  "tagline": "Generate whooshes, hits, risers and UI sounds, layer them on a timeline and export WAV or MP3. A free tool from Reel St…",
+  "description": "Generate whooshes, hits, risers and UI sounds, layer them on a timeline and export WAV or MP3. A free tool from Reel Studio.",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

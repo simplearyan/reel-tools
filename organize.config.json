@@ -1,0 +1,9 @@
+{
+  "_help": "aliases: detected slug (short name, or full title slug) -> the app slug you want; merges names into one app. names: display name per app slug. pages: slugs that are website pages, not apps (go to _unsorted/pages). ignore: slugs to leave in _unsorted/small.",
+  "aliases": {
+    "reel": "reel-studio"
+  },
+  "names": {},
+  "pages": [],
+  "ignore": []
+}

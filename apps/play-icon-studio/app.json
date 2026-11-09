@@ -1,0 +1,15 @@
+{
+  "name": "play-icon-studio",
+  "slug": "play-icon-studio",
+  "tagline": "TODO: one-line summary",
+  "description": "TODO: two or three sentences for search results",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

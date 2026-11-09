@@ -1,0 +1,234 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reel Logo Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14110D;--mut:#5A544A;--line:rgba(20,17,13,.14);--mint:#00E0A4;--card:#F8F4EC}
+*{box-sizing:border-box;margin:0}
+body{font:400 16px/1.5 'Hanken Grotesk',system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,#F8EEE2,#F8D9C9 40%,#EDD0DB 70%,#D6D8F0) fixed;-webkit-font-smoothing:antialiased}
+.w{width:min(1180px,100% - 32px);margin:0 auto;padding:48px 0 80px}
+h1{font-size:clamp(36px,6vw,64px);line-height:1;letter-spacing:-.055em;font-weight:800}h1 span{font-weight:200}
+.lead{color:var(--mut);margin:12px 0 22px;max-width:600px}
+h2{font-size:22px;letter-spacing:-.03em;margin:38px 0 4px}
+.seg{display:inline-flex;gap:3px;padding:3px;border-radius:99px;background:rgba(20,17,13,.08)}
+.seg button{border:0;background:transparent;height:34px;padding:0 16px;border-radius:99px;font:600 14px inherit;font-family:inherit;cursor:pointer;color:var(--mut)}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,350px),1fr));gap:18px;margin-top:16px}
+.c{background:var(--card);border-radius:28px;overflow:hidden;border:1px solid var(--line)}
+.big{height:170px;display:grid;place-items:center;background:linear-gradient(120deg,#F3E9DA,#F6D3C2 35%,#E4C2D6 60%,#C2D6EE)}
+.big svg{height:82px;width:auto;overflow:visible}
+.t{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 16px 0}
+.t div{height:64px;border-radius:16px;display:grid;place-items:center;border:1px solid var(--line)}
+.t svg{height:34px;width:auto}
+.lk{display:flex;align-items:center;gap:8px;font-size:20px;letter-spacing:-.05em;line-height:1;white-space:nowrap}.lk svg{height:26px;width:auto}.lk b{font-weight:800}.lk em{font-style:normal;font-weight:200}
+.r{display:flex;align-items:center;gap:14px;padding:14px 16px 0;flex-wrap:wrap}
+.fv{display:flex;align-items:flex-end;gap:10px}.fv svg{display:block}
+.m{padding:12px 16px 16px;display:flex;align-items:center;gap:10px}
+.m h3{font-size:18px;letter-spacing:-.03em;font-weight:700;flex:1}.m p{grid-column:1/-1}
+.d{padding:0 16px;color:var(--mut);font-size:14px}
+.cp{border:0;border-radius:99px;height:34px;padding:0 14px;background:var(--ink);color:#fff;font:600 13px 'Hanken Grotesk';cursor:pointer}
+.eq rect{transform-box:fill-box;transform-origin:center;animation:eq 1.1s ease-in-out infinite}
+.eq rect:nth-child(2){animation-delay:.15s}.eq rect:nth-child(3){animation-delay:.3s}.eq rect:nth-child(4){animation-delay:.45s}.eq rect:nth-child(5){animation-delay:.6s}
+@keyframes eq{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.15)}}
+@media(prefers-reduced-motion:reduce){.eq rect{animation:none}}
+@keyframes bl{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(.12)}}
+.bl rect{transform-box:fill-box;transform-origin:center;animation:bl 3.4s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.bl rect{animation:none}}
+@keyframes lg{0%,100%{transform:translateX(0)}30%{transform:translateX(-3px)}65%{transform:translateX(3px)}}
+.lg{animation:lg 5s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.lg{animation:none}}
+</style></head><body><div class="w">
+<h1>Reel <span>logo kit</span></h1>
+<p class="lead">All six directions as ready marks, plus audio-wave versions of option 5. Each shows ink, cream and mint versions, a lockup with the product name, and favicon sizes. Copy any mark as SVG.</p>
+<div class="seg" id="seg"></div>
+<h2>The six options</h2><div class="g" id="a"></div>
+<h2>From Reel Parallax</h2><p class="d" style="padding:0">The logo extracted from the Reel Parallax scene tool, plus its favicon.</p><div class="g" id="r"></div>
+<h2>Reel Relight ideas</h2><p class="d" style="padding:0">Marks built around light: a source, a rim, a handle, a before/after split.</p><div class="g" id="rl"></div>
+<h2>Reel Previz ideas</h2><p class="d" style="padding:0">Marks built around 3D previs and storyboards: a cube, frames, a camera, depth, an orbit.</p><div class="g" id="pv"></div>
+<h2>Option 5 as an audio wave</h2><p class="d" style="padding:0">The same ring and mint accent, with a waveform in place of the play triangle. Use it for audio, podcast and voice tools in the suite.</p><div class="g" id="b"></div>
+<h2>Option 5a, cuter and with ear cups</h2><p class="d" style="padding:0">Cuter faces on the 5a ring, plus headphones without a floating band: ear cups only, or a coloured band hugging the head so the face stays big.</p><div class="g" id="v"></div>
+<h2>More ear cups, plus a ball bot</h2><p class="d" style="padding:0">More takes on 5j to 5l, then a solid-ball character inspired by a glossy bot mascot.</p><div class="g" id="u"></div>
+<h2>Ball bot, more eyes and a thin bar</h2><p class="d" style="padding:0">5w and 5x with different eye placements and animations, then versions with a thin ink headphone bar instead of the peach band.</p><div class="g" id="q"></div>
+</div>
+<script>
+var INK='#14110D',CR='#F3EEE4',MINT='#00E0A4',PE='#F3B8A8',X='xmlns="http://www.w3.org/2000/svg"',P='Studio';
+var RING=function(c,w){return '<path d="M20 3c11 0 17 6 17 17s-6 17-17 17S3 31 3 20 9 3 20 3z" stroke="'+c+'" stroke-width="'+(w||3.2)+'"/>'};
+var BARS=function(m,cls){var h=[8,16,24,14,8],o='';for(var i=0;i<5;i++)o+='<rect x="'+(10.5+i*4.7)+'" y="'+(20-h[i]/2)+'" width="3" height="'+h[i]+'" rx="1.5" fill="'+m+'"/>';return '<g class="'+(cls||'')+'">'+o+'</g>'};
+var HP=function(c,m,cls){return '<svg '+X+' viewBox="0 0 40 40" fill="none"><path d="M4.5 22C4.5 8 11 3.5 20 3.5S35.5 8 35.5 22" stroke="'+c+'" stroke-width="3.2" stroke-linecap="round"/><g transform="translate(20 23.500) scale(.72) translate(-20 -20)">'+RING(c,3.6)+BARS(m,cls)+'</g><rect x="1.2" y="17.500" width="7" height="12.500" rx="3.500" fill="'+m+'" stroke="'+c+'" stroke-width="2.400"/><rect x="31.800" y="17.500" width="7" height="12.500" rx="3.500" fill="'+m+'" stroke="'+c+'" stroke-width="2.400"/></svg>'};
+var O=[
+{n:'Playhead',d:'The "l" is a playhead. Wordmark with a companion mark.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40" fill="none"><rect x="17.5" y="9" width="5" height="26" rx="2.5" fill="'+c+'"/><circle cx="20" cy="9" r="6.5" fill="'+m+'" stroke="'+c+'" stroke-width="3"/></svg>'},
+ word:function(c,m){return '<svg '+X+' viewBox="0 0 150 40" fill="none"><text x="0" y="31" font-family="Hanken Grotesk,sans-serif" font-weight="800" font-size="38" letter-spacing="-2.5" fill="'+c+'">Ree</text><rect x="73" y="5" width="4.5" height="30" rx="2.2" fill="'+c+'"/><circle cx="75.2" cy="6" r="5" fill="'+m+'" stroke="'+c+'" stroke-width="2.4"/></svg>'}},
+{n:'Annotation ring',d:'A hand-drawn circle around a dot. Says markup at a glance.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40" fill="none"><path d="M21 4C31 3 38 11 36 21c-2 9-10 16-19 14C8 33 3 25 4 17 5 9 12 5 21 4z" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/><circle cx="20" cy="20" r="6.2" fill="'+m+'"/></svg>'}},
+{n:'Timeline clips',d:'Three clips of different length. Reads as editing.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40"><rect x="3" y="7" width="22" height="7.5" rx="3.75" fill="'+c+'"/><rect x="11" y="16.25" width="26" height="7.5" rx="3.75" fill="'+m+'"/><rect x="3" y="25.5" width="16" height="7.5" rx="3.75" fill="'+PE+'"/></svg>'}},
+{n:'R monogram',d:'A bold R in a rounded square with a mint dot.',
+ mark:function(c,m){var f=c===INK?INK:CR,t=c===INK?CR:INK;return '<svg '+X+' viewBox="0 0 40 40"><rect width="40" height="40" rx="11" fill="'+f+'"/><path d="M12.5 29V11h8.2c4 0 6.2 2.2 6.2 5.3 0 2.7-1.700 4.600-4.300 5.100L28 29h-4.600l-3.700-6.200h-3V29z M15.700 20.200h4.700c1.700 0 2.800-.8 2.800-2.300s-1.100-2.300-2.800-2.300h-4.700z" fill="'+t+'" fill-rule="evenodd"/><circle cx="30.500" cy="10" r="3" fill="'+MINT+'"/></svg>'}},
+{n:'Squircle play',d:'Outlined squircle with a soft play triangle. The mark used across the suite today.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40" fill="none">'+RING(c)+'<path d="M16.5 13.5l11 6.5-11 6.5z" fill="'+m+'" stroke="'+m+'" stroke-width="3" stroke-linejoin="round"/></svg>'}},
+{n:'Lowercase + dot',d:'Just "reel." in bold lowercase with a mint full stop.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40"><text x="19" y="30" text-anchor="middle" font-family="Hanken Grotesk,sans-serif" font-weight="800" font-size="32" fill="'+c+'">r</text><circle cx="31" cy="28" r="3.2" fill="'+m+'"/></svg>'},
+ word:function(c,m){return '<svg '+X+' viewBox="0 0 100 40" fill="none"><text x="0" y="31" font-family="Hanken Grotesk,sans-serif" font-weight="800" font-size="38" letter-spacing="-2.5" fill="'+c+'">reel<tspan fill="'+m+'">.</tspan></text></svg>'}}
+];
+var W=[
+{n:'5a. Wave bars',d:'Five rounded bars inside the ring, like a level meter.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40" fill="none">'+RING(c)+BARS(m)+'</svg>'}},
+{n:'5b. Wave line',d:'A smooth sound-wave line inside the ring.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40" fill="none">'+RING(c)+'<path d="M8 20q3-10 6 0t6 0t6 0t6 0" stroke="'+m+'" stroke-width="3" stroke-linecap="round"/></svg>'}},
+{n:'5c. Animated wave',d:'The bars move like live audio. Still when reduced motion is on.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40" fill="none">'+RING(c)+BARS(m,'eq')+'</svg>'}},
+{n:'5d. Headphones',d:'The wave-bars face wearing headphones: a dark band over the top and mint ear cups. Cute and friendly for listening and music tools.',
+ mark:function(c,m){return HP(c,m,'')}},
+{n:'5e. Headphones, animated',d:'Same character with the bars moving to the music. Still when reduced motion is on.',
+ mark:function(c,m){return HP(c,m,'eq')}}
+];
+var SV=function(b){return '<svg '+X+' viewBox="0 0 40 40" fill="none">'+b+'</svg>'};
+var CHEEK=function(y){return '<circle cx="10.300" cy="'+y+'" r="2.100" fill="'+PE+'"/><circle cx="29.700" cy="'+y+'" r="2.100" fill="'+PE+'"/>'};
+var SBARS=function(m,cls,y){return '<g transform="translate(20 '+(y||16)+') scale(.62) translate(-21.400 -20)">'+BARS(m,cls)+'</g>'};
+var SMILE=function(c){return '<path d="M15.500 26q4.500 4.500 9 0" stroke="'+c+'" stroke-width="2.400" stroke-linecap="round"/>'};
+var EYES=function(c){return '<circle cx="14" cy="18" r="2.300" fill="'+c+'"/><circle cx="26" cy="18" r="2.300" fill="'+c+'"/>'};
+var HAPPY=function(c){return '<path d="M11 19q3-4.500 6 0M23 19q3-4.500 6 0" stroke="'+c+'" stroke-width="2.600" stroke-linecap="round"/>'};
+var OPEN=function(m){return '<path d="M15.500 24h9a4.500 4.500 0 0 1-9 0z" fill="'+m+'"/>'};
+var EARS=function(c,f){return '<rect x="0.900" y="14.500" width="7" height="13" rx="3.500" fill="'+f+'" stroke="'+c+'" stroke-width="2.400"/><rect x="32.100" y="14.500" width="7" height="13" rx="3.500" fill="'+f+'" stroke="'+c+'" stroke-width="2.400"/>'};
+var BAND=function(c,f){return '<path d="M4.400 19C4.400 10 10.800 3.800 20 3.800S35.600 10 35.600 19" stroke="'+c+'" stroke-width="6.600" stroke-linecap="round"/><path d="M4.400 19C4.400 10 10.800 3.800 20 3.800S35.600 10 35.600 19" stroke="'+f+'" stroke-width="3.400" stroke-linecap="round"/>'};
+var V=[
+{n:'5f. Smiley bars',d:'Smaller bars sit high like a fringe of sound, with a smile and rosy cheeks.',
+ mark:function(c,m){return SV(RING(c)+SBARS(m,'',16)+SMILE(c)+CHEEK(24))}},
+{n:'5g. Bar eyes',d:'Two mint bars become wide eyes. Smile and cheeks make it a little character.',
+ mark:function(c,m){return SV(RING(c)+'<rect x="12.500" y="11.500" width="3.600" height="10" rx="1.800" fill="'+m+'"/><rect x="23.900" y="11.500" width="3.600" height="10" rx="1.800" fill="'+m+'"/>'+SMILE(c)+CHEEK(24.500))}},
+{n:'5h. Happy face',d:'Closed happy eyes and an open mint smile. The friendliest of the set.',
+ mark:function(c,m){return SV(RING(c)+HAPPY(c)+OPEN(m)+CHEEK(24))}},
+{n:'5i. Smiley, animated',d:'Same smiley with the bars bouncing to the music. Still when reduced motion is on.',
+ mark:function(c,m){return SV(RING(c)+SBARS(m,'eq',16)+SMILE(c)+CHEEK(24))}},
+{n:'5j. Ear cups only',d:'No band at all. Two ear cups sit on the sides like ears and the face keeps its full size.',
+ mark:function(c,m){return SV(RING(c)+BARS(m)+EARS(c,m))}},
+{n:'5k. Ear cups, cute face',d:'Ear cups as ears on the smiley face. Soft and character-like.',
+ mark:function(c,m){return SV(RING(c)+EARS(c,m)+SBARS(m,'',16)+SMILE(c)+CHEEK(24))}},
+{n:'5l. Ear cups, happy',d:'Ear cups with the happy closed-eye face.',
+ mark:function(c,m){return SV(RING(c)+EARS(c,PE)+HAPPY(c)+OPEN(m))}},
+{n:'5m. Hugging band, peach',d:'A peach band hugs the top of the ring so the face stays big. Mint cups.',
+ mark:function(c,m){return SV(RING(c)+BAND(c,PE)+BARS(m)+EARS(c,m))}},
+{n:'5n. Hugging band, mint',d:'Mint band and peach cups for a two-colour headset. Face stays full size.',
+ mark:function(c,m){return SV(RING(c)+BAND(c,m)+BARS(m)+EARS(c,PE))}},
+{n:'5o. Hugging band, cute',d:'Peach band close to the head with the smiley face.',
+ mark:function(c,m){return SV(RING(c)+BAND(c,PE)+EARS(c,m)+SBARS(m,'',17)+SMILE(c)+CHEEK(25))}}
+];
+var BALL=function(c){return '<path d="M20 3c11 0 17 6 17 17s-6 17-17 17S3 31 3 20 9 3 20 3z" fill="'+c+'"/>'};
+var PILL=function(m,cx,cy,h,rot,cls){return '<g class="'+(cls||'')+'" transform="rotate('+rot+' '+cx+' '+cy+')"><rect x="'+(cx-1.7)+'" y="'+(cy-h/2)+'" width="3.4" height="'+h+'" rx="1.7" fill="'+m+'"/></g>'};
+var GLINT=function(m,cls){return PILL(m,23.5,13.5,8,-18,cls)+PILL(m,29.5,14.5,8,-18,cls)};
+var EYE2=function(m,cls){return PILL(m,14,17,9,-10,cls)+PILL(m,26,17,9,10,cls)};
+var BIGEARS=function(c,f){return '<circle cx="4.200" cy="21" r="4.600" fill="'+f+'" stroke="'+c+'" stroke-width="2.400"/><circle cx="35.800" cy="21" r="4.600" fill="'+f+'" stroke="'+c+'" stroke-width="2.400"/>'};
+var WINK=function(c,m){return '<circle cx="14" cy="18" r="2.300" fill="'+c+'"/><path d="M23.500 19q2.800-4.500 5.600 0" stroke="'+c+'" stroke-width="2.600" stroke-linecap="round"/>'};
+var HEADFILL=function(c,f){return '<path d="M20 3c11 0 17 6 17 17s-6 17-17 17S3 31 3 20 9 3 20 3z" fill="'+f+'" stroke="'+c+'" stroke-width="3.200"/>'};
+var U=[
+{n:'5p. Cups, bar eyes',d:'Peach ear cups with the two-bar eyes, a smile and cheeks.',
+ mark:function(c,m){return SV(RING(c)+EARS(c,PE)+'<rect x="12.500" y="11.500" width="3.600" height="10" rx="1.800" fill="'+m+'"/><rect x="23.900" y="11.500" width="3.600" height="10" rx="1.800" fill="'+m+'"/>'+SMILE(c)+CHEEK(24.500))}},
+{n:'5q. Cups, wink',d:'One dot eye and one happy arc. Cheeky and a bit more personality.',
+ mark:function(c,m){return SV(RING(c)+EARS(c,m)+WINK(c,m)+OPEN(m)+CHEEK(24.500))}},
+{n:'5r. Round ear cups',d:'Round ears instead of pill cups. Reads more like a little creature.',
+ mark:function(c,m){return SV(BIGEARS(c,m)+RING(c)+BARS(m))}},
+{n:'5s. Ear cups, animated',d:'5j with the bars moving to the music. Still when reduced motion is on.',
+ mark:function(c,m){return SV(RING(c)+BARS(m,'eq')+EARS(c,m))}},
+{n:'5t. Peach head, cups',d:'Face filled peach so the head feels solid, with mint cups and a happy face.',
+ mark:function(c,m){return SV(HEADFILL(c,PE)+EARS(c,m)+HAPPY(c)+OPEN(m))}},
+{n:'5u. Ball bot',d:'Inspired by a glossy bot ball: a solid head with two slanted glints for eyes, in our mint.',
+ mark:function(c,m){return SV(BALL(c)+GLINT(m,''))}},
+{n:'5v. Ball bot, ear cups',d:'Solid ball with centred slanted eyes and mint ear cups.',
+ mark:function(c,m){return SV(EARS(c,m)+BALL(c)+EYE2(m,''))}},
+{n:'5w. Ball bot, band',d:'Solid ball with a peach band hugging the head and mint cups.',
+ mark:function(c,m){return SV(BALL(c)+BAND(c,PE)+EARS(c,m)+EYE2(m,''))}},
+{n:'5x. Ball bot, blinking',d:'Ball bot with ear cups that blinks every few seconds. Still when reduced motion is on.',
+ mark:function(c,m){return SV(EARS(c,m)+BALL(c)+EYE2(m,'bl'))}}
+];
+var EY=function(m,x1,x2,y,h,r1,r2,cls){return PILL(m,x1,y,h,r1,cls)+PILL(m,x2,y,h,r2,cls)};
+var LG=function(b){return '<g class="lg">'+b+'</g>'};
+var SBALL=function(c){return '<g transform="translate(20 22) scale(.8) translate(-20 -20)">'+BALL(c)+'</g>'};
+var THIN=function(c){return '<path d="M4 21C4 10 10.500 3.200 20 3.200S36 10 36 21" stroke="'+c+'" stroke-width="2.200" stroke-linecap="round"/>'};
+var THINCUPS=function(c,f){return '<rect x="0.900" y="16" width="7" height="12.500" rx="3.500" fill="'+f+'" stroke="'+c+'" stroke-width="2.400"/><rect x="32.100" y="16" width="7" height="12.500" rx="3.500" fill="'+f+'" stroke="'+c+'" stroke-width="2.400"/>'};
+var PB=function(c,m,eyes){return SV(BALL(c)+BAND(c,PE)+EARS(c,m)+eyes)};
+var TB=function(c,m,eyes){return SV(SBALL(c)+THIN(c)+THINCUPS(c,m)+eyes)};
+var PBARS2=function(m,cls){return '<g class="'+cls+'"><rect x="12.300" y="12.500" width="3.400" height="9" rx="1.700" fill="'+m+'"/><rect x="24.300" y="12.500" width="3.400" height="9" rx="1.700" fill="'+m+'"/></g>'};
+var ARCEYE=function(m){return '<path d="M10.500 20q3.500-5.500 7 0M22.500 20q3.500-5.500 7 0" stroke="'+m+'" stroke-width="3" stroke-linecap="round"/>'};
+var Q=[
+{n:'5y. Band, low wide eyes',d:'Eyes sit low and far apart for a cuter, baby-faced look.',
+ mark:function(c,m){return PB(c,m,EY(m,12.500,27.500,23,8,0,0,''))}},
+{n:'5z. Band, curious eyes',d:'Eyes close together and tilted inward. A little curious and thoughtful.',
+ mark:function(c,m){return PB(c,m,EY(m,17,23,17,9,12,-12,''))}},
+{n:'5aa. Band, glints up-right',d:'The glossy glint placement from the ball, now with the peach band and cups.',
+ mark:function(c,m){return PB(c,m,GLINT(m,''))}},
+{n:'5ab. Band, happy arc eyes',d:'Closed happy eyes in mint on the solid head.',
+ mark:function(c,m){return PB(c,m,ARCEYE(m))}},
+{n:'5ac. Band, looking around',d:'The eyes drift left and right like the bot is looking about. Still when reduced motion is on.',
+ mark:function(c,m){return PB(c,m,LG(EYE2(m,'')))}},
+{n:'5ad. Band, bouncing eyes',d:'Eyes bounce up and down like audio bars. Still when reduced motion is on.',
+ mark:function(c,m){return PB(c,m,PBARS2(m,'eq'))}},
+{n:'5ae. Thin bar, slanted eyes',d:'No peach. A thin ink headphone bar floats just above a slightly smaller ball, with mint cups.',
+ mark:function(c,m){return TB(c,m,EY(m,15.500,24.500,20,7.500,-10,10,''))}},
+{n:'5af. Thin bar, glints',d:'Thin bar with the glossy up-right glints.',
+ mark:function(c,m){return TB(c,m,PILL(m,23.500,17.500,6.500,-18,'')+PILL(m,28.500,18.500,6.500,-18,''))}},
+{n:'5ag. Thin bar, blinking',d:'Thin bar version that blinks every few seconds. Still when reduced motion is on.',
+ mark:function(c,m){return TB(c,m,EY(m,15.500,24.500,20,7.500,-10,10,'bl'))}},
+{n:'5ah. Thin bar, looking around',d:'Thin bar version with eyes drifting side to side. Still when reduced motion is on.',
+ mark:function(c,m){return TB(c,m,LG(EY(m,15.500,24.500,20,7.500,-10,10,'')))}},
+{n:'5ai. Thin bar, happy eyes',d:'Thin bar with closed happy arc eyes.',
+ mark:function(c,m){return TB(c,m,'<path d="M11.500 21q3-5 6 0M22.500 21q3-5 6 0" stroke="'+m+'" stroke-width="2.800" stroke-linecap="round"/>')}}
+];
+var SQ='M20 3c11 0 17 6 17 17s-6 17-17 17S3 31 3 20 9 3 20 3z';
+var PLAY=function(m,tr){return '<path d="M16.5 13.5l11 6.5-11 6.5z"'+(tr?' transform="'+tr+'"':'')+' fill="'+m+'" stroke="'+m+'" stroke-width="3" stroke-linejoin="round"/>'};
+var R=[
+{n:'Parallax layers',prod:'Parallax',d:'Extracted from Reel Parallax: three stacked squircles fading back in depth, with the mint play triangle in front.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40" fill="none"><g stroke="'+c+'" stroke-width="3.2"><path d="'+SQ+'" transform="translate(7 7) scale(.82)" opacity=".16"/><path d="'+SQ+'" transform="translate(3.500 3.500) scale(.82)" opacity=".4"/><path d="'+SQ+'" transform="scale(.82)"/></g>'+PLAY(m,'scale(.82)')+'</svg>'}},
+{n:'Parallax favicon',prod:'Parallax',d:'The solid dot and play triangle used as the Reel Parallax browser tab icon.',
+ mark:function(c,m){return '<svg '+X+' viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" fill="'+c+'"/>'+PLAY(m)+'</svg>'}}
+];
+var RL=[
+{n:'Light cone',prod:'Relight',d:'A small light source throws a soft mint cone across the ring. The simplest read of "relight".',
+ mark:function(c,m){return SV(RING(c)+'<path d="M11 11L32 17.500 17 32z" fill="'+m+'" opacity=".5"/><circle cx="11" cy="11" r="3" fill="'+m+'" stroke="'+c+'" stroke-width="2"/>')}},
+{n:'Before / after',prod:'Relight',d:'Half the ring in shadow, half lit, split by a slider knob. Points at the before/after compare.',
+ mark:function(c,m){return SV('<path d="M20 5.500A14.500 14.500 0 0 0 20 34.500z" fill="'+c+'"/>'+RING(c)+'<path d="M20 3v34" stroke="'+c+'" stroke-width="2.600"/><circle cx="20" cy="20" r="4.200" fill="'+m+'" stroke="'+c+'" stroke-width="2.600"/>')}},
+{n:'Rim light',prod:'Relight',d:'A solid dark head with a mint rim catching the light on one edge. Strong at small sizes.',
+ mark:function(c,m){return SV(BALL(c)+'<path d="M22.500 3.500C30.500 4.500 36 10.500 36.200 18" stroke="'+m+'" stroke-width="3.600" stroke-linecap="round"/>')}},
+{n:'Light handle',prod:'Relight',d:'The draggable light handle from the editor: a mint knob on a stalk inside the ring.',
+ mark:function(c,m){return SV(RING(c)+'<path d="M14.500 25.500L25.500 14.500" stroke="'+c+'" stroke-width="2.600" stroke-linecap="round"/><circle cx="14.500" cy="25.500" r="2.200" fill="'+c+'"/><circle cx="26" cy="14" r="4" fill="'+m+'" stroke="'+c+'" stroke-width="2.400"/>')}},
+{n:'Sunburst',prod:'Relight',d:'A mint sun with eight short rays. Friendly and obvious, no ring.',
+ mark:function(c,m){var r='';for(var i=0;i<8;i++){var a=i*Math.PI/4,x1=20+Math.cos(a)*11.500,y1=20+Math.sin(a)*11.500,x2=20+Math.cos(a)*16.500,y2=20+Math.sin(a)*16.500;r+='M'+x1.toFixed(2)+' '+y1.toFixed(2)+'L'+x2.toFixed(2)+' '+y2.toFixed(2)}return SV('<path d="'+r+'" stroke="'+c+'" stroke-width="3.200" stroke-linecap="round"/><circle cx="20" cy="20" r="6.500" fill="'+m+'" stroke="'+c+'" stroke-width="2.600"/>')}},
+{n:'Crescent light',prod:'Relight',d:'A dark disc slides over a mint one, leaving a crescent of light. Reads as light and shadow.',
+ mark:function(c,m){return SV('<circle cx="20" cy="20" r="15.500" fill="'+m+'"/><circle cx="25.500" cy="14.500" r="14" fill="'+c+'"/>')}}
+];
+var PV=[
+{n:'Isometric cube',prod:'Previz',d:'A 3D cube with a mint top face. Says 3D at a glance.',
+ mark:function(c,m){return SV('<path d="M20 4L33.900 12 20 20 6.100 12z" fill="'+m+'"/><path d="M20 4l13.900 8v16L20 36 6.100 28V12z M20 20v16M6.100 12L20 20l13.900-8" stroke="'+c+'" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>')}},
+{n:'Storyboard grid',prod:'Previz',d:'Four frames in a grid, one lit mint. A storyboard page.',
+ mark:function(c,m){return SV('<rect x="4" y="4" width="14" height="14" rx="4.500" stroke="'+c+'" stroke-width="3"/><rect x="22" y="4" width="14" height="14" rx="4.500" stroke="'+c+'" stroke-width="3"/><rect x="4" y="22" width="14" height="14" rx="4.500" stroke="'+c+'" stroke-width="3"/><rect x="22" y="22" width="14" height="14" rx="4.500" fill="'+m+'"/>')}},
+{n:'Viewfinder',prod:'Previz',d:'Four camera framing corners around the mint play triangle.',
+ mark:function(c,m){return SV('<path d="M4 13V8a4 4 0 0 1 4-4h5M27 4h5a4 4 0 0 1 4 4v5M36 27v5a4 4 0 0 1-4 4h-5M13 36H8a4 4 0 0 1-4-4v-5" stroke="'+c+'" stroke-width="3.400" stroke-linecap="round"/>'+PLAY(m))}},
+{n:'Cine camera',prod:'Previz',d:'A simple camera body with a mint lens flare. Points to shot planning.',
+ mark:function(c,m){return SV('<rect x="3" y="10" width="23" height="20" rx="6" stroke="'+c+'" stroke-width="3.200"/><path d="M29 17l7-4.500v15L29 23z" fill="'+m+'" stroke="'+m+'" stroke-width="2.400" stroke-linejoin="round"/><circle cx="14.500" cy="20" r="3.600" fill="'+c+'"/>')}},
+{n:'Depth frame',prod:'Previz',d:'A frame receding toward a vanishing point, mint at the back. Echoes the layered depth of Parallax.',
+ mark:function(c,m){return SV('<rect x="3.500" y="3.500" width="33" height="33" rx="9" stroke="'+c+'" stroke-width="3.200"/><path d="M8.500 8.500l5.500 5.500M31.500 8.500L26 14M8.500 31.500l5.500-5.500M31.500 31.500L26 26" stroke="'+c+'" stroke-width="2.600" stroke-linecap="round"/><rect x="13" y="13" width="14" height="14" rx="4" fill="'+m+'"/>')}},
+{n:'Orbit',prod:'Previz',d:'A camera orbiting a subject. A tilted mint orbit around a solid core.',
+ mark:function(c,m){return SV('<circle cx="20" cy="20" r="9" fill="'+c+'"/><ellipse cx="20" cy="20" rx="17" ry="6.500" transform="rotate(-28 20 20)" stroke="'+m+'" stroke-width="3.200"/><circle cx="32.500" cy="12" r="3.200" fill="'+m+'" stroke="'+c+'" stroke-width="2"/>')}}
+];
+function lock(o,c,m){var mk=o.mark(c,m);return o.word&&!o.keep?'<span class="lk">'+o.word(c,m)+'</span>':'<span class="lk">'+mk+'<b>Reel</b><em>'+(o.prod||P)+'</em></span>'}
+function card(o,i,pre){var el=document.createElement('div');el.className='c';
+ var big=o.word?o.word(INK,MINT):o.mark(INK,MINT);
+ var fv=[16,32,48].map(function(s){return '<div>'+o.mark(INK,MINT).replace('<svg ','<svg width="'+s+'" height="'+s+'" ')+'</div>'}).join('');
+ el.innerHTML='<div class="big">'+big+'</div>'
+ +'<div class="t"><div style="background:#F6F1E8">'+o.mark(INK,MINT)+'</div><div style="background:'+INK+'">'+o.mark(CR,MINT)+'</div><div style="background:'+MINT+'">'+o.mark(INK,CR)+'</div></div>'
+ +'<div class="r"><div class="lk-w" style="padding:10px 14px;border-radius:14px;background:#F6F1E8;border:1px solid var(--line)" data-lock="light"></div><div style="padding:10px 14px;border-radius:14px;background:'+INK+'" data-lock="dark"></div></div>'
+ +'<div class="r"><div class="fv">'+fv+'</div></div>'
+ +'<div class="m"><h3>'+(pre?'':(i+1)+'. ')+o.n+'</h3><button class="cp">Copy SVG</button></div><p class="d" style="padding-bottom:16px">'+o.d+'</p>';
+ el.querySelector('.cp').onclick=function(e){var t=(o.word?o.word(INK,MINT):o.mark(INK,MINT));navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){e.target.textContent='Copied';setTimeout(function(){e.target.textContent='Copy SVG'},1200)})};
+ el._o=o;return el}
+function paint(){document.querySelectorAll('.c').forEach(function(el){var o=el._o;el.querySelector('[data-lock=light]').innerHTML=lock(o,INK,MINT);el.querySelector('[data-lock=dark]').innerHTML=lock({mark:o.mark,word:o.word,prod:o.prod},CR,MINT).replace('class="lk"','class="lk" style="color:#F3EEE4"')})}
+O.forEach(function(o,i){document.getElementById('a').appendChild(card(o,i))});
+RL.forEach(function(o,i){document.getElementById('rl').appendChild(card(o,i,1))});
+PV.forEach(function(o,i){document.getElementById('pv').appendChild(card(o,i,1))});
+R.forEach(function(o,i){document.getElementById('r').appendChild(card(o,i,1))});
+Q.forEach(function(o,i){document.getElementById('q').appendChild(card(o,i,1))});
+U.forEach(function(o,i){document.getElementById('u').appendChild(card(o,i,1))});
+V.forEach(function(o,i){document.getElementById('v').appendChild(card(o,i,1))});
+W.forEach(function(o,i){document.getElementById('b').appendChild(card(o,i,1))});
+var seg=document.getElementById('seg');['Studio','Cover','Keyer','Brand','Parallax'].forEach(function(n){var b=document.createElement('button');b.textContent='Reel '+n;b.setAttribute('aria-pressed',n===P);b.onclick=function(){P=n;[].forEach.call(seg.children,function(x){x.setAttribute('aria-pressed',x===b)});paint()};seg.appendChild(b)});
+paint();
+</script></body></html>

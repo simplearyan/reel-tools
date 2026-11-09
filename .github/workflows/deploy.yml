@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:                      # only rebuild when something that ends up on the site changes
+      - "apps/**"
+      - "shared/**"
+      - "scripts/**"
+      - "site.json"
+      - "about.md"
+      - "README.md"
+      - "LICENSE"
+      - "package.json"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:            # adds a "Run workflow" button in the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check apps and site settings
+        run: node scripts/validate.mjs --strict
+
+      - name: Build site
+        run: node scripts/build.mjs
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

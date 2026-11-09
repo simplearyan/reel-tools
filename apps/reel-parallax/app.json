@@ -1,0 +1,16 @@
+{
+  "name": "Reel Parallax",
+  "slug": "reel-parallax",
+  "tagline": "Reel Parallax turns layers of type, shape and image into depth scenes you can preview, animate and send to Reel Studio.",
+  "description": "Reel Parallax turns layers of type, shape and image into depth scenes you can preview, animate and send to Reel Studio.",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

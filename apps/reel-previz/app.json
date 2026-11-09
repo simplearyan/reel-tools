@@ -1,0 +1,15 @@
+{
+  "name": "reel-previz",
+  "slug": "reel-previz",
+  "tagline": "3D previz and storyboards",
+  "description": "3D previz and storyboards",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

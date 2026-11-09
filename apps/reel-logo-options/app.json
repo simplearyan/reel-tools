@@ -1,0 +1,14 @@
+{
+  "name": "Reel Logo Options",
+  "slug": "reel-logo-options",
+  "tagline": "TODO: one-line summary",
+  "description": "TODO: two or three sentences for search results",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

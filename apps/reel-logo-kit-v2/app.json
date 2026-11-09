@@ -1,0 +1,15 @@
+{
+  "name": "Reel Logo Kit v2",
+  "slug": "reel-logo-kit-v2",
+  "tagline": "TODO: one-line summary",
+  "description": "TODO: two or three sentences for search results",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

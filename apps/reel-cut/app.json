@@ -1,0 +1,16 @@
+{
+  "name": "Reel Cut",
+  "slug": "reel-cut",
+  "tagline": "Reel Cut is a phone video editor from Reel Studio. Import a clip, cut, grade, add text and export, all on your device.",
+  "description": "Reel Cut is a phone video editor from Reel Studio. Import a clip, cut, grade, add text and export, all on your device.",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

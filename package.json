@@ -1,0 +1,26 @@
+{
+  "name": "reel",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs --open",
+    "start": "node scripts/dev.mjs --open",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/validate.mjs && node scripts/build.mjs",
+    "validate": "node scripts/validate.mjs",
+    "list": "node scripts/list.mjs",
+    "new": "node scripts/new-app.mjs",
+    "archive": "node scripts/archive.mjs",
+    "init": "node scripts/init-apps.mjs",
+    "organize": "node scripts/organize.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "ship": "node scripts/ship.mjs",
+    "clean": "node -e \"import('node:fs').then(f=>f.rmSync('dist',{recursive:true,force:true}))\"",
+    "admin": "node scripts/dev.mjs --admin",
+    "studio": "node scripts/dev.mjs --admin",
+    "layout": "node scripts/layout.mjs"
+  }
+}

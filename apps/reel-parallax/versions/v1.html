@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Reel Parallax — Layered depth scenes for Reel Studio</title>
+<meta name="description" content="Reel Parallax turns layers of type, shape and image into depth scenes you can preview, animate and send to Reel Studio.">
+<meta name="theme-color" content="#F8D9C9">
+<script>try{if(localStorage.theme==="dark"||(!("theme" in localStorage)&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}</script>
+    
+    <!-- Favicon Emoji -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2217%22 fill=%22%2314110D%22/%3E%3Cpath d=%22M16.5 13.5l11 6.5-11 6.5z%22 fill=%22%2300E0A4%22 stroke=%22%2300E0A4%22 stroke-width=%223%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;700;800;900&family=JetBrains+Mono:wght@400;500&family=Rubik:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <!-- Tailwind -->
+    <script>
+        // Suppress cdn.tailwindcss.com warning in console
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+            originalWarn.apply(console, args);
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script>
+        tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['"Hanken Grotesk"','system-ui','sans-serif'],display:['"Hanken Grotesk"','system-ui','sans-serif'],mono:['"JetBrains Mono"','monospace']},colors:{mint:'#00E0A4',reel:{blue:'#14110D',bluelight:'#C9F4E4',bg:'#EFE7DB',surface:'#F8F4EC',surface2:'#EDE7DC',border:'#D8CEBC',text:'#14110D',textmuted:'#5A544A',hover:'#E6DFD3'},night:{bg:'#14121B',surface:'#1B1724',surface2:'#241F2E',border:'#3A3447',text:'#F4EFE5',textmuted:'#B6AFC0',blue:'#3FE9BB',bluebg:'#0F4A3D',hover:'#2A2436'}}}}}
+    </script>
+    <style type="text/tailwindcss">
+:root{color-scheme:light;--grad:linear-gradient(160deg,#F8EEE2 0%,#F8D9C9 40%,#EDD0DB 70%,#D6D8F0 100%);--glass:rgba(248,244,236,.88);--eo:cubic-bezier(.05,.7,.1,1)}
+.dark{color-scheme:dark;--grad:linear-gradient(160deg,#16121D 0%,#1D1830 38%,#241B38 66%,#16242F 100%);--glass:rgba(27,23,36,.88)}
+html,body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{background:var(--grad) fixed!important;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+::selection{background:#00E0A4;color:#06281E}
+header,main{background:transparent!important}
+.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+h1,h3{letter-spacing:-.035em}
+.wm b{font-weight:800;letter-spacing:-.05em}.wm i{font-style:normal;font-weight:200;letter-spacing:-.05em}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#CFC4AF;border-radius:3px}.dark ::-webkit-scrollbar-thumb{background:#4A4358}
+input[type=range]{-webkit-appearance:none;width:100%;background:transparent}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:16px;width:16px;border-radius:50%;background:#14110D;border:3px solid #F8F4EC;cursor:pointer;margin-top:-6px;transition:transform .3s var(--eo)}
+.dark input[type=range]::-webkit-slider-thumb{background:#00E0A4;border-color:#241F2E}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=range]::-webkit-slider-runnable-track{width:100%;height:4px;cursor:pointer;background:#D8CEBC;border-radius:9px}
+.dark input[type=range]::-webkit-slider-runnable-track{background:#3A3447}
+input[type=range]:focus{outline:none}
+:focus-visible{outline:2px solid #14110D;outline-offset:3px}.dark :focus-visible{outline-color:#F4EFE5}
+.layer-item.active,.track-item.active{background-color:#C9F4E4;color:#14110D}
+.dark .layer-item.active,.dark .track-item.active{background-color:#0F4A3D;color:#3FE9BB}
+.btn-icon{@apply p-1.5 md:p-2 rounded-full hover:bg-reel-hover dark:hover:bg-night-hover transition-colors flex items-center justify-center text-reel-textmuted dark:text-night-textmuted}
+.rail-btn{@apply flex flex-col items-center justify-center w-[52px] h-[52px] md:w-[64px] md:h-[64px] rounded-full hover:bg-reel-hover dark:hover:bg-night-hover text-reel-textmuted dark:text-night-textmuted gap-1 transition-colors cursor-pointer relative}
+.rail-btn.active{@apply bg-reel-text text-white dark:bg-night-text dark:text-[#14110D]}
+#contextToolbar .hidden{display:none!important}
+#sidePanel,#timelineContainer{background:var(--glass)!important;backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.5)}
+.dark #sidePanel,.dark #timelineContainer{border-color:rgba(255,255,255,.1)}
+#timelineContainer{border-radius:24px}
+#rightSidebar,#rightSidebar>div:last-child{background:transparent!important}
+#thumbnailCanvas{border:0!important;border-radius:28px!important}
+#subTabDesignBtn,#subTabParallaxBtn,#subTabAnimationBtn,div:has(>#subTabDesignBtn){border-radius:999px!important}
+#sidePanel input[type=text],#sidePanel select{border-radius:999px!important}
+.dark input:focus,.dark select:focus{border-color:#3FE9BB!important}
+.snack{position:fixed;left:50%;bottom:24px;transform:translate(-50%,24px);background:#14110D;color:#fff;padding:14px 22px;border-radius:999px;font-size:15px;opacity:0;pointer-events:none;transition:transform .3s var(--eo),opacity .2s;z-index:80}
+.dark .snack{background:#F4EFE5;color:#14110D}.snack.on{transform:translate(-50%,0);opacity:1}
+
+
+:root{--bd:rgba(20,17,13,.14)}.dark{--bd:rgba(244,239,229,.16)}
+.rseg{display:inline-flex;padding:3px;border-radius:999px;border:1px solid var(--bd);gap:2px;background:rgba(255,255,255,.3)}.dark .rseg{background:rgba(255,255,255,.06)}
+.rseg button{height:32px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:500;color:#5A544A;transition:background .25s,color .25s}.dark .rseg button{color:#B6AFC0}
+.rseg button[aria-pressed=true]{background:#14110D;color:#fff}.dark .rseg button[aria-pressed=true]{background:#F4EFE5;color:#14110D}
+.pbtn{display:flex;align-items:center;gap:4px;height:38px;padding:0 12px 0 18px;border-radius:999px;font-weight:700;font-size:14px;background:#14110D;color:#fff}.dark .pbtn{background:#F4EFE5;color:#14110D}
+.emenu{position:absolute;right:0;top:calc(100% + 8px);width:250px;padding:6px;border-radius:20px;background:#F6F0E5;border:1px solid var(--bd);z-index:60}.dark .emenu{background:#2A2436}.emenu[hidden]{display:none}
+.emenu button{display:block;width:100%;text-align:left;padding:10px 14px;border-radius:14px;font-weight:600;font-size:14px}.emenu button:hover{background:rgba(127,127,127,.16)}
+.emenu small{display:block;font-weight:400;font-size:12px;opacity:.65}.emenu hr{border:0;border-top:1px solid var(--bd);margin:4px 8px}
+.sstat{font-size:12px;font-weight:500;padding:2px 10px;border-radius:99px;background:rgba(0,224,164,.2);color:#0A6B52}.dark .sstat{color:#3FE9BB}
+.ruler{position:sticky!important;top:0;height:22px;margin-left:96px;z-index:12;pointer-events:none;font-size:10px;color:#5A544A;background:var(--glass)}.dark .ruler{color:#B6AFC0}
+@media(min-width:768px){.ruler{margin-left:128px}}
+.ruler i{position:absolute;bottom:0;height:6px;border-left:1px solid currentColor;opacity:.5}.ruler i.mj{height:10px}.ruler b{position:absolute;top:-14px;left:3px;font-weight:500}
+.tbar{position:absolute;top:6px;bottom:6px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#14110D;z-index:20;cursor:grab;min-width:10px;overflow:hidden;white-space:nowrap;touch-action:none}
+.tbar.on{box-shadow:0 0 0 2px #14110D}.dark .tbar.on{box-shadow:0 0 0 2px #F4EFE5}
+.tbar u{position:absolute;top:0;bottom:0;width:10px;cursor:ew-resize}.tbar .hl{left:0}.tbar .hr{right:0}
+.eye{font-size:16px!important;margin-left:auto;opacity:.6}
+.pgrp{display:flex;flex-direction:column;gap:12px}.lyname{width:100%;font-weight:700;font-size:17px;background:transparent;border:0;outline:0;letter-spacing:-.02em}
+.alrow{display:flex;padding:3px;border-radius:999px;border:1px solid var(--bd);justify-content:space-between}
+.swrow{display:flex;gap:8px;flex-wrap:wrap}.swrow button{width:26px;height:26px;border-radius:50%;border:1px solid var(--bd);transition:transform .3s var(--eo)}.swrow button:hover{transform:translateY(-2px)}
+#propColorHex{min-width:0;flex:1 1 0;width:auto}#propertiesContent{overflow-x:hidden}
+#contextToolbar .btn-icon{color:#14110D}.dark #contextToolbar .btn-icon{color:#F4EFE5}#contextToolbar #tbDelete{color:#ef4444}
+.helpov{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(20,17,13,.55)}.helpov[hidden]{display:none}
+.helpbox{background:#F6F0E5;color:#14110D;border-radius:28px;padding:26px 30px;width:min(420px,92vw)}.dark .helpbox{background:#2A2436;color:#F4EFE5}
+.helpbox h3{font-size:26px;font-weight:800;margin-bottom:10px}.helpbox div{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--bd);font-size:15px}.helpbox kbd{font:500 13px 'JetBrains Mono',monospace;opacity:.75}
+
+header{position:relative;z-index:60!important}
+#playBtn{width:38px!important;height:38px!important;background:#00E0A4!important;color:#06281E!important;box-shadow:none!important}
+#playIcon{font-size:24px!important;margin:0!important;font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24!important}
+div:has(>#playBtn){background:transparent!important;padding:0!important;gap:14px!important}
+span:has(>#playTimeText){font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:400}
+#playTimeText{display:inline-block;min-width:46px;font-weight:600;font-size:14px;color:#14110D}.dark #playTimeText{color:#F4EFE5}
+.tbar span{opacity:0;transition:opacity .2s}.tbar.on span,.tbar:hover span{opacity:1}
+.ruler i:last-child b{left:auto;right:3px}
+.rowh{position:relative}.rowh .eye,.rowh .lk{position:absolute;top:50%;transform:translateY(-50%);margin:0;font-size:15px!important;opacity:0;transition:opacity .2s;background:var(--glass);border-radius:99px;padding:2px}
+.rowh .eye{right:28px}.rowh .lk{right:6px}
+#timelineTracks>div:hover .eye,#timelineTracks>div:hover .lk,.eye.on,.lk.on{opacity:.85}
+#workspace{position:relative}
+.cvbar{position:absolute;left:12px;bottom:8px;z-index:25;display:flex;gap:8px;align-items:center}
+.cvbar .zm{display:flex;align-items:center;gap:2px;padding:3px;border-radius:999px;border:1px solid var(--bd);background:rgba(255,255,255,.3)}.dark .cvbar .zm{background:rgba(255,255,255,.06)}
+.cvbar .zm span.v{font:600 12px 'JetBrains Mono',monospace;min-width:42px;text-align:center}.cvbar .rseg button{height:28px;padding:0 10px;font-size:12px}
+.oprow{display:flex;align-items:center;gap:10px;font-size:13px;color:#5A544A}.dark .oprow{color:#B6AFC0}.oprow input{flex:1}.oprow b{font:600 12px 'JetBrains Mono',monospace;min-width:38px;text-align:right}
+.mcode{border-top:1px solid var(--bd);padding-top:14px}.mcode summary{cursor:pointer;font-weight:600;font-size:14px}
+.mcode pre{margin-top:10px;padding:12px 14px;border-radius:16px;background:rgba(127,127,127,.12);font:500 12px/1.6 'JetBrains Mono',monospace;overflow-x:auto;white-space:pre}
+.mcopy{margin-top:8px;font-size:12px;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--bd)}
+
+#textProps{display:none!important}
+.vchip{display:flex;align-items:center;gap:2px;height:34px;padding:0 8px 0 14px;border-radius:999px;border:1px solid var(--bd);font:600 13px 'JetBrains Mono',monospace;background:rgba(255,255,255,.3)}.dark .vchip{background:rgba(255,255,255,.06)}
+.vmenu{left:0;right:auto;width:210px}.vmenu small{display:inline;margin-left:8px}.mh{font-size:12px;font-weight:600;padding:8px 14px 2px;opacity:.6}.emenu [aria-pressed=true]{background:rgba(0,224,164,.18)}
+.tx{display:flex;flex-direction:column;gap:10px}.tx h4{font-size:13px;font-weight:600;opacity:.65;margin:14px 2px 2px}.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.addr{display:flex;align-items:center;justify-content:space-between;width:100%;height:52px;padding:0 18px;border-radius:999px;border:1px solid var(--bd);background:rgba(255,255,255,.3);transition:background .2s}.dark .addr{background:rgba(255,255,255,.06)}.addr:hover{background:rgba(127,127,127,.14)}
+.sty{display:flex;flex-direction:column;justify-content:space-between;height:104px;padding:12px 14px;border-radius:20px;background:#F4EFE5;color:#14110D;text-align:left;transition:transform .35s var(--eo)}.sty:hover{transform:translateY(-3px)}
+.sty .sv{line-height:1.1;white-space:nowrap;overflow:hidden}.sty .sn{font-size:12px;opacity:.6;font-weight:500}
+#tprops details{border-top:1px solid var(--bd);padding-top:14px;display:flex;flex-direction:column;gap:12px}#tprops summary{cursor:pointer;font-weight:600;font-size:14px;margin-bottom:10px}
+.tin{width:100%;height:42px;padding:0 16px;border-radius:999px;border:1px solid var(--bd);background:rgba(255,255,255,.3);font-size:14px;outline:0}.dark .tin{background:rgba(255,255,255,.06);color:#F4EFE5;color-scheme:dark}
+.trow{display:flex;gap:8px}.trow .tin{flex:1;padding:0 12px}.oprow span{min-width:58px}
+.tg2{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--bd);font-size:13px;font-weight:600}.tg2[aria-pressed=true]{background:#14110D;color:#fff}.dark .tg2[aria-pressed=true]{background:#F4EFE5;color:#14110D}
+
+.ur{display:flex;padding:2px;border-radius:999px;border:1px solid var(--bd)}
+.tzm{display:flex;align-items:center;gap:2px;padding:2px;border-radius:999px;border:1px solid var(--bd);margin-right:4px}#tzv{font:600 12px 'JetBrains Mono',monospace;min-width:40px;text-align:center;cursor:pointer}.tzm{height:30px;padding:0 2px}.tzm .btn-icon{padding:4px}#tzFit{display:none}#timelineContainer>.justify-between{position:relative}#timelineContainer>.justify-between>div:first-child{display:none}div:has(>#playBtn){position:absolute;left:50%;transform:translateX(-50%)}
+.xl-only{display:none}@media(min-width:980px){.xl-only{display:inline}}
+@media(max-width:1180px){.crumb,#helpBtn{display:none!important}}
+@media(max-width:980px){#saveStat{display:none}}
+@media(max-width:760px){#redoBtn,#arWrap{display:none!important}}
+@media(max-width:560px){.wm i,#themeToggle{display:none}.rseg button{padding:0 10px}}
+.ac{display:flex;flex-direction:column;gap:6px;text-align:left}.ac .nm{font-size:12px;font-weight:500;opacity:.7}
+.tp{aspect-ratio:16/10;border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;transition:transform .35s var(--eo)}.ac:hover .tp,.ac:hover .el{transform:translateY(-3px)}
+.tp b{font:800 14px/1 'Hanken Grotesk',sans-serif;letter-spacing:-.03em}.tp i{display:block;height:5px;width:45%;border-radius:9px}
+.pc{height:64px;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:800 20px 'Hanken Grotesk',sans-serif;letter-spacing:-.03em}.pc i{width:16px;height:16px;border-radius:50%}
+.el{height:72px;border-radius:16px;background:rgba(127,127,127,.12);display:grid;place-items:center;transition:transform .35s var(--eo)}.mt{margin-top:14px}
+.xo{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:rgba(20,17,13,.55);padding:16px}.xo[hidden]{display:none}
+.xd{width:min(440px,100%);max-height:100%;overflow-y:auto;border-radius:28px;padding:24px;background:#F6F0E5;color:#14110D;border:1px solid var(--bd)}.dark .xd{background:#2A2436;color:#F4EFE5}
+.xd h3{font-size:24px;font-weight:800;letter-spacing:-.03em;margin:0 0 4px}.xd .xs{font-size:13px;color:#5A544A;margin-bottom:18px}.dark .xd .xs{color:#B6AFC0}
+.xg{margin-bottom:16px}.xg>p{font-size:13px;font-weight:600;margin:0 0 8px;opacity:.7}.xr{display:flex;gap:8px;flex-wrap:wrap}
+.xr button{height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--bd);font-size:14px;font-weight:600}.xr button[aria-pressed=true]{background:#14110D;color:#fff;border-color:transparent}.dark .xr button[aria-pressed=true]{background:#F4EFE5;color:#14110D}.xr button:disabled{opacity:.35}
+.xn{font-size:12px;opacity:.7;margin:6px 2px 0}.xa{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px}.xa .sum{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.xa button{height:44px;padding:0 22px;border-radius:999px;font-weight:700;font-size:14px;border:1px solid var(--bd)}.xa .go{background:#14110D;color:#fff;border-color:transparent}.dark .xa .go{background:#F4EFE5;color:#14110D}
+.xb{height:8px;border-radius:99px;background:rgba(127,127,127,.2);overflow:hidden;margin:18px 0 10px}.xb i{display:block;height:100%;width:0;background:#00E0A4;transition:width .15s}
+
+.dz{display:flex;flex-direction:column;gap:8px}.dzh{display:flex;justify-content:space-between;font-size:13px;color:#5A544A}.dark .dzh{color:#B6AFC0}.dzh b{font:600 12px 'JetBrains Mono',monospace}
+.dzs{position:relative;height:84px;border-radius:20px;border:1px solid var(--bd);background:rgba(127,127,127,.08) linear-gradient(90deg,var(--bd) 1px,transparent 1px) 0 0/25% 100%;touch-action:none;overflow:hidden}
+.dzs em{position:absolute;bottom:5px;left:12px;font-size:10px;font-style:normal;opacity:.55}.dzs em:last-child{left:auto;right:12px}
+.dzs i{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;cursor:grab}.dzs i.on{box-shadow:0 0 0 3px #00E0A4}
+#sidePanel>div,#propertiesContent{min-height:0}#panelProperties,#panelText,#panelAssets{min-height:0;overflow:hidden}
+.rail-btn{border-radius:18px!important}.rail-btn.active{background:#C9F4E4!important;color:#14110D!important}.dark .rail-btn.active{background:rgba(0,224,164,.16)!important;color:#3FE9BB!important}
+#playBtn{width:36px!important;height:36px!important;background:transparent!important;color:#14110D!important}.dark #playBtn{color:#F4EFE5!important}#playIcon{font-size:32px!important}
+span:has(>#playTimeText){font-family:'Hanken Grotesk',sans-serif;font-variant-numeric:tabular-nums;font-size:15px;color:#5A544A}.dark span:has(>#playTimeText){color:#B6AFC0}
+#playTimeText{font-family:inherit;font-size:15px;font-weight:600}
+#tzv,.oprow b,.vchip{font-family:'Hanken Grotesk',sans-serif!important;font-variant-numeric:tabular-nums;font-weight:600}
+.oprow{display:grid;grid-template-columns:64px 1fr 44px;align-items:center;gap:10px}.oprow b{text-align:right}
+.trow{display:flex;align-items:center;gap:8px}.trow .tin{flex:1;min-width:0}.tin{height:40px}.tg2{height:40px}
+#tprops{gap:0}#tprops details{gap:14px;padding:16px 0}#tprops summary{list-style:none;display:flex;justify-content:space-between;align-items:center;margin:0}#tprops summary::-webkit-details-marker{display:none}
+#tprops summary::after{content:'';width:6px;height:6px;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:rotate(45deg);opacity:.5;transition:transform .2s}#tprops details[open]>summary::after{transform:rotate(-135deg)}
+#zpre .tg2{flex:1}.dzh{display:none}.dzs{height:96px}
+select option{background:#F8F4EC;color:#14110D}.dark select option{background:#241F2E;color:#F4EFE5}
+.oprow{grid-template-columns:1fr auto;grid-template-areas:'l v' 's s';row-gap:10px;column-gap:12px}.oprow>span{grid-area:l;min-width:0}.oprow>b{grid-area:v}.oprow>input{grid-area:s}
+.pgrp{gap:18px}#tprops details{padding:20px 0}#tprops details>*+*{margin-top:16px}.tin{height:44px;padding:0 18px;font-size:14px}.trow{gap:10px}.tg2{height:44px}#tpIt{width:44px;padding:0;flex:none;display:grid;place-items:center}
+#contextToolbar{gap:4px;padding:6px 12px;border-radius:999px;max-width:calc(100% - 24px);overflow-x:auto;scrollbar-width:none}
+#tbFont,#tbWeight{height:32px;width:auto;border-radius:999px;border:1px solid var(--bd);background:transparent;color:inherit;padding:0 12px;font-size:13px;font-weight:500}
+#contextToolbar .w-px{height:18px;margin:0 6px;opacity:.6}
+.ptt{font-size:17px;font-weight:700;letter-spacing:-.02em}.phint{font-size:13px;line-height:1.5;margin-top:4px;color:#5A544A}.dark .phint{color:#B6AFC0}
+
+</style>
+</head>
+<body class="bg-reel-surface dark:bg-night-surface text-reel-text dark:text-night-text h-screen flex flex-col overflow-hidden transition-colors duration-200 font-sans">
+
+    <!-- Top Header - Completely Cleaned -->
+    <header class="h-14 md:h-16 flex items-center justify-between px-4 md:px-6 shrink-0 z-20">
+        <!-- Left: Reel Parallax brand -->
+        <div class="flex items-center gap-3 md:gap-5 min-w-0">
+            <a href="#" class="flex items-center gap-2.5 text-inherit no-underline" aria-label="Reel Parallax"><svg viewBox="0 0 40 40" width="34" height="34" fill="none" aria-hidden="true" class="shrink-0"><g stroke="currentColor" stroke-width="3.2"><path d="M20 3c11 0 17 6 17 17s-6 17-17 17S3 31 3 20 9 3 20 3z" transform="translate(7 7) scale(.82)" opacity=".16"/><path d="M20 3c11 0 17 6 17 17s-6 17-17 17S3 31 3 20 9 3 20 3z" transform="translate(3.5 3.5) scale(.82)" opacity=".4"/><path d="M20 3c11 0 17 6 17 17s-6 17-17 17S3 31 3 20 9 3 20 3z" transform="scale(.82)"/></g><path d="M16.5 13.5l11 6.5-11 6.5z" transform="scale(.82)" fill="#00E0A4" stroke="#00E0A4" stroke-width="3" stroke-linejoin="round"/></svg><span class="wm flex items-baseline gap-1 text-[20px] md:text-[22px] leading-none"><b>Reel</b><i>Parallax</i></span></a>
+            <span class="hidden md:block w-px h-6 bg-reel-border dark:bg-night-border"></span>
+            <h1 class="font-display font-medium text-[14px] md:text-[15px] flex items-center gap-2 min-w-0 truncate"><span class="hidden lg:inline text-reel-textmuted dark:text-night-textmuted">Reel Studio ›</span>Untitled scene<span class="material-symbols-rounded text-[18px] text-reel-textmuted dark:text-night-textmuted cursor-pointer hidden sm:block">star_outline</span><span class="material-symbols-rounded text-[18px] text-reel-textmuted dark:text-night-textmuted cursor-pointer hidden sm:block">cloud_done</span></h1>
+        </div>
+        
+        <!-- Right: Actions -->
+        <div class="flex items-center gap-2 md:gap-3">
+            <button id="themeToggle" class="btn-icon" title="Toggle Dark Mode">
+                <span class="material-symbols-rounded text-[18px] md:text-[20px]">dark_mode</span>
+            </button>
+            
+            <button id="parallaxToggleBtn" class="flex items-center gap-2 px-3 py-1.5 md:px-4 rounded-full hover:bg-reel-hover dark:hover:bg-night-hover font-display text-xs md:text-sm font-medium transition border border-transparent text-reel-textmuted dark:text-night-textmuted">
+                <span class="material-symbols-rounded text-[18px]">3d_rotation</span> <span class="hidden sm:inline">Preview depth</span>
+            </button>
+
+            <button id="openReelBtn" class="hidden md:flex items-center gap-2 px-4 py-2 rounded-full border border-reel-border dark:border-night-border font-display text-sm font-medium hover:bg-reel-hover dark:hover:bg-night-hover transition">Open in Reel Studio</button>
+            <button id="exportBtn" class="flex items-center gap-2 px-4 py-1.5 md:px-5 md:py-2 rounded-full font-display text-xs md:text-sm font-bold transition bg-reel-text text-white dark:bg-night-text dark:text-[#14110D] hover:opacity-90 active:scale-[.97]">Export</button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 flex overflow-hidden bg-reel-bg dark:bg-night-bg relative">
+        
+        <!-- Center Column (Canvas + Floating Timeline) -->
+        <div class="flex-1 flex flex-col relative min-w-0">
+            
+            <!-- Warning Banner for Parallax Mode -->
+            <div id="parallaxWarning" class="absolute top-4 left-1/2 -translate-x-1/2 bg-reel-text text-reel-surface dark:bg-night-text dark:text-night-surface px-5 py-2 md:px-6 md:py-2.5 rounded-full shadow-lg text-xs md:text-sm font-medium z-40 flex items-center gap-2 opacity-0 pointer-events-none transition-opacity duration-300">
+                <span class="material-symbols-rounded text-[18px] md:text-[20px]">360</span> Move your mouse to explore depth
+            </div>
+            <!-- Floating Context-Based Action Toolbar -->
+            <div id="contextToolbar" class="absolute top-4 left-1/2 -translate-x-1/2 bg-white dark:bg-night-surface border border-reel-border/60 dark:border-night-border shadow-[0_4px_20px_rgba(0,0,0,0.08)] rounded-full px-2 py-1.5 flex items-center gap-1 z-30 transition-all duration-300 opacity-0 -translate-y-4 pointer-events-none scale-95 origin-top">
+                <select id="tbFont" class="text-style-tool hidden bg-transparent text-[11px] md:text-xs font-medium px-2 py-1 outline-none text-reel-textmuted dark:text-night-textmuted border border-reel-border/40 dark:border-night-border rounded-full cursor-pointer hover:bg-reel-hover dark:hover:bg-night-hover transition mr-1">
+                    <option value='"Hanken Grotesk", sans-serif'>Hanken Grotesk</option>
+                    <option value='"JetBrains Mono", monospace'>JetBrains Mono</option><option value='"Rubik", sans-serif'>Rubik</option>
+                    <option value='"Playfair Display", serif'>Playfair Display</option>
+                </select>
+                <select id="tbWeight" class="text-style-tool hidden bg-transparent text-[11px] md:text-xs font-medium px-2 py-1 outline-none text-reel-textmuted dark:text-night-textmuted border border-reel-border/40 dark:border-night-border rounded-full cursor-pointer hover:bg-reel-hover dark:hover:bg-night-hover transition mr-1">
+                    <option value="200">Extralight</option><option value="300">Light</option>
+                    <option value="400">Regular</option>
+                    <option value="500">Medium</option>
+                    <option value="700">Bold</option>
+                    <option value="800">Extrabold</option><option value="900">Black</option>
+                </select>
+                <button id="tbBoldBtn" class="btn-icon text-style-tool hidden" title="Bold"><span class="material-symbols-rounded text-[18px]">format_bold</span></button>
+                <button id="tbItalicBtn" class="btn-icon text-style-tool hidden" title="Italic"><span class="material-symbols-rounded text-[18px]">format_italic</span></button>
+                <div class="w-px h-5 bg-reel-border dark:bg-night-border mx-1 text-style-tool hidden"></div>
+                
+                <div class="relative color-tool hidden flex items-center justify-center">
+                    <button class="btn-icon" title="Color">
+                        <span class="material-symbols-rounded text-[18px]" id="tbColorIcon">format_color_text</span>
+                    </button>
+                    <input type="color" id="tbColor" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer">
+                </div>
+                <div class="w-px h-5 bg-reel-border dark:bg-night-border mx-1 color-tool hidden"></div>
+                
+                <button id="tbScaleDownBtn" class="btn-icon scale-tool hidden" title="Scale Down"><span class="material-symbols-rounded text-[18px]">zoom_out</span></button>
+                <button id="tbScaleUpBtn" class="btn-icon scale-tool hidden" title="Scale Up"><span class="material-symbols-rounded text-[18px]">zoom_in</span></button>
+                <div class="w-px h-5 bg-reel-border dark:bg-night-border mx-1 scale-tool hidden"></div>
+                
+                <button id="tbBringForward" class="btn-icon" title="Bring Forward"><span class="material-symbols-rounded text-[18px]">flip_to_front</span></button>
+                <button id="tbSendBackward" class="btn-icon" title="Send Backward"><span class="material-symbols-rounded text-[18px]">flip_to_back</span></button>
+                <div class="w-px h-5 bg-reel-border dark:bg-night-border mx-1"></div>
+                <button id="tbDelete" class="btn-icon text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" title="Delete"><span class="material-symbols-rounded text-[18px]">delete</span></button>
+            </div>
+
+            <!-- Canvas Area (Maximum Space) -->
+            <div class="flex-1 flex items-center justify-center p-2 md:p-4 overflow-hidden" id="workspace">
+                <div class="relative shadow-sm transition-transform duration-200" id="canvasWrapper">
+                    <canvas id="thumbnailCanvas" width="1280" height="720" class="block w-full max-w-[1080px] h-auto cursor-crosshair bg-white border border-gray-200 dark:border-gray-800 rounded"></canvas>
+                </div>
+            </div>
+
+            <!-- Floating Timeline panel (Reduced Padding and Spacing) -->
+            <div id="timelineContainer" class="bg-reel-surface dark:bg-night-surface mx-1 mb-1 md:mx-2 md:mb-2 mt-0 rounded-xl shadow-sm border border-reel-border/50 dark:border-night-border flex flex-col shrink-0 overflow-hidden relative" style="height: 240px;">
+                <!-- Resize drag handle -->
+                <div id="timelineResizer" class="absolute top-0 left-0 right-0 h-1.5 cursor-ns-resize hover:bg-reel-blue/30 dark:hover:bg-night-blue/30 transition-colors z-30"></div>
+                <!-- Timeline Controls -->
+                <div class="flex items-center justify-between px-4 md:px-6 h-12 md:h-14 shrink-0 bg-white/50 dark:bg-black/20 border-b border-reel-border/30 dark:border-night-border/50">
+                    <div class="flex items-center gap-3">
+                        <button class="flex items-center gap-1 text-xs md:text-[13px] font-medium px-2 py-1 md:px-3 md:py-1.5 hover:bg-reel-hover dark:hover:bg-night-hover rounded-full transition">
+                            <span class="material-symbols-rounded text-[16px] md:text-[18px]">view_timeline</span> <span class="hidden sm:inline">Show timing</span> <span class="material-symbols-rounded text-[16px] md:text-[18px]">expand_more</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Play Controls -->
+                    <div class="flex items-center gap-2 md:gap-4 bg-reel-bluelight/50 dark:bg-night-bluebg/30 px-3 py-1 md:px-5 md:py-1.5 rounded-full">
+                        <button id="playBtn" class="w-6 h-6 md:w-8 md:h-8 rounded-full bg-mint text-[#06281E] flex items-center justify-center hover:scale-105 transition-transform">
+                            <span id="playIcon" class="material-symbols-rounded text-[16px] md:text-[20px] ml-0.5">play_arrow</span>
+                        </button>
+                        <span class="text-xs md:text-[13px] font-medium text-reel-blue dark:text-night-blue"><span id="playTimeText">00:00.0</span> <span class="text-reel-textmuted dark:text-night-textmuted font-normal">/ 00:05.0</span></span>
+                    </div>
+                    
+                    <div class="flex items-center gap-1 md:gap-1.5 justify-end hidden sm:flex">
+                        <button class="btn-icon" title="Zoom Out"><span class="material-symbols-rounded text-[18px] text-reel-textmuted dark:text-night-textmuted">zoom_out</span></button>
+                        <button class="btn-icon" title="Zoom In"><span class="material-symbols-rounded text-[18px] text-reel-textmuted dark:text-night-textmuted">zoom_in</span></button>
+                    </div>
+                </div>
+                
+                <!-- Timeline Tracks -->
+                <div class="flex-1 overflow-y-auto overflow-x-hidden px-1 md:px-2 py-0 space-y-0.5 md:space-y-1 relative" id="timelineTracks">
+                    <!-- Playhead Overlay Container -->
+                    <div id="playheadContainer" class="absolute left-24 md:left-32 right-0 top-0 bottom-0 pointer-events-auto cursor-ew-resize z-10">
+                        <!-- Playhead Line -->
+                        <div id="playheadLine" class="absolute top-0 bottom-0 w-px bg-reel-text dark:bg-night-text pointer-events-none" style="left: 0%;">
+                            <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-mint absolute -top-1 -left-[5px]"></div>
+                        </div>
+                    </div>
+                    <!-- Tracks built via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar Area -->
+        <aside class="flex bg-reel-surface dark:bg-night-surface shrink-0 z-20 sm:rounded-tr-3xl relative overflow-hidden transition-all duration-300 shadow-[-10px_0_20px_rgba(0,0,0,0.02)] dark:shadow-none" id="rightSidebar">
+            
+            <!-- Collapsible Panel Content -->
+            <div id="sidePanel" class="flex flex-col w-[280px] md:w-[300px] transition-[width] duration-300 overflow-hidden bg-white dark:bg-night-surface sm:rounded-tl-3xl shadow-sm border-l border-reel-border/30 dark:border-night-border absolute sm:relative right-[60px] md:right-[72px] sm:right-auto md:right-auto h-full">
+                
+                <!-- PROPERTIES PANEL -->
+                <div id="panelProperties" class="w-[280px] md:w-[300px] flex-1 flex flex-col hidden shrink-0">
+                    <div class="px-5 py-4 md:px-6 md:py-5 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-rounded text-reel-textmuted dark:text-night-textmuted">tune</span>
+                            <h3 class="font-display font-medium text-[15px] md:text-[16px]">Properties</h3>
+                        </div>
+                        <button class="btn-icon close-panel-btn hidden sm:flex" title="Close Panel"><span class="material-symbols-rounded text-[18px] md:text-[20px]">close</span></button>
+                    </div>
+
+                    <!-- Sub-tabs -->
+                    <div class="px-5 md:px-6 pb-2">
+                        <div class="flex bg-reel-bg dark:bg-night-bg p-1 rounded-xl">
+                            <button id="subTabDesignBtn" class="flex-1 text-[12px] md:text-[13px] font-medium py-1.5 rounded-lg bg-white dark:bg-night-surface shadow-sm text-reel-text dark:text-night-text">Design</button>
+                            <button id="subTabParallaxBtn" class="flex-1 text-[12px] md:text-[13px] font-medium py-1.5 rounded-lg text-reel-textmuted dark:text-night-textmuted hover:text-reel-text dark:hover:text-night-text transition">Parallax</button>
+                            <button id="subTabAnimationBtn" class="flex-1 text-[12px] md:text-[13px] font-medium py-1.5 rounded-lg text-reel-textmuted dark:text-night-textmuted hover:text-reel-text dark:hover:text-night-text transition">Animation</button>
+                        </div>
+                    </div>
+
+                    <div id="propertiesContent" class="flex-1 overflow-y-auto px-5 py-3 md:px-6 md:py-4 space-y-6 md:space-y-8 hidden">
+                        <!-- Sub Tab: Design -->
+                        <div id="subTabDesign" class="space-y-5 md:space-y-6">
+                            <!-- Text specific -->
+                            <div id="textProps" class="space-y-3 md:space-y-4">
+                                <div>
+                                    <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-1.5 md:mb-2">Text Content</label>
+                                    <input type="text" id="propText" class="w-full text-xs md:text-sm px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-reel-bg dark:bg-night-bg border border-transparent focus:border-reel-blue outline-none transition text-reel-text dark:text-night-text">
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-1.5 md:mb-2">Font Family</label>
+                                    <select id="propFont" class="w-full text-xs md:text-sm px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-reel-bg dark:bg-night-bg border border-transparent focus:border-reel-blue outline-none transition text-reel-text dark:text-night-text cursor-pointer">
+                                        <option value='"Hanken Grotesk", sans-serif'>Hanken Grotesk (Default)</option>
+                                        <option value='"JetBrains Mono", monospace'>JetBrains Mono</option><option value='"Rubik", sans-serif'>Rubik</option>
+                                        <option value='"Playfair Display", serif'>Playfair Display</option>
+                                    </select>
+                                </div>
+                                <div class="flex gap-2.5">
+                                    <div class="flex-1">
+                                        <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-1.5 md:mb-2">Font Weight</label>
+                                        <select id="propWeight" class="w-full text-xs md:text-sm px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-reel-bg dark:bg-night-bg border border-transparent focus:border-reel-blue outline-none transition text-reel-text dark:text-night-text cursor-pointer">
+                                            <option value="200">Extralight</option><option value="300">Light (300)</option>
+                                            <option value="400">Regular (400)</option>
+                                            <option value="500">Medium (500)</option>
+                                            <option value="700">Bold (700)</option>
+                                            <option value="800">Extrabold</option><option value="900">Black (900)</option>
+                                        </select>
+                                    </div>
+                                    <div class="w-20 md:w-24">
+                                        <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-1.5 md:mb-2">Style</label>
+                                        <div class="flex gap-1">
+                                            <button id="propBoldBtn" class="flex-1 h-9 md:h-11 rounded-xl border border-reel-border/50 dark:border-night-border flex items-center justify-center hover:bg-reel-hover dark:hover:bg-night-hover transition text-reel-textmuted dark:text-night-textmuted" title="Bold">
+                                                <span class="material-symbols-rounded text-[18px]">format_bold</span>
+                                            </button>
+                                            <button id="propItalicBtn" class="flex-1 h-9 md:h-11 rounded-xl border border-reel-border/50 dark:border-night-border flex items-center justify-center hover:bg-reel-hover dark:hover:bg-night-hover transition text-reel-textmuted dark:text-night-textmuted" title="Italic">
+                                                <span class="material-symbols-rounded text-[18px]">format_italic</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-2 md:mb-3 flex justify-between">
+                                        Font Size <span id="propSizeVal" class="text-reel-text dark:text-night-text font-mono bg-reel-bg dark:bg-night-bg px-1.5 py-0.5 rounded text-xs">100</span>
+                                    </label>
+                                    <input type="range" id="propSize" min="20" max="300" value="100" class="mt-1">
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-2 md:mb-3 flex justify-between">
+                                        Letter Spacing <span id="propTrackingVal" class="text-reel-text dark:text-night-text font-mono bg-reel-bg dark:bg-night-bg px-1.5 py-0.5 rounded text-xs">0px</span>
+                                    </label>
+                                    <input type="range" id="propTracking" min="-5" max="25" value="0" class="mt-1 w-full">
+                                </div>
+                            </div>
+
+                            <!-- Layout (X/Y) -->
+                            <div>
+                                <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-1.5 md:mb-2">Position</label>
+                                <div class="flex gap-2 md:gap-3">
+                                    <div class="flex-1 flex items-center bg-reel-bg dark:bg-night-bg rounded-xl px-2 py-1.5 md:px-3 md:py-2 border border-transparent focus-within:border-reel-blue transition">
+                                        <span class="text-[10px] md:text-[11px] text-reel-textmuted dark:text-night-textmuted mr-1.5 md:mr-2 font-mono uppercase">X</span>
+                                        <input type="number" id="propX" class="w-full bg-transparent text-xs md:text-sm outline-none text-reel-text dark:text-night-text font-mono">
+                                    </div>
+                                    <div class="flex-1 flex items-center bg-reel-bg dark:bg-night-bg rounded-xl px-2 py-1.5 md:px-3 md:py-2 border border-transparent focus-within:border-reel-blue transition">
+                                        <span class="text-[10px] md:text-[11px] text-reel-textmuted dark:text-night-textmuted mr-1.5 md:mr-2 font-mono uppercase">Y</span>
+                                        <input type="number" id="propY" class="w-full bg-transparent text-xs md:text-sm outline-none text-reel-text dark:text-night-text font-mono">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shape size (Rect Only) -->
+                            <div id="rectProps" class="hidden">
+                                <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-1.5 md:mb-2">Size</label>
+                                <div class="flex gap-2 md:gap-3">
+                                    <div class="flex-1 flex items-center bg-reel-bg dark:bg-night-bg rounded-xl px-2 py-1.5 md:px-3 md:py-2 border border-transparent focus-within:border-reel-blue transition">
+                                        <span class="text-[10px] md:text-[11px] text-reel-textmuted dark:text-night-textmuted mr-1.5 md:mr-2 font-mono uppercase">W</span>
+                                        <input type="number" id="propW" class="w-full bg-transparent text-xs md:text-sm outline-none text-reel-text dark:text-night-text font-mono">
+                                    </div>
+                                    <div class="flex-1 flex items-center bg-reel-bg dark:bg-night-bg rounded-xl px-2 py-1.5 md:px-3 md:py-2 border border-transparent focus-within:border-reel-blue transition">
+                                        <span class="text-[10px] md:text-[11px] text-reel-textmuted dark:text-night-textmuted mr-1.5 md:mr-2 font-mono uppercase">H</span>
+                                        <input type="number" id="propH" class="w-full bg-transparent text-xs md:text-sm outline-none text-reel-text dark:text-night-text font-mono">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Color -->
+                            <div>
+                                <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-1.5 md:mb-2">Fill Color</label>
+                                <div class="flex items-center gap-2 md:gap-3">
+                                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl overflow-hidden shrink-0 shadow-sm border border-black/5 dark:border-white/5">
+                                        <input type="color" id="propColor" class="w-[150%] h-[150%] -m-2 cursor-pointer outline-none">
+                                    </div>
+                                    <input type="text" id="propColorHex" class="flex-1 text-xs md:text-sm px-3 py-1.5 md:px-4 md:py-2.5 rounded-xl bg-reel-bg dark:bg-night-bg outline-none text-reel-text dark:text-night-text font-mono uppercase" readonly>
+                                </div>
+                            </div>
+                            
+                            <!-- Scale (Images & Shapes) -->
+                            <div id="scaleProps" class="hidden">
+                                <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-2 md:mb-3 flex justify-between">
+                                    Scale <span id="propScaleVal" class="text-reel-text dark:text-night-text font-mono bg-reel-bg dark:bg-night-bg px-1.5 py-0.5 rounded text-xs">100%</span>
+                                </label>
+                                <input type="range" id="propScale" min="10" max="300" value="100" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Sub Tab: Parallax -->
+                        <div id="subTabParallax" class="space-y-4 hidden">
+                            <div class="bg-reel-bg dark:bg-night-bg p-5 md:p-6 rounded-2xl text-center flex flex-col items-center">
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-night-surface rounded-full flex items-center justify-center mb-3 md:mb-4 shadow-sm">
+                                    <span class="material-symbols-rounded text-[20px] md:text-[24px] text-reel-blue dark:text-night-blue">layers</span>
+                                </div>
+                                <h4 class="text-[14px] md:text-[15px] font-medium mb-1">Depth</h4>
+                                <p class="text-[12px] md:text-[13px] text-reel-textmuted dark:text-night-textmuted mb-4 md:mb-6 leading-relaxed">Set how far forward this layer sits. Nearer layers move more when you preview.</p>
+                                
+                                <div class="w-full flex items-center justify-between text-[10px] md:text-[11px] font-bold text-reel-textmuted dark:text-night-textmuted mb-2 md:mb-3 uppercase tracking-wider">
+                                    <span>Back</span>
+                                    <span id="propZVal" class="text-reel-blue dark:text-night-blue bg-white dark:bg-night-surface px-2 py-1 rounded-md shadow-sm">0.00</span>
+                                    <span>Front</span>
+                                </div>
+                                <input type="range" id="propZ" min="0" max="1" step="0.05" value="0" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Sub Tab: Animation -->
+                        <div id="subTabAnimation" class="space-y-5 hidden">
+                            <div class="space-y-3">
+                                <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-1">Motion presets</label>
+                                <div class="grid grid-cols-2 gap-2.5" id="animPresetGrid">
+                                    <!-- None -->
+                                    <button class="anim-preset-btn p-3 rounded-2xl border border-reel-border/40 dark:border-night-border bg-white dark:bg-night-surface hover:bg-reel-hover dark:hover:bg-night-hover transition text-center flex flex-col items-center justify-center gap-1 group active" data-anim="none">
+                                        <div class="w-9 h-9 rounded-lg bg-reel-bg dark:bg-night-bg flex items-center justify-center text-reel-textmuted dark:text-night-textmuted group-hover:scale-105 transition-transform">
+                                            <span class="material-symbols-rounded text-[20px]">block</span>
+                                        </div>
+                                        <span class="text-[11px] font-medium text-reel-text dark:text-night-text">None</span>
+                                    </button>
+                                    <!-- Typewriter -->
+                                    <button class="anim-preset-btn p-3 rounded-2xl border border-reel-border/40 dark:border-night-border bg-white dark:bg-night-surface hover:bg-reel-hover dark:hover:bg-night-hover transition text-center flex flex-col items-center justify-center gap-1 group" data-anim="typewriter">
+                                        <div class="w-9 h-9 rounded-lg bg-reel-bg dark:bg-night-bg flex items-center justify-center text-reel-blue dark:text-night-blue group-hover:scale-105 transition-transform">
+                                            <span class="material-symbols-rounded text-[20px]">keyboard</span>
+                                        </div>
+                                        <span class="text-[11px] font-medium text-reel-text dark:text-night-text">Typewriter</span>
+                                    </button>
+                                    <!-- Fade -->
+                                    <button class="anim-preset-btn p-3 rounded-2xl border border-reel-border/40 dark:border-night-border bg-white dark:bg-night-surface hover:bg-reel-hover dark:hover:bg-night-hover transition text-center flex flex-col items-center justify-center gap-1 group" data-anim="fade">
+                                        <div class="w-9 h-9 rounded-lg bg-reel-bg dark:bg-night-bg flex items-center justify-center text-reel-blue dark:text-night-blue group-hover:scale-105 transition-transform">
+                                            <span class="material-symbols-rounded text-[20px]">blur_on</span>
+                                        </div>
+                                        <span class="text-[11px] font-medium text-reel-text dark:text-night-text">Fade</span>
+                                    </button>
+                                    <!-- Slide -->
+                                    <button class="anim-preset-btn p-3 rounded-2xl border border-reel-border/40 dark:border-night-border bg-white dark:bg-night-surface hover:bg-reel-hover dark:hover:bg-night-hover transition text-center flex flex-col items-center justify-center gap-1 group" data-anim="slide">
+                                        <div class="w-9 h-9 rounded-lg bg-reel-bg dark:bg-night-bg flex items-center justify-center text-reel-blue dark:text-night-blue group-hover:scale-105 transition-transform">
+                                            <span class="material-symbols-rounded text-[20px]">trending_flat</span>
+                                        </div>
+                                        <span class="text-[11px] font-medium text-reel-text dark:text-night-text">Slide</span>
+                                    </button>
+                                    <!-- Rise -->
+                                    <button class="anim-preset-btn p-3 rounded-2xl border border-reel-border/40 dark:border-night-border bg-white dark:bg-night-surface hover:bg-reel-hover dark:hover:bg-night-hover transition text-center flex flex-col items-center justify-center gap-1 group" data-anim="rise">
+                                        <div class="w-9 h-9 rounded-lg bg-reel-bg dark:bg-night-bg flex items-center justify-center text-reel-blue dark:text-night-blue group-hover:scale-105 transition-transform">
+                                            <span class="material-symbols-rounded text-[20px]">south_to_north</span>
+                                        </div>
+                                        <span class="text-[11px] font-medium text-reel-text dark:text-night-text">Rise</span>
+                                    </button>
+                                    <!-- Scale -->
+                                    <button class="anim-preset-btn p-3 rounded-2xl border border-reel-border/40 dark:border-night-border bg-white dark:bg-night-surface hover:bg-reel-hover dark:hover:bg-night-hover transition text-center flex flex-col items-center justify-center gap-1 group" data-anim="scale">
+                                        <div class="w-9 h-9 rounded-lg bg-reel-bg dark:bg-night-bg flex items-center justify-center text-reel-blue dark:text-night-blue group-hover:scale-105 transition-transform">
+                                            <span class="material-symbols-rounded text-[20px]">zoom_in</span>
+                                        </div>
+                                        <span class="text-[11px] font-medium text-reel-text dark:text-night-text">Scale</span>
+                                    </button>
+                                    <!-- Spin -->
+                                    <button class="anim-preset-btn p-3 rounded-2xl border border-reel-border/40 dark:border-night-border bg-white dark:bg-night-surface hover:bg-reel-hover dark:hover:bg-night-hover transition text-center flex flex-col items-center justify-center gap-1 group" data-anim="spin">
+                                        <div class="w-9 h-9 rounded-lg bg-reel-bg dark:bg-night-bg flex items-center justify-center text-reel-blue dark:text-night-blue group-hover:scale-105 transition-transform">
+                                            <span class="material-symbols-rounded text-[20px]">autorenew</span>
+                                        </div>
+                                        <span class="text-[11px] font-medium text-reel-text dark:text-night-text">Spin</span>
+                                    </button>
+                                    <!-- Breathe -->
+                                    <button class="anim-preset-btn p-3 rounded-2xl border border-reel-border/40 dark:border-night-border bg-white dark:bg-night-surface hover:bg-reel-hover dark:hover:bg-night-hover transition text-center flex flex-col items-center justify-center gap-1 group" data-anim="breathe">
+                                        <div class="w-9 h-9 rounded-lg bg-reel-bg dark:bg-night-bg flex items-center justify-center text-reel-blue dark:text-night-blue group-hover:scale-105 transition-transform">
+                                            <span class="material-symbols-rounded text-[20px]">pulse</span>
+                                        </div>
+                                        <span class="text-[11px] font-medium text-reel-text dark:text-night-text">Breathe</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Duration setting -->
+                            <div class="pt-2">
+                                <label class="block text-[12px] md:text-[13px] font-medium text-reel-textmuted dark:text-night-textmuted mb-2 md:mb-3 flex justify-between">
+                                    Animation Duration <span id="animDurationVal" class="text-reel-text dark:text-night-text font-mono bg-reel-bg dark:bg-night-bg px-1.5 py-0.5 rounded text-xs">1.0s</span>
+                                </label>
+                                <input type="range" id="propAnimDuration" min="200" max="3000" step="100" value="1000" class="w-full">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyProps" class="flex-1 flex flex-col items-center justify-center p-6 md:p-8 text-center">
+                        <div class="w-12 h-12 md:w-16 md:h-16 bg-reel-bg dark:bg-night-bg rounded-full flex items-center justify-center mb-3 md:mb-4 text-reel-textmuted/50 dark:text-night-textmuted/50">
+                            <span class="material-symbols-rounded text-[24px] md:text-[32px]">touch_app</span>
+                        </div>
+                        <h4 class="text-[14px] md:text-[15px] font-medium mb-1 text-reel-text dark:text-night-text">Nothing selected</h4>
+                        <p class="text-[12px] md:text-[13px] text-reel-textmuted dark:text-night-textmuted">Pick a layer on the canvas to edit it.</p>
+                    </div>
+                </div>
+
+                <!-- LAYERS PANEL -->
+                <div id="panelLayers" class="w-[280px] md:w-[300px] flex-1 flex flex-col shrink-0">
+                    <div class="px-5 py-4 md:px-6 md:py-5 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-rounded text-reel-textmuted dark:text-night-textmuted">stacks</span>
+                            <h3 class="font-display font-medium text-[15px] md:text-[16px]">Layers</h3>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button class="btn-icon text-reel-blue dark:text-night-blue hover:bg-reel-bluelight dark:hover:bg-night-bluebg" title="Add Layer"><span class="material-symbols-rounded text-[18px] md:text-[20px]">add</span></button>
+                            <button class="btn-icon close-panel-btn hidden sm:flex" title="Close Panel"><span class="material-symbols-rounded text-[18px] md:text-[20px]">close</span></button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto px-3 md:px-4 pb-4 space-y-1" id="layerList">
+                        <!-- Layers populated via JS -->
+                    </div>
+                </div>
+
+                <!-- TEXT PANEL -->
+                <div id="panelText" class="w-[280px] md:w-[300px] flex-1 flex flex-col hidden shrink-0">
+                    <div class="px-5 py-4 md:px-6 md:py-5 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-rounded text-reel-textmuted dark:text-night-textmuted">match_case</span>
+                            <h3 class="font-display font-medium text-[15px] md:text-[16px]">Text</h3>
+                        </div>
+                        <button class="btn-icon close-panel-btn hidden sm:flex" title="Close Panel"><span class="material-symbols-rounded text-[18px] md:text-[20px]">close</span></button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto px-5 pb-5 space-y-6">
+                        <!-- Quick Add Buttons -->
+                        <div class="space-y-2.5">
+                            <button id="addHeadingBtn" class="w-full text-left px-4 py-3 rounded-2xl bg-reel-bg dark:bg-night-bg hover:bg-reel-hover dark:hover:bg-night-hover border border-reel-border/20 dark:border-night-border/25 transition flex flex-col justify-center">
+                                <span class="text-base font-bold text-reel-text dark:text-night-text">Add a heading</span>
+                                <span class="text-[11px] text-reel-textmuted dark:text-night-textmuted mt-0.5">Hanken Grotesk / Extrabold / size 90</span>
+                            </button>
+                            <button id="addSubheadingBtn" class="w-full text-left px-4 py-3 rounded-2xl bg-reel-bg dark:bg-night-bg hover:bg-reel-hover dark:hover:bg-night-hover border border-reel-border/20 dark:border-night-border/25 transition flex flex-col justify-center">
+                                <span class="text-sm font-semibold text-reel-text dark:text-night-text">Add a subheading</span>
+                                <span class="text-[11px] text-reel-textmuted dark:text-night-textmuted mt-0.5">Hanken Grotesk / Bold / size 48</span>
+                            </button>
+                            <button id="addBodyTextBtn" class="w-full text-left px-4 py-3 rounded-2xl bg-reel-bg dark:bg-night-bg hover:bg-reel-hover dark:hover:bg-night-hover border border-reel-border/20 dark:border-night-border/25 transition flex flex-col justify-center">
+                                <span class="text-xs font-normal text-reel-text dark:text-night-text">Add body text</span>
+                                <span class="text-[11px] text-reel-textmuted dark:text-night-textmuted mt-0.5">Hanken Grotesk / Regular / size 24</span>
+                            </button>
+                        </div>
+
+                        <!-- Presets Section -->
+                        <div class="space-y-3">
+                            <h4 class="text-[11px] font-bold text-reel-textmuted dark:text-night-textmuted uppercase tracking-wider">Type presets</h4>
+                            <div class="grid grid-cols-1 gap-2.5">
+                                <button class="text-preset-btn w-full text-left p-3.5 rounded-2xl bg-reel-bg dark:bg-night-bg hover:bg-reel-hover dark:hover:bg-night-hover border border-reel-border/20 dark:border-night-border/25 transition flex flex-col gap-1 items-start" data-preset="minimal">
+                                    <span class="px-2 py-0.5 bg-reel-blue text-white rounded-md text-[9px] font-bold uppercase tracking-wider font-sans mb-1">Minimalist</span>
+                                    <span class="text-base font-bold tracking-tight text-reel-text dark:text-night-text font-sans select-none">MINIMAL SANS</span>
+                                </button>
+                                <button class="text-preset-btn w-full text-left p-4 rounded-2xl bg-reel-bg dark:bg-night-bg hover:bg-reel-hover dark:hover:bg-night-hover border border-reel-border/20 dark:border-night-border/25 transition flex flex-col items-center justify-center text-center gap-1" data-preset="editorial">
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-reel-textmuted dark:text-night-textmuted font-serif mb-1">Editorial</span>
+                                    <span class="text-xl font-medium italic text-reel-text dark:text-night-text font-serif select-none">Classic Editorial</span>
+                                </button>
+                                <button class="text-preset-btn w-full text-left p-4 rounded-2xl bg-reel-bg dark:bg-night-bg hover:bg-reel-hover dark:hover:bg-night-hover border border-reel-border/20 dark:border-night-border/25 transition flex flex-col gap-1 items-start" data-preset="mono">
+                                    <span class="px-2 py-0.5 bg-[#4285f4]/10 text-reel-blue rounded-md text-[9px] font-bold uppercase tracking-wider font-mono mb-1">Technical</span>
+                                    <span class="text-[14px] font-bold tracking-tight text-reel-text dark:text-night-text font-mono select-none">TECHNICAL_MONO</span>
+                                </button>
+                                <button class="text-preset-btn w-full text-left p-4 rounded-2xl bg-reel-bg dark:bg-night-bg hover:bg-reel-hover dark:hover:bg-night-hover border border-reel-border/20 dark:border-night-border/25 transition flex flex-col gap-1 items-start" data-preset="caption">
+                                    <span class="text-[12px] font-semibold uppercase tracking-[0.15em] text-reel-text dark:text-night-text select-none">ELEGANT CAPTION</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IMAGE PANEL -->
+                <div id="panelImage" class="w-[280px] md:w-[300px] flex-1 flex flex-col hidden shrink-0">
+                    <div class="px-5 py-4 md:px-6 md:py-5 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-rounded text-reel-textmuted dark:text-night-textmuted">image</span>
+                            <h3 class="font-display font-medium text-[15px] md:text-[16px]">Image</h3>
+                        </div>
+                        <button class="btn-icon close-panel-btn hidden sm:flex" title="Close Panel"><span class="material-symbols-rounded text-[18px] md:text-[20px]">close</span></button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto px-5 pb-5 space-y-6">
+                        <!-- Upload Box -->
+                        <div class="border-2 border-dashed border-reel-border/60 dark:border-night-border rounded-3xl p-6 text-center hover:bg-reel-hover dark:hover:bg-night-hover transition cursor-pointer flex flex-col items-center justify-center gap-3 group relative" id="imageUploadZone">
+                            <input type="file" id="imageFileInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <div class="w-12 h-12 rounded-2xl bg-reel-bluelight dark:bg-night-bluebg/50 text-reel-blue dark:text-night-blue flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-rounded text-[24px]">cloud_upload</span>
+                            </div>
+                            <div>
+                                <h4 class="text-[13px] font-medium text-reel-text dark:text-night-text">Upload from computer</h4>
+                                <p class="text-[11px] text-reel-textmuted dark:text-night-textmuted mt-1">Supports PNG, JPG, WebP</p>
+                            </div>
+                        </div>
+
+                        <!-- Uploaded Images Section -->
+                        <div id="uploadedImagesSection" class="space-y-3 hidden">
+                            <h4 class="text-[11px] font-bold text-reel-textmuted dark:text-night-textmuted uppercase tracking-wider">Uploaded Images</h4>
+                            <div class="grid grid-cols-2 gap-2.5" id="uploadedImagesGrid">
+                                <!-- Dynamically populated thumbnails -->
+                            </div>
+                        </div>
+
+                        <!-- Info Card -->
+                        <div class="bg-reel-bg dark:bg-night-bg rounded-2xl p-4 text-[12px] text-reel-textmuted dark:text-night-textmuted flex items-start gap-2.5">
+                            <span class="material-symbols-rounded text-[18px] text-reel-blue dark:text-night-blue shrink-0">info</span>
+                            <p class="leading-relaxed">Images land on the canvas as new layers. Drag, resize and set depth on each.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AUDIO PANEL -->
+                <div id="panelAudio" class="w-[280px] md:w-[300px] flex-1 flex flex-col hidden shrink-0">
+                    <div class="px-5 py-4 md:px-6 md:py-5 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-rounded text-reel-textmuted dark:text-night-textmuted">music_note</span>
+                            <h3 class="font-display font-medium text-[15px] md:text-[16px]">Audio</h3>
+                        </div>
+                        <button class="btn-icon close-panel-btn hidden sm:flex" title="Close Panel"><span class="material-symbols-rounded text-[18px] md:text-[20px]">close</span></button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto px-5 pb-5 space-y-6">
+                        <!-- Upload Box -->
+                        <div class="border-2 border-dashed border-reel-border/60 dark:border-night-border rounded-3xl p-6 text-center hover:bg-reel-hover dark:hover:bg-night-hover transition cursor-pointer flex flex-col items-center justify-center gap-3 group relative" id="audioUploadZone">
+                            <input type="file" id="audioFileInput" accept="audio/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <div class="w-12 h-12 rounded-2xl bg-reel-bluelight dark:bg-night-bluebg/50 text-reel-blue dark:text-night-blue flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-rounded text-[24px]">audiotrack</span>
+                            </div>
+                            <div>
+                                <h4 class="text-[13px] font-medium text-reel-text dark:text-night-text">Upload audio file</h4>
+                                <p class="text-[11px] text-reel-textmuted dark:text-night-textmuted mt-1">Supports MP3, WAV, M4A</p>
+                            </div>
+                        </div>
+
+                        <!-- Active Audio State -->
+                        <div id="activeAudioCard" class="bg-reel-bluelight/40 dark:bg-night-bluebg/25 border border-reel-blue/10 dark:border-night-blue/20 rounded-2xl p-4 hidden">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-reel-blue text-white flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-rounded text-[20px]">graphic_eq</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 id="audioTrackName" class="text-[12px] font-medium text-reel-text dark:text-night-text truncate">track.mp3</h4>
+                                    <p id="audioTrackDuration" class="text-[10px] text-reel-textmuted dark:text-night-textmuted mt-0.5">0:00</p>
+                                </div>
+                                <button id="removeAudioBtn" class="btn-icon text-reel-textmuted hover:text-[#FF7A59]" title="Remove Audio">
+                                    <span class="material-symbols-rounded text-[18px]">delete</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Info Card -->
+                        <div class="bg-reel-bg dark:bg-night-bg rounded-2xl p-4 text-[12px] text-reel-textmuted dark:text-night-textmuted flex items-start gap-2.5">
+                            <span class="material-symbols-rounded text-[18px] text-reel-blue dark:text-night-blue shrink-0">info</span>
+                            <p class="leading-relaxed">Audio follows the playhead. Press play and the track plays with it.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Navigation Rail (Far Right - Clean, spaced out) -->
+            <div class="w-[60px] md:w-[72px] flex flex-col items-center py-4 md:py-6 gap-2 md:gap-3 shrink-0 bg-reel-surface dark:bg-night-surface border-l border-reel-border/30 dark:border-night-border sm:border-none shadow-[-5px_0_15px_rgba(0,0,0,0.05)] sm:shadow-none z-30">
+                <button class="rail-btn active group" data-target="panelLayers">
+                    <span class="material-symbols-rounded text-[20px] md:text-[24px]">stacks</span>
+                    <span class="text-[9px] md:text-[10px] font-medium hidden sm:block">Layers</span>
+                </button>
+                <button class="rail-btn group" data-target="panelProperties">
+                    <span class="material-symbols-rounded text-[20px] md:text-[24px]">tune</span>
+                    <span class="text-[9px] md:text-[10px] font-medium hidden sm:block">Props</span>
+                </button>
+                
+                <div class="w-6 md:w-8 h-px bg-reel-border dark:bg-night-border my-1 md:my-2"></div>
+                
+                <button class="rail-btn group" data-target="panelText">
+                    <span class="material-symbols-rounded text-[20px] md:text-[24px]">match_case</span>
+                    <span class="text-[9px] md:text-[10px] font-medium hidden sm:block">Text</span>
+                </button>
+                <button class="rail-btn group" id="addRectBtn">
+                    <span class="material-symbols-rounded text-[20px] md:text-[24px]">shapes</span>
+                    <span class="text-[9px] md:text-[10px] font-medium hidden sm:block">Shape</span>
+                </button>
+                <button class="rail-btn group" data-target="panelImage">
+                    <span class="material-symbols-rounded text-[20px] md:text-[24px]">image</span>
+                    <span class="text-[9px] md:text-[10px] font-medium hidden sm:block">Image</span>
+                </button>
+                <button class="rail-btn group" data-target="panelAudio">
+                    <span class="material-symbols-rounded text-[20px] md:text-[24px]">music_note</span>
+                    <span class="text-[9px] md:text-[10px] font-medium hidden sm:block">Audio</span>
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        // --- Theme / Dark Mode Logic ---
+        const html = document.documentElement;
+        const themeToggle = document.getElementById('themeToggle');
+        
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            if (html.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                themeToggle.innerHTML = '<span class="material-symbols-rounded text-[18px] md:text-[20px]">light_mode</span>';
+            } else {
+                localStorage.theme = 'light';
+                themeToggle.innerHTML = '<span class="material-symbols-rounded text-[18px] md:text-[20px]">dark_mode</span>';
+            }
+            render();
+        });
+
+        if (html.classList.contains('dark')) {
+             themeToggle.innerHTML = '<span class="material-symbols-rounded text-[18px] md:text-[20px]">light_mode</span>';
+        }
+        // --- Canvas & State Setup ---
+        const canvas = document.getElementById('thumbnailCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let layers = [
+            { id: 'l1', name: 'Background Base', type: 'rect', x: 640, y: 360, w: 1280, h: 720, color: '#F4EFE5', scale: 1.0, animation: 'none', animDuration: 1000, z: 0.0 },
+            { id: 'l3', name: 'Primary Glow', type: 'circle', x: 640, y: 360, w: 450, h: 450, color: '#00E0A4', scale: 1.0, animation: 'none', animDuration: 1000, z: 0.2 }, 
+            { id: 'l4', name: 'Caption Tag', type: 'text', x: 640, y: 260, text: 'REEL STUDIO · PARALLAX', size: 28, color: '#14110D', font: '"Hanken Grotesk", sans-serif', weight: '400', style: 'normal', scale: 1.0, animation: 'none', animDuration: 1000, z: 0.5 },
+            { id: 'l5', name: 'Main Title', type: 'text', x: 640, y: 380, text: 'PARALLAX', size: 160, color: '#14110D', font: '"Hanken Grotesk", sans-serif', weight: '900', style: 'normal', scale: 1.0, animation: 'none', animDuration: 1000, z: 0.8 },
+            { id: 'l6', name: 'Accent Bar', type: 'rect', x: 1000, y: 480, w: 100, h: 10, color: '#F0A25C', scale: 1.0, animation: 'none', animDuration: 1000, z: 1.0 }
+        ];
+
+        let selectedLayerId = null;
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        
+        let isParallaxMode = false;
+        let isPlaying = false;
+        let timelineAudio = null;
+        let currentTime = 0; // ms
+        const maxDuration = 5000; // ms
+        let playheadAnimFrameId = null;
+        let lastPlaybackTime = 0;
+        let mouseNormX = 0; 
+        let mouseNormY = 0; 
+
+        // --- Core Rendering Logic ---
+        function render() {
+            ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#14121B' : '#EFE7DB';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            layers.forEach(layer => {
+                let px = 0, py = 0;
+                if (isParallaxMode) {
+                    px = (mouseNormX * -150) * layer.z; 
+                    py = (mouseNormY * -80) * layer.z;
+                }
+
+                const drawX = layer.x + px;
+                const drawY = layer.y + py;
+
+                ctx.save();
+                ctx.fillStyle = layer.color; ctx.globalAlpha = layer.opacity ?? 1;
+
+                // --- Apply Animations ---
+                const anim = layer.animation || 'none';
+                const animDur = layer.animDuration || 1000;
+                const t_anim = Math.min(1, currentTime / animDur);
+
+                if (anim === 'fade') {
+                    ctx.globalAlpha = t_anim * (layer.opacity ?? 1);
+                } else if (anim === 'slide') {
+                    const slideOffset = (1 - t_anim) * 300;
+                    ctx.translate(-slideOffset, 0);
+                } else if (anim === 'rise') {
+                    const riseOffset = (1 - t_anim) * 150;
+                    ctx.translate(0, riseOffset);
+                } else if (anim === 'scale') {
+                    ctx.translate(drawX, drawY);
+                    ctx.scale(t_anim, t_anim);
+                    ctx.translate(-drawX, -drawY);
+                } else if (anim === 'spin') {
+                    ctx.translate(drawX, drawY);
+                    ctx.rotate((1 - t_anim) * Math.PI);
+                    ctx.translate(-drawX, -drawY);
+                } else if (anim === 'breathe') {
+                    const breatheProgress = (Math.sin((currentTime / 1000) * Math.PI) + 1) / 2;
+                    const breatheScale = 1 + breatheProgress * 0.08;
+                    ctx.translate(drawX, drawY);
+                    ctx.scale(breatheScale, breatheScale);
+                    ctx.translate(-drawX, -drawY);
+                }
+                            const scale = layer.scale || 1.0;
+                const scaledW = layer.w * scale;
+                const scaledH = layer.h * scale;
+                
+                if (layer.type === 'rect') {
+                    ctx.fillRect(drawX - scaledW/2, drawY - scaledH/2, scaledW, scaledH);
+                } 
+                else if (layer.type === 'circle') {
+                    ctx.beginPath();
+                    ctx.arc(drawX, drawY, scaledW/2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                else if (layer.type === 'image' && layer.img) {
+                    ctx.drawImage(layer.img, drawX - scaledW/2, drawY - scaledH/2, scaledW, scaledH);
+                }
+                else if (layer.type === 'text') {
+                    const fontFamily = layer.font || '"Hanken Grotesk", sans-serif';
+                    const fontWeight = layer.weight || '400';
+                    const fontStyle = layer.style || 'normal';
+                    ctx.font = `${fontStyle} ${fontWeight} ${layer.size * scale}px ${fontFamily}`;
+                    ctx.letterSpacing = `${layer.letterSpacing || 0}px`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    if (layer.glow) {
+                        ctx.shadowColor = layer.glow;
+                        ctx.shadowBlur = 25;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    } else if (layer.z > 0.1 && layer.shadow !== false) {
+                        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                        ctx.shadowBlur = layer.z * 30;
+                        ctx.shadowOffsetY = layer.z * 15;
+                    }
+
+                    let textToDraw = layer.text;
+                    if (anim === 'typewriter') {
+                        const numChars = Math.floor(t_anim * layer.text.length);
+                        textToDraw = layer.text.substring(0, numChars);
+                    }
+                    ctx.fillText(textToDraw, drawX, drawY);
+                    ctx.letterSpacing = '0px';
+                }
+
+                ctx.globalAlpha = 1; if (!isParallaxMode && layer.id === selectedLayerId) {
+                    const isDark = document.documentElement.classList.contains('dark');
+                    ctx.strokeStyle = '#14110D';
+                    ctx.lineWidth = 2;
+                    
+                    if (layer.type === 'rect' || layer.type === 'circle' || layer.type === 'image') {
+                        ctx.strokeRect(drawX - scaledW/2, drawY - scaledH/2, scaledW, scaledH);
+                    } else if (layer.type === 'text') {
+                        ctx.letterSpacing = `${layer.letterSpacing || 0}px`;
+                        const metrics = ctx.measureText(layer.text);
+                        const h = layer.size * scale;
+                        const w = metrics.width;
+                        ctx.strokeRect(drawX - w/2 - 15, drawY - h/2 - 15, w + 30, h + 30);
+                        ctx.letterSpacing = '0px';
+                    }
+                    
+                    ctx.fillStyle = '#ffffff';
+                    const drawHandle = (x, y) => {
+                        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    }
+                    
+                    if(layer.type === 'rect' || layer.type === 'image') {
+                        drawHandle(drawX - scaledW/2, drawY - scaledH/2);
+                        drawHandle(drawX + scaledW/2, drawY + scaledH/2);
+                    } else if (layer.type === 'text') {
+                        drawHandle(drawX, drawY - layer.size/2 - 15);
+                    }
+                }
+                
+                ctx.restore();
+            });
+        }
+
+        // --- Panel Navigation (Rail) ---
+        const railBtns = document.querySelectorAll('.rail-btn[data-target]');
+        const panels = {
+            'panelLayers': document.getElementById('panelLayers'),
+            'panelProperties': document.getElementById('panelProperties'),
+            'panelText': document.getElementById('panelText'),
+            'panelImage': document.getElementById('panelImage'),
+            'panelAudio': document.getElementById('panelAudio')
+        };
+        const sidePanel = document.getElementById('sidePanel');
+        
+        // Auto-close panel on small screens initially
+        let isPanelOpen = window.innerWidth >= 640;
+        if(!isPanelOpen) {
+            sidePanel.style.width = '0px';
+            railBtns.forEach(b => b.classList.remove('active'));
+        }
+
+        railBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-target');
+
+                if (btn.classList.contains('active') && isPanelOpen) {
+                    // Close
+                    isPanelOpen = false;
+                    sidePanel.style.width = '0px';
+                    btn.classList.remove('active');
+                } else {
+                    // Open
+                    isPanelOpen = true;
+                    sidePanel.style.width = ''; // Let tailwind classes take over based on breakpoint
+                    if(window.innerWidth < 768) sidePanel.style.width = '280px'; // mobile explicit width
+
+                    railBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    Object.values(panels).forEach(p => p.classList.add('hidden'));
+                    if(panels[target]) panels[target].classList.remove('hidden');
+                }
+            });
+        });
+
+        document.querySelectorAll('.close-panel-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                isPanelOpen = false;
+                sidePanel.style.width = '0px';
+                railBtns.forEach(b => b.classList.remove('active'));
+            });
+        });
+
+        // --- Properties Sub-tabs ---
+        const subTabDesignBtn = document.getElementById('subTabDesignBtn');
+        const subTabParallaxBtn = document.getElementById('subTabParallaxBtn');
+        const subTabAnimationBtn = document.getElementById('subTabAnimationBtn');
+        const subTabDesign = document.getElementById('subTabDesign');
+        const subTabParallax = document.getElementById('subTabParallax');
+        const subTabAnimation = document.getElementById('subTabAnimation');
+
+        function switchPropTab(tab) {
+            const activeClass = ['bg-white', 'dark:bg-night-surface', 'shadow-sm', 'text-reel-text', 'dark:text-night-text'];
+            const inactiveClass = ['text-reel-textmuted', 'dark:text-night-textmuted', 'hover:text-reel-text', 'dark:hover:text-night-text'];
+            
+            [
+                { id: 'design', btn: subTabDesignBtn, panel: subTabDesign },
+                { id: 'parallax', btn: subTabParallaxBtn, panel: subTabParallax },
+                { id: 'animation', btn: subTabAnimationBtn, panel: subTabAnimation }
+            ].forEach(t => {
+                if (!t.btn || !t.panel) return;
+                if (t.id === tab) {
+                    t.btn.classList.remove(...inactiveClass);
+                    t.btn.classList.add(...activeClass);
+                    t.panel.classList.remove('hidden');
+                } else {
+                    t.btn.classList.remove(...activeClass);
+                    t.btn.classList.add(...inactiveClass);
+                    t.panel.classList.add('hidden');
+                }
+            });
+        }
+
+        subTabDesignBtn.addEventListener('click', () => switchPropTab('design'));
+        subTabParallaxBtn.addEventListener('click', () => switchPropTab('parallax'));
+        subTabAnimationBtn.addEventListener('click', () => switchPropTab('animation'));
+
+
+        // --- Build UI Lists (Layers & Timeline) ---
+        function buildLayerList() {
+            const container = document.getElementById('layerList');
+            container.innerHTML = '';
+            
+            [...layers].reverse().forEach(layer => {
+                const el = document.createElement('div');
+                el.className = `layer-item flex items-center justify-between p-2 md:p-3 rounded-xl cursor-pointer transition-colors ${layer.id === selectedLayerId ? 'active shadow-sm' : 'hover:bg-reel-bg dark:hover:bg-night-bg'}`;
+                
+                let icon = 'rectangle';
+                if (layer.type === 'text') icon = 'title';
+                else if (layer.type === 'circle') icon = 'circle';
+                else if (layer.type === 'image') icon = 'image';
+                
+                el.innerHTML = `
+                    <div class="flex items-center gap-2 md:gap-3 overflow-hidden">
+                        <div class="w-7 h-7 md:w-8 md:h-8 rounded bg-black/5 dark:bg-white/5 flex items-center justify-center shrink-0">
+                             <span class="material-symbols-rounded text-[16px] md:text-[18px] opacity-70">${icon}</span>
+                        </div>
+                        <span class="text-[13px] md:text-[14px] font-medium truncate">${layer.name}</span>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="delete-btn p-1.5 rounded hover:bg-black/10 dark:hover:bg-white/10 text-red-500 transition material-symbols-rounded text-[16px] md:text-[18px]">delete</button>
+                    </div>
+                `;
+                if(layer.id === selectedLayerId) {
+                     el.lastElementChild.classList.remove('opacity-0');
+                } else {
+                     el.classList.add('group');
+                }
+
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('.delete-btn')) {
+                        layers = layers.filter(l => l.id !== layer.id);
+                        if (selectedLayerId === layer.id) selectLayer(null);
+                        else { buildLayerList(); render(); }
+                        return;
+                    }
+                    selectLayer(layer.id);
+                });
+                
+                container.appendChild(el);
+            });
+
+            // Build Timeline Tracks
+            const trackContainer = document.getElementById('timelineTracks');
+            Array.from(trackContainer.children).forEach(child => {
+                if(!child.classList.contains('absolute')) child.remove();
+            });
+
+            [...layers].reverse().forEach((layer) => {
+                const track = document.createElement('div');
+                track.className = `flex items-center h-10 md:h-12 rounded-xl cursor-pointer group transition-colors ${layer.id === selectedLayerId ? 'bg-reel-bg dark:bg-night-bg' : 'hover:bg-black/5 dark:hover:bg-white/5'}`;
+                track.onclick = () => selectLayer(layer.id);
+                
+                const header = document.createElement('div');
+                header.className = `w-24 md:w-32 shrink-0 h-full flex items-center px-2 md:px-2.5 border-r border-reel-border/50 dark:border-night-border gap-1.5 md:gap-2 text-[11px] md:text-xs font-medium truncate ${layer.id === selectedLayerId ? 'text-reel-blue dark:text-night-blue' : 'text-reel-textmuted dark:text-night-textmuted'}`;
+                header.innerHTML = `<span class="material-symbols-rounded text-[15px] md:text-[17px] opacity-70">${layer.type === 'text' ? 'title' : (layer.type === 'image' ? 'image' : 'shape_line')}</span> <span class="truncate">${layer.name}</span>`;
+                
+                const content = document.createElement('div');
+                content.className = 'flex-1 h-full relative flex items-center px-2 py-1.5';
+                
+                const block = document.createElement('div');
+                let blockClasses = layer.id === selectedLayerId 
+                     ? 'bg-reel-bluelight text-reel-blue border-reel-blue/30 dark:bg-night-bluebg dark:text-night-blue dark:border-night-blue/50' 
+                     : 'bg-white text-reel-textmuted border-reel-border dark:bg-night-surface dark:text-night-textmuted dark:border-night-border';
+                
+                block.className = `absolute left-4 right-8 md:right-12 top-1.5 bottom-1.5 rounded-lg border flex items-center px-2 md:px-3 text-[11px] md:text-[12px] font-medium truncate shadow-sm transition-colors ${blockClasses}`;
+                block.textContent = layer.name;
+
+                content.appendChild(block);
+                track.appendChild(header);
+                track.appendChild(content);
+                trackContainer.appendChild(track);
+            });
+        }
+
+        // --- Context Toolbar Logic ---
+        function updateContextToolbar() {
+            const tb = document.getElementById('contextToolbar');
+            const styleTools = document.querySelectorAll('.text-style-tool');
+            const colorTools = document.querySelectorAll('.color-tool');
+            const scaleTools = document.querySelectorAll('.scale-tool');
+            const colorIcon = document.getElementById('tbColorIcon');
+
+            if (!selectedLayerId || isParallaxMode) {
+                tb.classList.add('opacity-0', '-translate-y-4', 'pointer-events-none', 'scale-95');
+                tb.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto', 'scale-100');
+                return;
+            }
+
+            const layer = layers.find(l => l.id === selectedLayerId);
+            tb.classList.remove('opacity-0', '-translate-y-4', 'pointer-events-none', 'scale-95');
+            tb.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto', 'scale-100');
+
+            // Default: hide everything
+            styleTools.forEach(t => t.classList.add('hidden'));
+            colorTools.forEach(t => t.classList.add('hidden'));
+            scaleTools.forEach(t => t.classList.add('hidden'));
+
+            if (layer.type === 'text') {
+                // Text: show style, color, and scale
+                styleTools.forEach(t => t.classList.remove('hidden'));
+                colorTools.forEach(t => t.classList.remove('hidden'));
+                scaleTools.forEach(t => t.classList.remove('hidden'));
+                colorIcon.textContent = 'format_color_text';
+
+                document.getElementById('tbFont').value = layer.font || '"Hanken Grotesk", sans-serif';
+                tbWeight.value = layer.weight || '400';
+                tbColor.value = layer.color;
+                tbColorIcon.style.color = layer.color;
+
+                const tbActiveClasses = ['bg-reel-blue/10', 'text-reel-blue', 'dark:bg-night-blue/20', 'dark:text-night-blue'];
+                const tbInactiveClasses = ['text-reel-textmuted', 'dark:text-night-textmuted'];
+
+                if (layer.weight && parseInt(layer.weight) >= 700) {
+                    tbBoldBtn.classList.add(...tbActiveClasses);
+                    tbBoldBtn.classList.remove(...tbInactiveClasses);
+                } else {
+                    tbBoldBtn.classList.remove(...tbActiveClasses);
+                    tbBoldBtn.classList.add(...tbInactiveClasses);
+                }
+
+                if (layer.style === 'italic') {
+                    tbItalicBtn.classList.add(...tbActiveClasses);
+                    tbItalicBtn.classList.remove(...tbInactiveClasses);
+                } else {
+                    tbItalicBtn.classList.remove(...tbActiveClasses);
+                    tbItalicBtn.classList.add(...tbInactiveClasses);
+                }
+            } else if (layer.type === 'rect' || layer.type === 'circle') {
+                // Shape: show color and scale only (no styling)
+                colorTools.forEach(t => t.classList.remove('hidden'));
+                scaleTools.forEach(t => t.classList.remove('hidden'));
+                colorIcon.textContent = 'palette';
+
+                tbColor.value = layer.color;
+                tbColorIcon.style.color = layer.color;
+            } else if (layer.type === 'image') {
+                // Image: show scale only
+                scaleTools.forEach(t => t.classList.remove('hidden'));
+            }
+        }
+
+        document.getElementById('tbScaleDownBtn').addEventListener('click', () => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (layer) {
+                layer.scale = Math.max(0.1, (layer.scale || 1.0) - 0.1);
+                updatePropertiesPanel();
+                render();
+            }
+        });
+
+        document.getElementById('tbScaleUpBtn').addEventListener('click', () => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (layer) {
+                layer.scale = Math.min(3.0, (layer.scale || 1.0) + 0.1);
+                updatePropertiesPanel();
+                render();
+            }
+        });
+
+        document.getElementById('tbDelete').addEventListener('click', () => {
+            if(!selectedLayerId) return;
+            layers = layers.filter(l => l.id !== selectedLayerId);
+            selectLayer(null);
+        });
+
+        document.getElementById('tbBringForward').addEventListener('click', () => {
+            if(!selectedLayerId) return;
+            const idx = layers.findIndex(l => l.id === selectedLayerId);
+            if(idx < layers.length - 1) {
+                const temp = layers[idx];
+                layers[idx] = layers[idx+1];
+                layers[idx+1] = temp;
+                buildLayerList();
+                render();
+            }
+        });
+
+        document.getElementById('tbSendBackward').addEventListener('click', () => {
+            if(!selectedLayerId) return;
+            const idx = layers.findIndex(l => l.id === selectedLayerId);
+            if(idx > 0) {
+                const temp = layers[idx];
+                layers[idx] = layers[idx-1];
+                layers[idx-1] = temp;
+                buildLayerList();
+                render();
+            }
+        });
+
+        function selectLayer(id) {
+            selectedLayerId = id;
+            buildLayerList();
+            render();
+            updatePropertiesPanel();
+            updateContextToolbar();
+
+            if (id) {
+                switchPropTab('design');
+                const propsBtn = document.querySelector('.rail-btn[data-target="panelProperties"]');
+                if (!propsBtn.classList.contains('active') || !isPanelOpen) {
+                    propsBtn.click();
+                }
+            }
+        }
+
+        const propsContent = document.getElementById('propertiesContent');
+        const emptyProps = document.getElementById('emptyProps');
+        const pX = document.getElementById('propX');
+        const pY = document.getElementById('propY');
+        const pW = document.getElementById('propW');
+        const pH = document.getElementById('propH');
+        const pText = document.getElementById('propText');
+        const pFont = document.getElementById('propFont');
+        const tbFont = document.getElementById('tbFont');
+        const pWeight = document.getElementById('propWeight');
+        const pBoldBtn = document.getElementById('propBoldBtn');
+        const pItalicBtn = document.getElementById('propItalicBtn');
+        const tbBoldBtn = document.getElementById('tbBoldBtn');
+        const tbItalicBtn = document.getElementById('tbItalicBtn');
+        const tbColor = document.getElementById('tbColor');
+        const tbColorIcon = document.getElementById('tbColorIcon');
+        const tbWeight = document.getElementById('tbWeight');
+        const pSize = document.getElementById('propSize');
+        const pSizeVal = document.getElementById('propSizeVal');
+        const pColor = document.getElementById('propColor');
+        const pColorHex = document.getElementById('propColorHex');
+        const pZ = document.getElementById('propZ');
+        const pZVal = document.getElementById('propZVal');
+        const pAnimDuration = document.getElementById('propAnimDuration');
+        const pAnimDurationVal = document.getElementById('animDurationVal');
+        const rectPropsGrp = document.getElementById('rectProps');
+        const textPropsGrp = document.getElementById('textProps');
+        const scalePropsGrp = document.getElementById('scaleProps');
+        const pScale = document.getElementById('propScale');
+        const pScaleVal = document.getElementById('propScaleVal');
+        const pTracking = document.getElementById('propTracking');
+        const pTrackingVal = document.getElementById('propTrackingVal');
+
+        function updatePropertiesPanel() {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer) {
+                propsContent.classList.add('hidden');
+                emptyProps.classList.remove('hidden');
+                return;
+            }
+
+            propsContent.classList.remove('hidden');
+            emptyProps.classList.add('hidden');
+
+            pX.value = Math.round(layer.x);
+            pY.value = Math.round(layer.y);
+            pColor.value = layer.color;
+            if (pColorHex) pColorHex.value = layer.color;
+            pZ.value = layer.z;
+            pZVal.textContent = layer.z.toFixed(2);
+
+            if (layer.type === 'text') {
+                textPropsGrp.classList.remove('hidden');
+                rectPropsGrp.classList.add('hidden');
+                scalePropsGrp.classList.add('hidden');
+                pText.value = layer.text;
+                pSize.value = layer.size;
+                pSizeVal.textContent = layer.size;
+                pFont.value = layer.font || '"Hanken Grotesk", sans-serif';
+                pWeight.value = layer.weight || '400';
+                pTracking.value = layer.letterSpacing || 0;
+                pTrackingVal.textContent = (layer.letterSpacing || 0) + 'px';
+
+                const activeClasses = ['bg-reel-blue/10', 'text-reel-blue', 'border-reel-blue/30', 'dark:bg-night-blue/20', 'dark:text-night-blue', 'dark:border-night-blue/30'];
+                const inactiveClasses = ['text-reel-textmuted', 'dark:text-night-textmuted'];
+
+                if (layer.weight && parseInt(layer.weight) >= 700) {
+                    pBoldBtn.classList.add(...activeClasses);
+                    pBoldBtn.classList.remove(...inactiveClasses);
+                } else {
+                    pBoldBtn.classList.remove(...activeClasses);
+                    pBoldBtn.classList.add(...inactiveClasses);
+                }
+
+                if (layer.style === 'italic') {
+                    pItalicBtn.classList.add(...activeClasses);
+                    pItalicBtn.classList.remove(...inactiveClasses);
+                } else {
+                    pItalicBtn.classList.remove(...activeClasses);
+                    pItalicBtn.classList.add(...inactiveClasses);
+                }
+            } else {
+                textPropsGrp.classList.add('hidden');
+                rectPropsGrp.classList.remove('hidden');
+                scalePropsGrp.classList.remove('hidden');
+                pW.value = layer.w;
+                pH.value = layer.h;
+
+                const sPct = Math.round((layer.scale || 1.0) * 100);
+                pScale.value = sPct;
+                pScaleVal.textContent = sPct + '%';
+            }
+
+            // Sync animation subtab
+            pAnimDuration.value = layer.animDuration || 1000;
+            pAnimDurationVal.textContent = ((layer.animDuration || 1000) / 1000).toFixed(1) + 's';
+            
+            const currentAnim = layer.animation || 'none';
+            document.querySelectorAll('.anim-preset-btn').forEach(btn => {
+                const animName = btn.getAttribute('data-anim');
+                if (animName === currentAnim) {
+                    btn.classList.add('active', 'border-reel-blue', 'text-reel-blue', 'dark:border-night-blue', 'dark:text-night-blue');
+                    btn.classList.remove('border-reel-border/40', 'dark:border-night-border');
+                } else {
+                    btn.classList.remove('active', 'border-reel-blue', 'text-reel-blue', 'dark:border-night-blue', 'dark:text-night-blue');
+                    btn.classList.add('border-reel-border/40', 'dark:border-night-border');
+                }
+            });
+        }
+
+        function bindProp(el, key, isNum = true) {
+            el.addEventListener('input', (e) => {
+                const layer = layers.find(l => l.id === selectedLayerId);
+                if (!layer) return;
+                layer[key] = isNum ? parseFloat(e.target.value) : e.target.value;
+                if (key === 'color') {
+                    if (pColorHex) pColorHex.value = layer.color;
+                    tbColor.value = layer.color;
+                    tbColorIcon.style.color = layer.color;
+                }
+                if (key === 'z') pZVal.textContent = layer.z.toFixed(2);
+                if (key === 'size') pSizeVal.textContent = layer.size;
+                render();
+                if(key === 'z' || key === 'name' || key === 'text') buildLayerList(); 
+            });
+        }
+
+        bindProp(pX, 'x'); bindProp(pY, 'y'); bindProp(pW, 'w'); bindProp(pH, 'h');
+        bindProp(pText, 'text', false); bindProp(pSize, 'size'); bindProp(pColor, 'color', false);
+        bindProp(pZ, 'z');
+
+        pScale.addEventListener('input', (e) => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer) return;
+            layer.scale = parseFloat(e.target.value) / 100;
+            pScaleVal.textContent = e.target.value + '%';
+            render();
+        });
+
+        pTracking.addEventListener('input', (e) => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer) return;
+            layer.letterSpacing = parseInt(e.target.value);
+            pTrackingVal.textContent = e.target.value + 'px';
+            render();
+        });
+
+        pText.addEventListener('input', (e) => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if(layer && layer.type === 'text') {
+                layer.name = layer.text.substring(0, 15) || 'Empty Text';
+                buildLayerList();
+            }
+        });
+
+        pFont.addEventListener('change', (e) => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer) return;
+            layer.font = e.target.value;
+            tbFont.value = e.target.value; // Sync contextual toolbar
+            render();
+        });
+
+        tbFont.addEventListener('change', (e) => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer) return;
+            layer.font = e.target.value;
+            pFont.value = e.target.value; // Sync properties panel
+            render();
+        });
+
+        pWeight.addEventListener('change', (e) => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer) return;
+            layer.weight = e.target.value;
+            tbWeight.value = e.target.value; // Sync contextual toolbar
+            updatePropertiesPanel();
+            updateContextToolbar();
+            render();
+        });
+
+        tbWeight.addEventListener('change', (e) => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer) return;
+            layer.weight = e.target.value;
+            pWeight.value = e.target.value; // Sync properties panel
+            updatePropertiesPanel();
+            updateContextToolbar();
+            render();
+        });
+
+        function toggleBold() {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer || layer.type !== 'text') return;
+            const currentWeight = parseInt(layer.weight || '400');
+            layer.weight = currentWeight >= 700 ? '400' : '700';
+            pWeight.value = layer.weight;
+            tbWeight.value = layer.weight;
+            updatePropertiesPanel();
+            updateContextToolbar();
+            render();
+        }
+
+        function toggleItalic() {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer || layer.type !== 'text') return;
+            layer.style = layer.style === 'italic' ? 'normal' : 'italic';
+            updatePropertiesPanel();
+            updateContextToolbar();
+            render();
+        }
+
+        pBoldBtn.addEventListener('click', toggleBold);
+        tbBoldBtn.addEventListener('click', toggleBold);
+        pItalicBtn.addEventListener('click', toggleItalic);
+        tbItalicBtn.addEventListener('click', toggleItalic);
+
+        tbColor.addEventListener('input', (e) => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer) return;
+            layer.color = e.target.value;
+            pColor.value = e.target.value;
+            if (pColorHex) pColorHex.value = e.target.value;
+            tbColorIcon.style.color = e.target.value;
+            render();
+        });
+
+        // Animation preset selection
+        document.querySelectorAll('.anim-preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const layer = layers.find(l => l.id === selectedLayerId);
+                if (!layer) return;
+                layer.animation = btn.getAttribute('data-anim');
+                updatePropertiesPanel();
+                render();
+            });
+        });
+
+        // Animation duration slider
+        pAnimDuration.addEventListener('input', (e) => {
+            const layer = layers.find(l => l.id === selectedLayerId);
+            if (!layer) return;
+            layer.animDuration = parseInt(e.target.value);
+            pAnimDurationVal.textContent = (layer.animDuration / 1000).toFixed(1) + 's';
+            render();
+        });
+
+        // --- Mouse & Parallax Logic ---
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (evt.clientX - rect.left) / (rect.width / canvas.width),
+                y: (evt.clientY - rect.top) / (rect.height / canvas.height)
+            };
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            if (isParallaxMode) {
+                const rect = canvas.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                mouseNormX = (e.clientX - centerX) / (rect.width / 2);
+                mouseNormY = (e.clientY - centerY) / (rect.height / 2);
+                mouseNormX = Math.max(-1, Math.min(1, mouseNormX));
+                mouseNormY = Math.max(-1, Math.min(1, mouseNormY));
+                requestAnimationFrame(render);
+                return;
+            }
+
+            if (isDragging && selectedLayerId) {
+                const layer = layers.find(l => l.id === selectedLayerId);
+                const pos = getMousePos(e);
+                layer.x = pos.x - dragOffsetX;
+                layer.y = pos.y - dragOffsetY;
+                
+                pX.value = Math.round(layer.x);
+                pY.value = Math.round(layer.y);
+                render();
+            }
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (isParallaxMode) return;
+            const pos = getMousePos(e);
+            let clickedLayer = null;
+
+            for (let i = layers.length - 1; i >= 0; i--) {
+                const layer = layers[i]; if (layer.locked) continue;
+                if (layer.type === 'rect' || layer.type === 'circle' || layer.type === 'image') {
+                    const scale = layer.scale || 1.0;
+                    const halfW = (layer.w * scale) / 2;
+                    const halfH = (layer.h * scale) / 2;
+                    if (pos.x >= layer.x - halfW && pos.x <= layer.x + halfW &&
+                        pos.y >= layer.y - halfH && pos.y <= layer.y + halfH) {
+                        clickedLayer = layer;
+                        break;
+                    }
+                } else if (layer.type === 'text') {
+                    const scale = layer.scale || 1.0;
+                    const fontFamily = layer.font || '"Hanken Grotesk", sans-serif';
+                    const fontWeight = layer.weight || '400';
+                    const fontStyle = layer.style || 'normal';
+                    ctx.font = `${fontStyle} ${fontWeight} ${layer.size * scale}px ${fontFamily}`;
+                    ctx.letterSpacing = `${layer.letterSpacing || 0}px`;
+                    const m = ctx.measureText(layer.text);
+                    const halfH = (layer.size * scale) / 2;
+                    if (pos.x >= layer.x - m.width/2 && pos.x <= layer.x + m.width/2 &&
+                        pos.y >= layer.y - halfH && pos.y <= layer.y + halfH) {
+                        ctx.letterSpacing = '0px';
+                        clickedLayer = layer;
+                        break;
+                    }
+                    ctx.letterSpacing = '0px';
+                }
+            }
+
+            if (clickedLayer) {
+                selectLayer(clickedLayer.id);
+                isDragging = true;
+                dragOffsetX = pos.x - clickedLayer.x;
+                dragOffsetY = pos.y - clickedLayer.y;
+            } else {
+                selectLayer(null);
+            }
+        });
+
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        // --- Toggle Parallax Mode ---
+        const parallaxToggleBtn = document.getElementById('parallaxToggleBtn');
+        const parallaxWarning = document.getElementById('parallaxWarning');
+        
+        parallaxToggleBtn.addEventListener('click', () => {
+            isParallaxMode = !isParallaxMode;
+            if (isParallaxMode) {
+                parallaxToggleBtn.classList.add('bg-reel-bluelight', 'dark:bg-night-bluebg', 'text-reel-text', 'dark:text-night-blue', 'border-mint', 'dark:border-mint');
+                parallaxToggleBtn.classList.remove('border-transparent', 'text-reel-textmuted', 'dark:text-night-textmuted');
+                selectLayer(null);
+                parallaxWarning.classList.remove('opacity-0');
+                mouseNormX = 0; mouseNormY = 0; 
+            } else {
+                parallaxToggleBtn.classList.remove('bg-reel-bluelight', 'dark:bg-night-bluebg', 'text-reel-text', 'dark:text-night-blue', 'border-mint', 'dark:border-mint');
+                parallaxToggleBtn.classList.add('border-transparent', 'text-reel-textmuted', 'dark:text-night-textmuted');
+                parallaxWarning.classList.add('opacity-0');
+                mouseNormX = 0; mouseNormY = 0;
+            }
+            updateContextToolbar();
+            render();
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            if (isParallaxMode) {
+                mouseNormX = 0; mouseNormY = 0;
+                requestAnimationFrame(render);
+            }
+        });
+
+        // --- Adding Elements ---
+        document.getElementById('addHeadingBtn').addEventListener('click', () => {
+            const id = 'l' + Date.now();
+            layers.push({ id, name: 'Heading', type: 'text', x: 640, y: 360, text: 'Add a heading', size: 90, color: '#14110D', font: '"Hanken Grotesk", sans-serif', weight: '800', style: 'normal', animation: 'none', animDuration: 1000, z: 0.5 });
+            selectLayer(id);
+        });
+
+        document.getElementById('addSubheadingBtn').addEventListener('click', () => {
+            const id = 'l' + Date.now();
+            layers.push({ id, name: 'Subheading', type: 'text', x: 640, y: 360, text: 'Add a subheading', size: 48, color: '#14110D', font: '"Hanken Grotesk", sans-serif', weight: '700', style: 'normal', animation: 'none', animDuration: 1000, z: 0.5 });
+            selectLayer(id);
+        });
+
+        document.getElementById('addBodyTextBtn').addEventListener('click', () => {
+            const id = 'l' + Date.now();
+            layers.push({ id, name: 'Body Text', type: 'text', x: 640, y: 360, text: 'Add body text', size: 24, color: '#14110D', font: '"Hanken Grotesk", sans-serif', weight: '400', style: 'normal', animation: 'none', animDuration: 1000, z: 0.5 });
+            selectLayer(id);
+        });
+
+        document.querySelectorAll('.text-preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const preset = btn.getAttribute('data-preset');
+                const id = 'l' + Date.now();
+                
+                if (preset === 'minimal') {
+                    layers.push({ id, name: 'Minimal Sans', type: 'text', x: 640, y: 360, text: "MINIMAL SANS", size: 80, color: '#14110D', font: '"Rubik", sans-serif', weight: '700', style: 'normal', animation: 'none', animDuration: 1000, z: 0.5 });
+                } else if (preset === 'editorial') {
+                    layers.push({ id, name: 'Editorial Serif', type: 'text', x: 640, y: 360, text: 'Classic Editorial', size: 70, color: '#F4EFE5', font: '"Playfair Display", serif', weight: '400', style: 'italic', animation: 'none', animDuration: 1000, z: 0.5 });
+                } else if (preset === 'mono') {
+                    layers.push({ id, name: 'Technical Mono', type: 'text', x: 640, y: 360, text: 'TECHNICAL_MONO', size: 65, color: '#14110D', font: 'monospace', weight: '400', style: 'normal', animation: 'none', animDuration: 1000, z: 0.5 });
+                } else if (preset === 'caption') {
+                    layers.push({ id, name: 'Elegant Caption', type: 'text', x: 640, y: 360, text: 'ELEGANT CAPTION', size: 30, color: '#14110D', font: '"Hanken Grotesk", sans-serif', weight: '500', style: 'normal', animation: 'none', animDuration: 1000, z: 0.5 });
+                }
+                
+                selectLayer(id);
+            });
+        });
+
+        document.getElementById('addRectBtn').addEventListener('click', () => {
+            const id = 'l' + Date.now();
+            layers.push({ id, name: 'New Shape', type: 'rect', x: 640, y: 360, w: 200, h: 200, color: '#FF7A59', z: 0.5 });
+            selectLayer(id);
+        });
+
+        // --- Image Loading & drag-drop ---
+        const imageFileInput = document.getElementById('imageFileInput');
+        const imageUploadZone = document.getElementById('imageUploadZone');
+        const uploadedImagesSection = document.getElementById('uploadedImagesSection');
+        const uploadedImagesGrid = document.getElementById('uploadedImagesGrid');
+        let uploadedImages = [];
+
+        imageFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            loadImageFile(file);
+        });
+
+        function renderUploadedImages() {
+            if (uploadedImages.length === 0) {
+                uploadedImagesSection.classList.add('hidden');
+                return;
+            }
+            uploadedImagesSection.classList.remove('hidden');
+            uploadedImagesGrid.innerHTML = '';
+
+            uploadedImages.forEach((imgObj) => {
+                const card = document.createElement('div');
+                card.className = "group relative aspect-video rounded-xl overflow-hidden bg-black/5 dark:bg-white/5 border border-reel-border/40 dark:border-night-border cursor-pointer hover:border-reel-blue dark:hover:border-night-blue transition";
+                card.innerHTML = `
+                    <img src="${imgObj.src}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span class="material-symbols-rounded text-white text-[20px]">add_circle</span>
+                    </div>
+                    <button class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-[#FF7A59] transition shadow opacity-0 group-hover:opacity-100 delete-asset-btn" title="Delete Asset">
+                        <span class="material-symbols-rounded text-[12px]">close</span>
+                    </button>
+                `;
+
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.delete-asset-btn')) return;
+
+                    const img = new Image();
+                    img.onload = () => {
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > 500) { h = (500 / w) * h; w = 500; }
+                        if (h > 400) { w = (400 / h) * w; h = 400; }
+                        const id = 'l' + Date.now();
+                        layers.push({
+                            id: id,
+                            name: imgObj.name.substring(0, 15) || 'Image Layer',
+                            type: 'image',
+                            img: img,
+                            x: 640,
+                            y: 360,
+                            w: Math.round(w),
+                            h: Math.round(h),
+                            color: '#ffffff',
+                            scale: 1.0,
+                            animation: 'none',
+                            animDuration: 1000,
+                            z: 0.5
+                        });
+                        selectLayer(id);
+                        switchPropTab('design');
+                    };
+                    img.src = imgObj.src;
+                });
+
+                card.querySelector('.delete-asset-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    uploadedImages = uploadedImages.filter(item => item.id !== imgObj.id);
+                    renderUploadedImages();
+                });
+
+                uploadedImagesGrid.appendChild(card);
+            });
+        }
+
+        function loadImageFile(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width;
+                    let h = img.height;
+                    // Cap dimensions to canvas ratios nicely
+                    if (w > 500) {
+                        h = (500 / w) * h;
+                        w = 500;
+                    }
+                    if (h > 400) {
+                        w = (400 / h) * w;
+                        h = 400;
+                    }
+                    const id = 'l' + Date.now();
+                    layers.push({
+                        id: id,
+                        name: file.name.substring(0, 15) || 'Image Layer',
+                        type: 'image',
+                        img: img,
+                        x: 640,
+                        y: 360,
+                        w: Math.round(w),
+                        h: Math.round(h),
+                        color: '#ffffff',
+                        scale: 1.0,
+                        animation: 'none',
+                        animDuration: 1000,
+                        z: 0.5
+                    });
+                    
+                    // Add to uploaded images cached list
+                    uploadedImages.push({
+                        id: 'u' + Date.now(),
+                        name: file.name,
+                        src: event.target.result
+                    });
+                    renderUploadedImages();
+
+                    selectLayer(id);
+                    switchPropTab('design');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        imageUploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUploadZone.classList.add('border-reel-blue', 'bg-reel-bluelight/10');
+        });
+        imageUploadZone.addEventListener('dragleave', () => {
+            imageUploadZone.classList.remove('border-reel-blue', 'bg-reel-bluelight/10');
+        });
+        imageUploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imageUploadZone.classList.remove('border-reel-blue', 'bg-reel-bluelight/10');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImageFile(file);
+            }
+        });
+
+        // --- Audio Loading & drag-drop ---
+        const audioFileInput = document.getElementById('audioFileInput');
+        const audioUploadZone = document.getElementById('audioUploadZone');
+        const activeAudioCard = document.getElementById('activeAudioCard');
+        const audioTrackName = document.getElementById('audioTrackName');
+        const audioTrackDuration = document.getElementById('audioTrackDuration');
+        const removeAudioBtn = document.getElementById('removeAudioBtn');
+
+        audioFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            loadAudioFile(file);
+        });
+
+        function loadAudioFile(file) {
+            if (timelineAudio) {
+                timelineAudio.pause();
+                timelineAudio = null;
+            }
+
+            const url = URL.createObjectURL(file);
+            timelineAudio = new Audio(url);
+            timelineAudio.addEventListener('loadedmetadata', () => {
+                const durationText = formatTime(timelineAudio.duration * 1000);
+                audioTrackDuration.textContent = durationText;
+            });
+
+            audioTrackName.textContent = file.name;
+            activeAudioCard.classList.remove('hidden');
+
+            if (isPlaying) {
+                timelineAudio.currentTime = currentTime / 1000;
+                timelineAudio.play();
+            }
+        }
+
+        removeAudioBtn.addEventListener('click', () => {
+            if (timelineAudio) {
+                timelineAudio.pause();
+                timelineAudio = null;
+            }
+            activeAudioCard.classList.add('hidden');
+            audioFileInput.value = '';
+        });
+
+        audioUploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            audioUploadZone.classList.add('border-reel-blue', 'bg-reel-bluelight/10');
+        });
+        audioUploadZone.addEventListener('dragleave', () => {
+            audioUploadZone.classList.remove('border-reel-blue', 'bg-reel-bluelight/10');
+        });
+        audioUploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            audioUploadZone.classList.remove('border-reel-blue', 'bg-reel-bluelight/10');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('audio/')) {
+                loadAudioFile(file);
+            }
+        });
+
+        // --- Export ---
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const wasParallax = isParallaxMode;
+            isParallaxMode = false;
+            selectLayer(null);
+            render();
+            
+            const link = document.createElement('a');
+            link.download = 'reel-parallax.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            isParallaxMode = wasParallax;
+            render();
+        });
+
+        // --- Timeline Resizer Logic ---
+        const timelineContainer = document.getElementById('timelineContainer');
+        const timelineResizer = document.getElementById('timelineResizer');
+        let isResizingTimeline = false;
+        let startY = 0;
+        let startHeight = 0;
+
+        timelineResizer.addEventListener('mousedown', (e) => {
+            isResizingTimeline = true;
+            startY = e.clientY;
+            startHeight = timelineContainer.getBoundingClientRect().height;
+            document.body.style.cursor = 'ns-resize';
+            document.body.style.userSelect = 'none'; // Prevent text selection
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isResizingTimeline) return;
+            // Upwards drag decreases clientY, which increases height
+            const dy = startY - e.clientY;
+            let newHeight = startHeight + dy;
+            
+            // Constrain heights
+            const minHeight = 100;
+            const maxHeight = window.innerHeight * 0.5; // Cap at 50% viewport height
+            newHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+            
+            timelineContainer.style.height = `${newHeight}px`;
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isResizingTimeline) {
+                isResizingTimeline = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        });
+
+        // --- Timeline Playback / Seek Logic ---
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const playTimeText = document.getElementById('playTimeText');
+        const playheadContainer = document.getElementById('playheadContainer');
+        const playheadLine = document.getElementById('playheadLine');
+
+        function formatTime(ms) {
+            const totalSecs = ms / 1000;
+            const mins = Math.floor(totalSecs / 60);
+            const secs = Math.floor(totalSecs % 60);
+            const tenths = Math.floor((ms % 1000) / 100);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${tenths}`;
+        }
+
+        function updatePlayheadUI() {
+            const pct = (currentTime / maxDuration) * 100;
+            playheadLine.style.left = `${pct}%`;
+            playTimeText.textContent = formatTime(currentTime);
+        }
+
+        function playTimeline() {
+            if (isPlaying) return;
+            isPlaying = true;
+            playIcon.textContent = 'pause';
+            lastPlaybackTime = performance.now();
+            
+            if (timelineAudio) {
+                timelineAudio.currentTime = currentTime / 1000;
+                timelineAudio.play();
+            }
+            
+            function tick(now) {
+                if (!isPlaying) return;
+                const dt = now - lastPlaybackTime;
+                lastPlaybackTime = now;
+                
+                currentTime += dt;
+                if (currentTime >= maxDuration) {
+                    currentTime = 0; // Loop play back
+                    if (timelineAudio) {
+                        timelineAudio.currentTime = 0;
+                    }
+                }
+                
+                updatePlayheadUI();
+                render();
+                playheadAnimFrameId = requestAnimationFrame(tick);
+            }
+            playheadAnimFrameId = requestAnimationFrame(tick);
+        }
+
+        function pauseTimeline() {
+            isPlaying = false;
+            playIcon.textContent = 'play_arrow';
+            if (playheadAnimFrameId) {
+                cancelAnimationFrame(playheadAnimFrameId);
+                playheadAnimFrameId = null;
+            }
+            if (timelineAudio) {
+                timelineAudio.pause();
+            }
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                pauseTimeline();
+            } else {
+                playTimeline();
+            }
+        });
+
+        // Seek Interaction
+        let isSeeking = false;
+        function seek(e) {
+            const rect = playheadContainer.getBoundingClientRect();
+            let pct = (e.clientX - rect.left) / rect.width;
+            pct = Math.max(0, Math.min(1, pct));
+            currentTime = pct * maxDuration;
+            updatePlayheadUI();
+            
+            if (timelineAudio) {
+                timelineAudio.currentTime = currentTime / 1000;
+            }
+            
+            render();
+        }
+
+        playheadContainer.addEventListener('mousedown', (e) => {
+            isSeeking = true;
+            pauseTimeline();
+            seek(e);
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isSeeking) {
+                seek(e);
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isSeeking) {
+                isSeeking = false;
+            }
+        });
+
+        // Init
+        buildLayerList();
+        render();
+
+    </script>
+<div class="snack" id="snack" role="status"></div>
+<script>(function(){var s=document.getElementById('snack'),t;document.getElementById('openReelBtn').addEventListener('click',function(){s.textContent='Demo only: sending to Reel Studio isn\u2019t wired up';s.classList.add('on');clearTimeout(t);t=setTimeout(function(){s.classList.remove('on')},2400)})})();</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),Q=(s,r=document)=>r.querySelector(s),sn=$('snack');let st;
+const toast=m=>{sn.textContent=m;sn.classList.add('on');clearTimeout(st);st=setTimeout(()=>sn.classList.remove('on'),2200)};
+const mk=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild},sel=()=>layers.find(l=>l.id===selectedLayerId);
+const KEY='reel-parallax-scene-2';
+try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(Array.isArray(d)&&d.length)layers=d}catch(e){}
+const _r=render;render=function(){const all=layers,ct=currentTime,timed=isPlaying||ct>0,rest=!isPlaying&&ct===0;layers=all.filter(l=>!l.hidden&&(!timed||l.id===selectedLayerId||((l.start==null||ct>=l.start)&&(l.end==null||ct<=l.end))));if(rest)currentTime=maxDuration;try{_r()}finally{layers=all;currentTime=ct}};
+const _u=updatePropertiesPanel;updatePropertiesPanel=function(){_u();const l=sel();if(l&&$('lyName'))$('lyName').value=l.name};
+// history + autosave
+const snap=()=>layers.map(l=>({...l})),key=()=>JSON.stringify(layers,(k,v)=>v&&typeof v==='object'&&!Array.isArray(v)&&v.constructor!==Object?undefined:v);
+let hist=[],redo=[],last=key(),tk=last,cur=snap();
+const setStat=t=>{const e=$('saveStat');if(e)e.textContent=t},upd=()=>{$('undoBtn').style.opacity=hist.length?1:.35;$('redoBtn').style.opacity=redo.length?1:.35};
+const apply=a=>{layers=a.map(l=>({...l}));if(!sel())selectedLayerId=null;buildLayerList();render();updatePropertiesPanel();updateContextToolbar();last=tk=key();upd()};
+const undoF=()=>{if(!hist.length)return;redo.push(cur);cur=hist.pop();apply(cur)},redoF=()=>{if(!redo.length)return;hist.push(cur);cur=redo.pop();apply(cur)};
+setInterval(()=>{const k=key();if(k!==tk){tk=k;setStat('Saving…');return}if(k!==last){hist.push(cur);if(hist.length>80)hist.shift();redo=[];cur=snap();last=k;try{localStorage.setItem(KEY,JSON.stringify(layers.filter(l=>l.type!=='image')))}catch(e){}setStat('Saved');upd()}},300);
+// header
+const right=$('themeToggle').parentElement,h1=Q('h1');
+h1.querySelectorAll('.material-symbols-rounded').forEach(e=>e.remove());h1.insertAdjacentHTML('beforeend','<span id="saveStat" class="sstat">Saved</span>');
+const ic=(id,i,t)=>`<button class="btn-icon" id="${id}" title="${t}"><span class="material-symbols-rounded text-[20px]">${i}</span></button>`;
+right.prepend(mk(ic('helpBtn','keyboard','Shortcuts (?)')),mk(ic('redoBtn','redo','Redo (⇧⌘Z)')),mk(ic('undoBtn','undo','Undo (⌘Z)')));
+$('undoBtn').onclick=undoF;$('redoBtn').onclick=redoF;upd();
+const seg=mk('<div class="rseg" role="group" aria-label="Mode"><button id="segEdit" aria-pressed="true">Edit</button><button id="segPrev" aria-pressed="false">Preview depth</button></div>');
+$('parallaxToggleBtn').before(seg);$('parallaxToggleBtn').style.display='none';
+const sync=()=>setTimeout(()=>{$('segEdit').setAttribute('aria-pressed',!isParallaxMode);$('segPrev').setAttribute('aria-pressed',isParallaxMode)});
+$('segEdit').onclick=()=>{if(isParallaxMode)$('parallaxToggleBtn').click();sync()};$('segPrev').onclick=()=>{if(!isParallaxMode)$('parallaxToggleBtn').click();sync()};
+const em=mk('<div class="relative" id="expWrap"><button class="pbtn" id="expBtn" aria-haspopup="true">Export<span class="material-symbols-rounded text-[18px]">expand_more</span></button><div class="emenu" id="expMenu" hidden><button data-a="png">PNG image<small>Current frame</small></button><button data-a="webm">WebM video<small>Records the 5s timeline</small></button><hr><button data-a="reel">Send to Reel Studio<small>Layers and depth</small></button></div></div>');
+$('exportBtn').before(em);$('exportBtn').style.display='none';$('openReelBtn').style.display='none';
+$('expBtn').onclick=e=>{e.stopPropagation();$('expMenu').hidden=!$('expMenu').hidden};document.addEventListener('click',()=>{$('expMenu').hidden=true});
+function rec(){if(!window.MediaRecorder){toast('Video export isn’t supported in this browser');return}
+pauseTimeline();selectLayer(null);currentTime=0;updatePlayheadUI();const ch=[],r=new MediaRecorder(canvas.captureStream(30));
+r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(ch,{type:'video/webm'}));a.download='reel-parallax.webm';a.click();toast('Exported reel-parallax.webm')};
+r.start();toast('Recording 5 seconds…');playTimeline();setTimeout(()=>{pauseTimeline();r.stop();currentTime=0;updatePlayheadUI();render()},maxDuration+250)}
+$('expMenu').onclick=e=>{const a=e.target.closest('[data-a]');if(!a)return;({png:()=>$('exportBtn').click(),webm:rec,reel:()=>$('openReelBtn').click()})[a.dataset.a]()};
+// timeline
+const tr=$('timelineTracks'),ruler=document.createElement('div');ruler.className='absolute ruler';
+let rh='';for(let i=0;i<=maxDuration/500;i++)rh+=`<i style="left:${i*500/maxDuration*100}%" class="${i%2?'':'mj'}">${i%2?'':'<b>'+i/2+'s</b>'}</i>`;ruler.innerHTML=rh;tr.prepend(ruler);
+const TC={text:'#C9F4E4',circle:'#F6C6B5',rect:'#F6C6B5',image:'#D5CBF2'},lab=(s,e)=>(s/1000).toFixed(1)+'–'+(e/1000).toFixed(1)+'s';
+function decorate(){const L=[...layers].reverse();[...tr.children].filter(c=>!c.classList.contains('absolute')).forEach((t,i)=>{const l=L[i],b=t.children[1]&&t.children[1].firstElementChild;if(!l||!b)return;
+const s=l.start??0,e=l.end??maxDuration;b.className='tbar'+(l.id===selectedLayerId?' on':'');b.style.cssText=`left:${s/maxDuration*100}%;width:${(e-s)/maxDuration*100}%;background:${TC[l.type]||TC.rect}`;
+b.innerHTML=`<u class="hl"></u><span>${lab(s,e)}</span><u class="hr"></u>`;if(l.hidden)t.style.opacity=.45;
+const eye=document.createElement('button');eye.className='eye material-symbols-rounded';eye.title='Show or hide';eye.textContent=l.hidden?'visibility_off':'visibility';eye.onclick=ev=>{ev.stopPropagation();l.hidden=!l.hidden;buildLayerList();render()};t.firstElementChild.appendChild(eye);
+b.onpointerdown=ev=>{ev.stopPropagation();const m=ev.target.classList.contains('hl')?'l':ev.target.classList.contains('hr')?'r':'m',x0=ev.clientX,w=b.parentElement.clientWidth,s0=s,e0=e;b.setPointerCapture(ev.pointerId);
+b.onpointermove=mv=>{const d=(mv.clientX-x0)/w*maxDuration;let a=s0,z=e0;if(m==='m'){const n=e0-s0;a=Math.max(0,Math.min(maxDuration-n,s0+d));z=a+n}else if(m==='l')a=Math.max(0,Math.min(e0-200,s0+d));else z=Math.min(maxDuration,Math.max(s0+200,e0+d));
+l.start=Math.round(a/50)*50;l.end=Math.round(z/50)*50;b.style.left=l.start/maxDuration*100+'%';b.style.width=(l.end-l.start)/maxDuration*100+'%';b.children[1].textContent=lab(l.start,l.end);render()};
+b.onpointerup=()=>{b.onpointermove=null}}})}
+const _b=buildLayerList;buildLayerList=function(){_b();decorate()};
+const xb=mk('<button class="btn-icon" title="Expand timeline"><span class="material-symbols-rounded text-[18px]">unfold_more</span></button>');
+xb.onclick=()=>{const c=$('timelineContainer');c.style.height=c.style.height==='400px'?'240px':'400px'};Q('#timelineContainer .justify-end').appendChild(xb);
+// inspector
+const AL={l:['align_horizontal_left','Align left'],c:['align_horizontal_center','Center horizontally'],r:['align_horizontal_right','Align right'],t:['align_vertical_top','Align top'],m:['align_vertical_center','Center vertically'],b:['align_vertical_bottom','Align bottom']};
+$('subTabDesign').prepend(mk(`<div class="pgrp"><input id="lyName" class="lyname" aria-label="Layer name"><div class="alrow">${Object.entries(AL).map(([k,v])=>`<button class="btn-icon" data-al="${k}" title="${v[1]}"><span class="material-symbols-rounded text-[18px]">${v[0]}</span></button>`).join('')}</div><div class="swrow">${['#14110D','#00E0A4','#FF7A59','#D5CBF2','#F4E7D3','#0B2447','#F4EFE5'].map(c=>`<button data-sw="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div></div>`));
+$('lyName').oninput=e=>{const l=sel();if(l)l.name=e.target.value};$('lyName').onchange=()=>buildLayerList();
+function hb(l){const s=l.scale||1;if(l.type==='text'){ctx.font=`${l.style||'normal'} ${l.weight||400} ${l.size*s}px ${l.font||'"Hanken Grotesk"'}`;ctx.letterSpacing=(l.letterSpacing||0)+'px';const w=ctx.measureText(l.text).width;ctx.letterSpacing='0px';return[w/2,l.size*s/2]}return[l.w*s/2,l.h*s/2]}
+$('subTabDesign').addEventListener('click',e=>{const l=sel();if(!l)return;const a=e.target.closest('[data-al]'),c=e.target.closest('[data-sw]');
+if(a){const[hw,hh]=hb(l),W=canvas.width,H=canvas.height,k=a.dataset.al;if(k==='l')l.x=hw;if(k==='c')l.x=W/2;if(k==='r')l.x=W-hw;if(k==='t')l.y=hh;if(k==='m')l.y=H/2;if(k==='b')l.y=H-hh}
+else if(c)l.color=c.dataset.sw;else return;render();updatePropertiesPanel()});
+// shortcuts
+const help=mk(`<div class="helpov" id="help" hidden><div class="helpbox"><h3>Shortcuts</h3>${[['Play / pause','Space'],['Undo / redo','⌘Z / ⇧⌘Z'],['Duplicate','⌘D'],['Delete','⌫'],['Nudge (×10 with ⇧)','← ↑ ↓ →'],['Text / shape','T / R'],['Preview depth','P'],['Deselect','Esc']].map(r=>`<div><span>${r[0]}</span><kbd>${r[1]}</kbd></div>`).join('')}</div></div>`);
+document.body.appendChild(help);help.onclick=()=>help.hidden=true;$('helpBtn').onclick=()=>help.hidden=!help.hidden;
+addEventListener('keydown',e=>{const t=e.target;if(/INPUT|SELECT|TEXTAREA/.test(t.tagName)||t.isContentEditable)return;const m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),l=sel();
+if(m&&k==='z'){e.preventDefault();e.shiftKey?redoF():undoF()}else if(m&&k==='y'){e.preventDefault();redoF()}
+else if(m&&k==='d'&&l){e.preventDefault();const c={...l,id:'l'+Date.now(),name:l.name+' copy',x:l.x+24,y:l.y+24};layers.push(c);selectLayer(c.id)}
+else if(k===' '){e.preventDefault();$('playBtn').click()}
+else if((k==='delete'||k==='backspace')&&l){layers=layers.filter(x=>x!==l);selectLayer(null)}
+else if(k.startsWith('arrow')&&l){e.preventDefault();const d=e.shiftKey?10:1;if(k==='arrowleft')l.x-=d;if(k==='arrowright')l.x+=d;if(k==='arrowup')l.y-=d;if(k==='arrowdown')l.y+=d;render();updatePropertiesPanel()}
+else if(k==='escape'){selectLayer(null);help.hidden=true}else if(k==='t')Q('[data-target=panelText]').click();else if(k==='r')$('addRectBtn').click();
+else if(k==='p')($('segPrev').getAttribute('aria-pressed')==='true'?$('segEdit'):$('segPrev')).click();else if(e.key==='?')help.hidden=!help.hidden});
+buildLayerList();render();
+})();
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),Q=s=>document.querySelector(s),sn=$('snack');let st;
+const toast=m=>{sn.textContent=m;sn.classList.add('on');clearTimeout(st);st=setTimeout(()=>sn.classList.remove('on'),2200)};
+const mk=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild},sel=()=>layers.find(l=>l.id===selectedLayerId);
+// time readout
+formatTime=function(ms){const s=ms/1000;return Math.floor(s/60)+':'+(s%60).toFixed(1).padStart(4,'0')};
+playTimeText.parentElement.lastElementChild.textContent='/ 0:05.0';updatePlayheadUI();
+Array.from(Q('#timelineContainer .justify-end').children).slice(0,2).forEach(b=>b.style.display='none');
+// lock + row header
+const _b2=buildLayerList;buildLayerList=function(){_b2();const L=[...layers].reverse();[...$('timelineTracks').children].filter(c=>!c.classList.contains('absolute')).forEach((t,i)=>{const l=L[i];if(!l)return;const h=t.firstElementChild;h.classList.add('rowh');const e=h.querySelector('.eye');if(l.hidden&&e)e.classList.add('on');
+const k=document.createElement('button');k.className='lk material-symbols-rounded'+(l.locked?' on':'');k.textContent=l.locked?'lock':'lock_open';k.title='Lock layer';k.onclick=ev=>{ev.stopPropagation();l.locked=!l.locked;buildLayerList()};h.appendChild(k)})};
+// canvas: aspect + zoom
+const ws=$('workspace'),SZ={'16:9':[1280,720],'1:1':[1080,1080],'9:16':[720,1280]};let z=1;
+const setZ=v=>{z=Math.max(.25,Math.min(2,v));$('canvasWrapper').style.transform=`scale(${z})`;$('zv').textContent=Math.round(z*100)+'%'};
+function fitC(){if(canvas.width/canvas.height>1.7){canvas.style.height='';canvas.style.width='';canvas.classList.add('w-full')}else{canvas.classList.remove('w-full');canvas.style.height=(ws.clientHeight-32)+'px';canvas.style.width='auto'}}
+function setAR(k){const[w,h]=SZ[k],ow=canvas.width,oh=canvas.height;if(w===ow&&h===oh)return;const rx=w/ow,ry=h/oh,f=Math.min(rx,ry);
+layers.forEach(l=>{const full=l.w>=ow-1&&l.h>=oh-1;l.x*=rx;l.y*=ry;if(full){l.w=w;l.h=h}});canvas.width=w;canvas.height=h;fitC();setZ(1);buildLayerList();render();updatePropertiesPanel()}
+ws.appendChild(mk(`<div class="cvbar"><div class="rseg" id="arSeg">${Object.keys(SZ).map((k,i)=>`<button data-ar="${k}" aria-pressed="${!i}">${k}</button>`).join('')}</div><div class="zm"><button class="btn-icon" id="zOut" title="Zoom out"><span class="material-symbols-rounded text-[16px]">remove</span></button><span class="v" id="zv">100%</span><button class="btn-icon" id="zIn" title="Zoom in"><span class="material-symbols-rounded text-[16px]">add</span></button><button class="btn-icon" id="zFit" title="Fit"><span class="material-symbols-rounded text-[16px]">fit_screen</span></button></div></div>`));
+$('arSeg').onclick=e=>{const b=e.target.closest('[data-ar]');if(!b)return;[...$('arSeg').children].forEach(c=>c.setAttribute('aria-pressed',c===b));setAR(b.dataset.ar)};
+$('zOut').onclick=()=>setZ(z-.25);$('zIn').onclick=()=>setZ(z+.25);$('zFit').onclick=()=>setZ(1);addEventListener('resize',fitC);
+// opacity + motion code
+Q('.pgrp').append(mk('<label class="oprow"><span>Opacity</span><input type="range" id="lyOp" min="0" max="100" value="100"><b id="lyOpV">100%</b></label>'));
+$('lyOp').oninput=e=>{const l=sel();if(!l)return;l.opacity=e.target.value/100;$('lyOpV').textContent=e.target.value+'%';render()};
+const _u2=updatePropertiesPanel;updatePropertiesPanel=function(){_u2();const l=sel();if(l){const o=Math.round((l.opacity??1)*100);$('lyOp').value=o;$('lyOpV').textContent=o+'%'}};
+$('subTabDesign').append(mk('<details class="mcode"><summary>Motion code</summary><pre id="mcodeP"></pre><button class="mcopy" id="mcodeC">Copy</button></details>'));
+const MC={fade:'from: { opacity: 0 },\n  to: { opacity: 1 }',slide:'from: { x: -300 },\n  to: { x: 0 }',rise:'from: { y: 150 },\n  to: { y: 0 }',scale:'from: { scale: 0 },\n  to: { scale: 1 }',spin:'from: { rotate: 180 },\n  to: { rotate: 0 }',breathe:'from: { scale: 1 },\n  to: { scale: 1.08 },\n  loop: true',typewriter:'from: { chars: 0 },\n  to: { chars: {N} }'};
+const code=l=>{const a=l.animation||'none';return MC[a]?`reel.animate("${l.name}", {\n  ${MC[a].replace('{N}',(l.text||'').length)},\n  duration: ${l.animDuration||1000},\n  ease: "outExpo",\n})`:`// No motion on "${l.name}" yet.\n// Pick a preset in the Animation tab.`};
+setInterval(()=>{const l=sel(),p=$('mcodeP');if(l&&p)p.textContent=code(l)},300);
+$('mcodeC').onclick=()=>{const t=$('mcodeP').textContent;try{navigator.clipboard.writeText(t).then(()=>toast('Copied'),()=>toast('Press Ctrl+C to copy'))}catch(e){toast('Press Ctrl+C to copy')}};
+buildLayerList();render();
+})();
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),Q=s=>document.querySelector(s);
+const mk=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild},sel=()=>layers.find(l=>l.id===selectedLayerId);
+const HG='"Hanken Grotesk", sans-serif',PF='"Playfair Display", serif',JB='"JetBrains Mono", monospace',RB='"Rubik", sans-serif';
+// View menu (aspect + zoom)
+Q('.cvbar').style.display='none';
+let z=1,ar='16:9';const AR={'16:9':'Landscape','1:1':'Square','9:16':'Portrait'},ZS=[['fit','Fit'],['.5','50%'],['1.5','150%'],['2','200%']];
+const vw=mk(`<div class="relative hidden md:block" id="viewWrap"><button class="vchip" id="viewBtn" aria-haspopup="true"><span id="viewLbl"></span><span class="material-symbols-rounded text-[18px]">expand_more</span></button><div class="emenu vmenu" id="viewMenu" hidden><p class="mh">Aspect ratio</p>${Object.entries(AR).map(([k,v])=>`<button data-ar="${k}">${k}<small>${v}</small></button>`).join('')}<hr><p class="mh">Zoom</p>${ZS.map(([k,v])=>`<button data-z="${k}">${v}</button>`).join('')}</div></div>`);
+Q('h1').parentElement.appendChild(vw);
+const vm=$('viewMenu'),paint=()=>{$('viewLbl').textContent=ar+' · '+(z===1?'Fit':Math.round(z*100)+'%');vm.querySelectorAll('[data-ar]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.ar===ar));vm.querySelectorAll('[data-z]').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.z==='fit'&&z===1)||+b.dataset.z===z))};
+const setZ=v=>{z=v;$('canvasWrapper').style.transform=`scale(${z})`;paint()};paint();
+$('viewBtn').onclick=e=>{e.stopPropagation();vm.hidden=!vm.hidden};document.addEventListener('click',()=>vm.hidden=true);
+vm.onclick=e=>{const a=e.target.closest('[data-ar]'),c=e.target.closest('[data-z]');if(a){Q('#arSeg [data-ar="'+a.dataset.ar+'"]').click();ar=a.dataset.ar;setZ(1)}else if(c)setZ(c.dataset.z==='fit'?1:+c.dataset.z)};
+// Text panel
+const addText=o=>{const id='l'+Date.now();layers.push({id,name:o.name,type:'text',x:canvas.width/2,y:canvas.height/2,text:o.text,size:o.size,color:o.col||'#14110D',font:o.font||HG,weight:o.w,style:o.i?'italic':'normal',letterSpacing:o.ls||0,animation:o.a||'none',animDuration:1000,z:.5});selectLayer(id)};
+const AD=[{name:'Heading',text:'Add a heading',size:90,w:'800',ls:-3,lab:'Heading',css:"font:800 20px 'Hanken Grotesk';letter-spacing:-.03em"},{name:'Subheading',text:'Add a subheading',size:48,w:'700',lab:'Subheading',css:"font:700 16px 'Hanken Grotesk'"},{name:'Body text',text:'Add body text',size:24,w:'400',lab:'Body text',css:"font:400 14px 'Hanken Grotesk'"}];
+const ST=[{n:'Hero',text:'Reel',font:HG,w:'800',size:140,ls:-6,a:'rise',p:34,pl:-1.5},{n:'Light',text:'Light',font:HG,w:'200',size:140,ls:-4,a:'fade',p:34,pl:-1},{n:'Editorial',text:'Editorial',font:PF,w:'500',i:1,size:100,a:'fade',p:28},{n:'Serif',text:'Serif',font:PF,w:'700',size:96,a:'fade',p:30},{n:'Technical',text:'depth: 0.8',font:JB,w:'500',size:64,a:'typewriter',p:18},{n:'Poster',text:'POSTER',font:RB,w:'900',size:120,col:'#FF7A59',a:'scale',p:24},{n:'Caption',text:'CAPTION',font:HG,w:'700',size:30,ls:6,a:'fade',p:12,pl:2},{n:'Number',text:'42',font:HG,w:'200',size:240,ls:-10,a:'rise',p:44,pl:-2}];
+Q('#panelText').children[1].innerHTML=`<div class="tx">${AD.map((a,i)=>`<button class="addr" data-add="${i}"><span style="${a.css}">${a.lab}</span><span class="material-symbols-rounded">add</span></button>`).join('')}<h4>Styles</h4><div class="sg">${ST.map((s,i)=>`<button class="sty" data-st="${i}"><span class="sv" style="font-family:${s.font.replace(/"/g,"'")};font-weight:${s.w};font-style:${s.i?'italic':'normal'};font-size:${s.p}px;letter-spacing:${s.pl||0}px;color:${s.col||'#14110D'}">${s.text}</span><span class="sn">${s.n}</span></button>`).join('')}</div></div>`;
+Q('#panelText').children[1].onclick=e=>{const a=e.target.closest('[data-add]'),s=e.target.closest('[data-st]');if(a)addText(AD[+a.dataset.add]);else if(s){const o=ST[+s.dataset.st];addText({...o,name:o.n})}};
+// Text properties
+const row=(id,l,mn,mx,st)=>`<label class="oprow"><span>${l}</span><input type="range" id="${id}" min="${mn}" max="${mx}" step="${st}"><b id="${id}v"></b></label>`;
+const tp=mk(`<div id="tprops" class="pgrp" style="display:none"><details open><summary>Type</summary><input id="tpText" class="tin" aria-label="Text"><div class="trow"><select id="tpFont" class="tin"><option value='${HG}'>Hanken Grotesk</option><option value='${JB}'>JetBrains Mono</option><option value='${RB}'>Rubik</option><option value='${PF}'>Playfair Display</option></select><button class="tg2" id="tpIt">Italic</button></div>${row('tpW','Weight',200,900,100)}${row('tpS','Size',12,400,1)}${row('tpT','Tracking',-10,40,1)}</details><details open><summary>Effects</summary><div class="trow"><button class="tg2" id="tpSh">Shadow</button><button class="tg2" id="tpGl">Glow</button></div></details></div>`);
+$('textProps').after(tp);
+function sync(){const l=sel(),ok=l&&l.type==='text';tp.style.display=ok?'':'none';if(!ok)return;$('tpText').value=l.text;$('tpFont').value=l.font||HG;
+[['tpW',l.weight||400],['tpS',Math.round(l.size)],['tpT',l.letterSpacing||0]].forEach(([i,v])=>{$(i).value=v;$(i+'v').textContent=v});
+$('tpIt').setAttribute('aria-pressed',l.style==='italic');$('tpSh').setAttribute('aria-pressed',l.shadow!==false);$('tpGl').setAttribute('aria-pressed',!!l.glow)}
+const on=(id,fn)=>$(id).addEventListener('input',e=>{const l=sel();if(l&&l.type==='text'){fn(l,e.target.value);render();sync()}});
+on('tpText',(l,v)=>l.text=v);on('tpFont',(l,v)=>l.font=v);on('tpW',(l,v)=>l.weight=v);on('tpS',(l,v)=>l.size=+v);on('tpT',(l,v)=>l.letterSpacing=+v);
+const tog=(id,fn)=>$(id).onclick=()=>{const l=sel();if(l){fn(l);render();sync()}};
+tog('tpIt',l=>l.style=l.style==='italic'?'normal':'italic');tog('tpSh',l=>l.shadow=l.shadow===false);tog('tpGl',l=>l.glow=l.glow?null:'#00E0A4');
+const _u3=updatePropertiesPanel;updatePropertiesPanel=function(){_u3();sync()};
+})();
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),Q=s=>document.querySelector(s);
+const mk=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild},toast=m=>{const sn=$('snack');sn.textContent=m;sn.classList.add('on');setTimeout(()=>sn.classList.remove('on'),2200)};
+const HG='"Hanken Grotesk", sans-serif',PF='"Playfair Display", serif';
+// ---- header: aspect chip, grouped undo/redo, short labels
+$('viewWrap').remove();
+const AR={'16:9':'Landscape','1:1':'Square','9:16':'Portrait'};
+Q('h1').parentElement.appendChild(mk(`<div class="relative hidden md:block" id="arWrap"><button class="vchip" id="arBtn" aria-haspopup="true"><span id="arLbl">16:9</span><span class="material-symbols-rounded text-[18px]">expand_more</span></button><div class="emenu vmenu" id="arMenu" hidden>${Object.entries(AR).map(([k,v])=>`<button data-ar="${k}" aria-pressed="${k==='16:9'}">${k}<small>${v}</small></button>`).join('')}</div></div>`));
+$('arBtn').onclick=e=>{e.stopPropagation();$('arMenu').hidden=!$('arMenu').hidden};document.addEventListener('click',()=>$('arMenu').hidden=true);
+let z=1;const ZL=[.25,.5,.75,1,1.5,2],setZ=v=>{z=v;$('canvasWrapper').style.transform=`scale(${z})`;$('tzv').textContent=Math.round(z*100)+'%'};
+$('arMenu').onclick=e=>{const b=e.target.closest('[data-ar]');if(!b)return;Q('#arSeg [data-ar="'+b.dataset.ar+'"]').click();$('arLbl').textContent=b.dataset.ar;$('arMenu').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));setZ(1)};
+Q('h1>span:first-child').classList.add('crumb');
+const ur=mk('<div class="ur"></div>');$('undoBtn').before(ur);ur.append($('undoBtn'),$('redoBtn'));$('themeToggle').after($('helpBtn'));
+$('segPrev').innerHTML='Preview<span class="xl-only"> depth</span>';
+// ---- zoom in timeline head
+Q('#timelineContainer .justify-end').prepend(mk(`<div class="tzm"><button class="btn-icon" id="tzOut" title="Zoom canvas out"><span class="material-symbols-rounded text-[16px]">remove</span></button><span id="tzv">100%</span><button class="btn-icon" id="tzIn" title="Zoom canvas in"><span class="material-symbols-rounded text-[16px]">add</span></button><button class="btn-icon" id="tzFit" title="Fit canvas"><span class="material-symbols-rounded text-[16px]">fit_screen</span></button></div>`));
+$('tzOut').onclick=()=>setZ([...ZL].reverse().find(v=>v<z-.01)||ZL[0]);$('tzIn').onclick=()=>setZ(ZL.find(v=>v>z+.01)||2);$('tzFit').onclick=()=>setZ(1);$('tzv').onclick=()=>setZ(1);$('tzv').title='Reset to 100%';
+// ---- scene builders (fractions of canvas)
+const W=()=>canvas.width,H=()=>canvas.height;let uid=0;
+const B=o=>({id:'l'+Date.now()+(uid++),scale:1,animation:'none',animDuration:1000,z:.3,...o});
+const R=(name,x,y,w,h,color,z,a)=>B({name,type:'rect',x:x*W(),y:y*H(),w:w*W(),h:h*H(),color,z,animation:a||'none'});
+const C=(name,x,y,d,color,z,a)=>B({name,type:'circle',x:x*W(),y:y*H(),w:d*H(),h:d*H(),color,z,animation:a||'none'});
+const T=(name,text,x,y,s,color,o={})=>B({name,type:'text',text,x:x*W(),y:y*H(),size:s*H(),color,font:HG,weight:'800',style:'normal',letterSpacing:0,z:.7,...o});
+const poster=(p)=>[R('Background',.5,.5,1,1,p.bg,0),C('Accent circle',.82,.2,.6,p.ac,.2,'fade'),T('Kicker',p.k,.5,.3,.045,p.fg,{weight:'700',letterSpacing:6,z:.5}),T('Title 1',p.l[0],.5,.46,.17,p.fg,{animation:'rise',letterSpacing:-5,z:.8}),T('Title 2',p.l[1],.5,.64,.17,p.fg,{animation:'rise',letterSpacing:-5,z:.8}),R('Bar',.5,.82,.3,.035,p.ac,.6,'scale')];
+const TPL=[
+{n:'Weekly recap',bg:'#FFB8C8',fg:'#2B1020',ac:'#FFFFFF',t:'Ship it',f:()=>poster({bg:'#FFB8C8',fg:'#2B1020',ac:'#FFFFFF',k:'WEEKLY RECAP',l:['Ship it','on Friday']})},
+{n:'Habits',bg:'#14271F',fg:'#E8F5EE',ac:'#00E0A4',t:'Early',f:()=>poster({bg:'#14271F',fg:'#E8F5EE',ac:'#00E0A4',k:'HABITS',l:['Early','mornings']})},
+{n:'Signups',bg:'#FFF3D6',fg:'#2B2108',ac:'#F29E4C',t:'2840',f:()=>[R('Background',.5,.5,1,1,'#FFF3D6',0),T('Kicker','GROWTH',.5,.24,.045,'#2B2108',{weight:'700',letterSpacing:6,z:.5}),T('Number','2840',.5,.5,.38,'#2B2108',{weight:'200',letterSpacing:-12,animation:'rise',z:.8}),T('Label','new signups',.5,.74,.06,'#2B2108',{weight:'500',z:.5}),R('Bar',.5,.86,.3,.035,'#F29E4C',.6,'scale')]},
+{n:'Launch',bg:'#FF7A59',fg:'#FFFFFF',ac:'#14110D',t:'Meet the',f:()=>[R('Background',.5,.5,1,1,'#FF7A59',0),R('Panel',.75,.5,.5,1,'#14110D',.2,'fade'),T('Title 1','Meet the',.27,.42,.13,'#FFFFFF',{animation:'rise',letterSpacing:-4,z:.8}),T('Title 2','new thing',.27,.58,.13,'#FFFFFF',{animation:'rise',letterSpacing:-4,z:.8}),T('Sub','Coming this fall',.27,.76,.05,'#FFFFFF',{weight:'500',z:.5}),T('Arrow','→',.75,.5,.3,'#FF7A59',{animation:'slide',z:.9})]},
+{n:'Quote',bg:'#F4E7D3',fg:'#2B1D12',ac:'#D2691E',t:'Quote',f:()=>[R('Background',.5,.5,1,1,'#F4E7D3',0),T('Mark','“',.5,.28,.4,'#D2691E',{font:PF,weight:'700',z:.3}),T('Quote','Done is better than perfect.',.5,.52,.09,'#2B1D12',{font:PF,weight:'500',style:'italic',animation:'fade',z:.7}),T('Source','DAILY NOTE',.5,.76,.04,'#2B1D12',{weight:'700',letterSpacing:6,z:.5})]},
+{n:'Quarter',bg:'#0F2A4A',fg:'#F4EFE5',ac:'#6FD3FF',t:'+38%',f:()=>[R('Background',.5,.5,1,1,'#0F2A4A',0),T('Title','Revenue up 38%',.5,.2,.1,'#F4EFE5',{animation:'rise',letterSpacing:-3,z:.8}),...[.38,.52,.47,.74,.92].map((h,i)=>R('Bar '+(i+1),.22+i*.14,.9-h*.25,.09,h*.5,i%2?'#F4EFE5':'#6FD3FF',.2+i*.1,'scale'))]}];
+const PAL=[['Cream','#F4EFE5','#14110D','#00E0A4'],['Ink','#14110D','#F4EFE5','#00E0A4'],['Mint','#00E0A4','#06281E','#FFFFFF'],['Sunset','#FF7A59','#FFFFFF','#14110D'],['Lilac','#D5CBF2','#1B1535','#FFFFFF'],['Sand','#F4E7D3','#2B1D12','#D2691E'],['Navy','#0B2447','#FFFFFF','#FFD84A']];
+const EL=[['Circle',()=>[C('Circle',.5,.5,.4,'#00E0A4',.4)],'<i style="width:30px;height:30px;border-radius:50%;background:#00E0A4"></i>'],['Square',()=>[R('Square',.5,.5,.3*H()/W(),.3,'#FF7A59',.4)],'<i style="width:28px;height:28px;background:#FF7A59"></i>'],['Bar',()=>[R('Bar',.5,.5,.35,.035,'#14110D',.5,'scale')],'<i style="width:44px;height:5px;border-radius:9px;background:#14110D"></i>'],['Highlight',()=>[R('Highlight',.5,.5,.4,.12,'#00E0A4',.2,'scale')],'<i style="width:48px;height:14px;background:#00E0A4"></i>'],
+['Arrow',()=>[T('Arrow','→',.5,.5,.3,'#14110D',{animation:'slide'})],'<b style="font:800 28px Hanken Grotesk">→</b>'],['Play mark',()=>[T('Play','▶',.5,.5,.25,'#00E0A4')],'<b style="font:800 24px Hanken Grotesk;color:#00E0A4">▶</b>'],
+['Note',()=>[R('Note chip',.5,.5,.24,.1,'#FFFFFF',.6),T('Note text','note',.5,.5,.05,'#14110D',{weight:'700',z:.7})],'<i style="padding:4px 12px;border-radius:99px;background:#fff;font:700 12px Hanken Grotesk;color:#14110D">note</i>'],['Badge',()=>[C('Badge',.5,.5,.22,'#00E0A4',.6),T('Badge text','NEW',.5,.5,.06,'#14110D',{z:.7})],'<i style="width:36px;height:36px;border-radius:50%;background:#00E0A4;display:grid;place-items:center;font:800 10px Hanken Grotesk;color:#14110D">NEW</i>']];
+// ---- Assets panel
+const pa=mk(`<div id="panelAssets" class="w-[280px] md:w-[300px] flex-1 flex flex-col hidden shrink-0"><div class="px-5 py-4 md:px-6 md:py-5 flex items-center justify-between shrink-0"><div class="flex items-center gap-2"><span class="material-symbols-rounded">widgets</span><h3 class="font-display font-medium text-[15px] md:text-[16px]">Assets</h3></div><button class="btn-icon" id="asClose" title="Close panel"><span class="material-symbols-rounded text-[20px]">close</span></button></div><div class="px-5 md:px-6 pb-3"><div class="rseg" id="asTabs"><button data-t="tpl" aria-pressed="true">Templates</button><button data-t="pal" aria-pressed="false">Palettes</button><button data-t="el" aria-pressed="false">Elements</button></div></div><div id="asBody" class="flex-1 overflow-y-auto px-5 md:px-6 pb-6"></div></div>`);
+$('sidePanel').appendChild(pa);
+const VIEW={tpl:()=>`<div class="sg">${TPL.map((t,i)=>`<button class="ac" data-tpl="${i}"><span class="tp" style="background:${t.bg};color:${t.fg}"><b>${t.t}</b><i style="background:${t.ac}"></i></span><span class="nm">${t.n}</span></button>`).join('')}</div><button class="addr mt" data-comm>Browse Community remixes<span class="material-symbols-rounded">arrow_outward</span></button>`,
+pal:()=>`<div class="sg">${PAL.map((p,i)=>`<button class="ac" data-pal="${i}"><span class="pc" style="background:${p[1]};color:${p[2]}">Aa<i style="background:${p[3]}"></i></span><span class="nm">${p[0]}</span></button>`).join('')}</div>`,
+el:()=>`<div class="sg">${EL.map((e,i)=>`<button class="ac" data-el="${i}"><span class="el">${e[2]}</span><span class="nm">${e[0]}</span></button>`).join('')}</div>`};
+const show=k=>{$('asBody').innerHTML=VIEW[k]();[...$('asTabs').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===k))};show('tpl');
+$('asTabs').onclick=e=>{const b=e.target.closest('[data-t]');if(b)show(b.dataset.t)};
+$('asBody').onclick=e=>{const t=e.target.closest('[data-tpl]'),p=e.target.closest('[data-pal]'),l=e.target.closest('[data-el]');
+if(t){layers=TPL[+t.dataset.tpl].f();selectLayer(null);toast('Template added. Undo with ⌘Z')}
+else if(p){const c=PAL[+p.dataset.pal];layers.forEach(y=>{if(y.type==='text')y.color=c[2];else if(y.type!=='image')y.color=(y.w>=canvas.width*.95&&y.h>=canvas.height*.95)?c[1]:c[3]});render();updatePropertiesPanel();toast(c[0]+' palette applied')}
+else if(l){const a=EL[+l.dataset.el][1]();layers.push(...a);selectLayer(a[a.length-1].id)}
+else if(e.target.closest('[data-comm]'))toast('Demo only: Community remixes aren’t wired up')};
+$('asClose').onclick=()=>{const b=Q('.rail-btn.active');if(b)b.click()};
+// ---- rail: Layers button becomes Assets, placed last
+const lb=Q('.rail-btn[data-target="panelLayers"]');panels.panelAssets=pa;lb.dataset.target='panelAssets';
+lb.innerHTML='<span class="material-symbols-rounded text-[20px] md:text-[24px]">widgets</span><span class="text-[9px] md:text-[10px] font-medium hidden sm:block">Assets</span>';
+Q('.rail-btn[data-target="panelAudio"]').after(lb);panels.panelLayers.classList.add('hidden');pa.classList.remove('hidden');
+})();
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),sel=()=>layers.find(l=>l.id===selectedLayerId);
+const box=document.createElement('div');box.className='dz';box.innerHTML='<div class="dzh"><span>Depth</span><b id="dzv"></b></div><div class="dzs" id="dzs"><em>Back</em><em>Front</em></div>';
+document.querySelector('.pgrp').append(box);
+const S=$('dzs'),TC={text:'#00E0A4',circle:'#FF7A59',rect:'#FF7A59',image:'#D5CBF2'};let drag=null;
+function draw(){if(drag)return;S.querySelectorAll('i').forEach(n=>n.remove());layers.forEach((l,k)=>{const d=document.createElement('i');d.dataset.id=l.id;d.title=l.name;d.style.left=(l.z||0)*100+'%';d.style.top=14+(k%4)*16+'px';d.style.background=TC[l.type]||'#ccc';if(l.id===selectedLayerId)d.className='on';S.appendChild(d)});const l=sel();$('dzv').textContent=l?'z '+(l.z||0).toFixed(2):''}
+S.addEventListener('pointerdown',e=>{const d=e.target.closest('i');if(!d)return;drag=d.dataset.id;if(selectedLayerId!==drag)selectLayer(drag);S.setPointerCapture(e.pointerId)});
+S.addEventListener('pointermove',e=>{if(!drag)return;const l=layers.find(x=>x.id===drag);if(!l)return;const r=S.getBoundingClientRect();l.z=Math.round(Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*100)/100;const n=S.querySelector(`[data-id="${drag}"]`);if(n)n.style.left=l.z*100+'%';$('dzv').textContent='z '+l.z.toFixed(2);render()});
+S.addEventListener('pointerup',()=>{if(!drag)return;drag=null;updatePropertiesPanel();draw()});
+const _u5=updatePropertiesPanel;updatePropertiesPanel=function(){_u5();draw()};setInterval(draw,500);draw();
+const pt=$('subTabParallax'),zr=$('propZ'),zl=$('propZVal');pt.innerHTML=`<div class='pgrp'><div><div class='ptt'>Depth</div><p class='phint'>Drag a dot to set how far forward a layer sits. Nearer layers move more in Preview.</p></div><div id='dzslot'></div><label class='oprow'><span>Distance</span><b id='zslot'></b></label><div class='trow' id='zpre'><button class='tg2' data-z='0'>Back</button><button class='tg2' data-z='.5'>Middle</button><button class='tg2' data-z='1'>Front</button></div></div>`;$('dzslot').appendChild(box);const zrow=pt.querySelector('.oprow');zrow.insertBefore(zr,$('zslot'));$('zslot').appendChild(zl);$('zpre').onclick=e=>{const b=e.target.closest('[data-z]'),l=sel();if(b&&l){l.z=+b.dataset.z;render();updatePropertiesPanel()}};
+$('tpIt').innerHTML=`<span class='material-symbols-rounded text-[18px]'>format_italic</span>`;$('tpIt').title='Italic';const sd=$('tbScaleDownBtn'),su=$('tbScaleUpBtn');sd.firstElementChild.textContent='remove';su.firstElementChild.textContent='add';sd.title='Smaller';su.title='Larger';
+const HGF='"Hanken Grotesk", sans-serif',bs=o=>({id:'l'+Date.now()+Math.random().toString(36).slice(2,6),scale:1,animation:'none',animDuration:1000,z:.3,...o});
+const starter=()=>{const W=canvas.width,H=canvas.height,tx=(name,text,y,s,w,ls,z,a)=>bs({name,type:'text',text,x:W/2,y:H*y,size:H*s,color:'#14110D',font:HGF,weight:w,style:'normal',letterSpacing:ls,z,animation:a||'none'});return[bs({name:'Background',type:'rect',x:W/2,y:H/2,w:W,h:H,color:'#F4EFE5',z:0}),bs({name:'Primary Glow',type:'circle',x:W/2,y:H/2,w:H*.62,h:H*.62,color:'#00E0A4',z:.2,animation:'fade'}),tx('Caption Tag','REEL STUDIO · PARALLAX',.36,.04,'400',0,.5),tx('Main Title','PARALLAX',.5,.22,'800',-4,.8,'rise'),bs({name:'Accent Bar',type:'rect',x:W*.7,y:H*.68,w:W*.08,h:H*.012,color:'#F0A25C',z:.6})]};
+const rs=document.createElement('div');rs.className='relative';rs.innerHTML=`<button class='btn-icon' id='rsBtn' title='Reset scene'><span class='material-symbols-rounded text-[20px]'>restart_alt</span></button><div class='emenu' id='rsMenu' hidden><button data-r='start'>Start over<small>Reload the starter scene</small></button><button data-r='clear'>Clear canvas<small>Remove every layer</small></button></div>`;document.querySelector('.ur').before(rs);
+$('rsBtn').onclick=e=>{e.stopPropagation();$('rsMenu').hidden=!$('rsMenu').hidden};document.addEventListener('click',()=>$('rsMenu').hidden=true);
+$('rsMenu').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;pauseTimeline();currentTime=0;updatePlayheadUI();layers=b.dataset.r==='clear'?[]:starter();selectLayer(null);const sn=$('snack');sn.textContent='Done. Undo with ⌘Z';sn.classList.add('on');setTimeout(()=>sn.classList.remove('on'),2200)};
+})();
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),mk=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)),canExact=!!(window.VideoEncoder&&window.VideoFrame);
+const toast=m=>{const s=$('snack');s.textContent=m;s.classList.add('on');setTimeout(()=>s.classList.remove('on'),2600)};
+// ---- WebM writer (ported from Reel Canvas)
+const ebId=id=>{const a=[];while(id>0){a.unshift(id&255);id=Math.floor(id/256)}return new Uint8Array(a)},cat=l=>{let n=0;l.forEach(x=>n+=x.length);const o=new Uint8Array(n);let p=0;l.forEach(x=>{o.set(x,p);p+=x.length});return o};
+const wrSize=(n,m)=>{let len=m;while(len<8&&n>=Math.pow(2,7*len)-1)len++;const o=new Uint8Array(len);let v=n;for(let i=len-1;i>=0;i--){o[i]=v%256;v=Math.floor(v/256)}o[0]|=(0x80>>(len-1));return o},el=(id,p)=>cat([ebId(id),wrSize(p.length,1),p]);
+const uintB=(n,f)=>{const a=[];if(f){for(let i=f-1;i>=0;i--)a.push(Math.floor(n/Math.pow(256,i))&255)}else{do{a.unshift(n%256);n=Math.floor(n/256)}while(n>0)}return new Uint8Array(a)},strB=s=>new Uint8Array([...String(s)].map(c=>c.charCodeAt(0)&127)),f64B=x=>{const d=new DataView(new ArrayBuffer(8));d.setFloat64(0,x);return new Uint8Array(d.buffer)};
+function muxWebm(fr,o){const header=el(0x1A45DFA3,cat([el(0x4286,uintB(1)),el(0x42F7,uintB(1)),el(0x42F2,uintB(4)),el(0x42F3,uintB(8)),el(0x4282,strB('webm')),el(0x4287,uintB(4)),el(0x4285,uintB(2))]));
+const info=el(0x1549A966,cat([el(0x2AD7B1,uintB(1000000)),el(0x4D80,strB('Reel Parallax')),el(0x5741,strB('Reel Parallax')),el(0x4489,f64B(o.durMs))]));
+const tracks=el(0x1654AE6B,el(0xAE,cat([el(0xD7,uintB(1)),el(0x73C5,uintB(1)),el(0x83,uintB(1)),el(0x9C,uintB(0)),el(0x23E383,uintB(Math.round(1e9/o.fps))),el(0x86,strB(o.codec)),el(0xE0,cat([el(0xB0,uintB(o.w)),el(0xBA,uintB(o.h))]))])));
+const cls=[];let cur=null;fr.forEach(f=>{if(!cur||f.key||f.t-cur.t>30000){cur={t:f.t,b:[]};cls.push(cur)}const rel=f.t-cur.t;cur.b.push(el(0xA3,cat([new Uint8Array([0x81,(rel>>8)&255,rel&255,f.key?0x80:0]),f.data])))});
+const cl=cls.map(c=>el(0x1F43B675,cat([el(0xE7,uintB(c.t))].concat(c.b))));
+const cues=base=>{let pos=base;return el(0x1C53BB6B,cat(cls.map((c,i)=>{const cp=el(0xBB,cat([el(0xB3,uintB(c.t)),el(0xB7,cat([el(0xF7,uintB(1)),el(0xF1,uintB(pos,4))]))]));pos+=cl[i].length;return cp})))};
+const base=info.length+tracks.length+cues(0).length;return new Blob([header,el(0x18538067,cat([info,tracks,cues(base)].concat(cl)))],{type:'video/webm'})}
+// ---- zip (store) for PNG frames
+const CT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})(),crc=u=>{let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CT[(c^u[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+function zip(files){const parts=[],cd=[],te=new TextEncoder();let off=0;files.forEach(f=>{const n=te.encode(f.name),c=crc(f.data),h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint32(14,c,true);h.setUint32(18,f.data.length,true);h.setUint32(22,f.data.length,true);h.setUint16(26,n.length,true);parts.push(new Uint8Array(h.buffer),n,f.data);
+const d=new DataView(new ArrayBuffer(46));d.setUint32(0,0x02014b50,true);d.setUint16(4,20,true);d.setUint16(6,20,true);d.setUint32(16,c,true);d.setUint32(20,f.data.length,true);d.setUint32(24,f.data.length,true);d.setUint16(28,n.length,true);d.setUint32(42,off,true);cd.push(new Uint8Array(d.buffer),n);off+=30+n.length+f.data.length});
+const cs=cd.reduce((a,x)=>a+x.length,0),e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);return new Blob([...parts,...cd,new Uint8Array(e.buffer)],{type:'application/zip'})}
+// ---- dialog
+const S={sz:'hd',fps:30,out:'webm',eng:canExact?'exact':'quick'},LONG={hd:1280,fhd:1920,uhd:3840};let cancel=false,busy=false,bypass=false;
+const dims=()=>{const W=canvas.width,H=canvas.height,k=LONG[S.sz]/Math.max(W,H);return{k,w:Math.round(W*k/2)*2,h:Math.round(H*k/2)*2}};
+const grp=(g,t,items)=>`<div class='xg'><p>${t}</p><div class='xr' data-g='${g}'>${items.map(([v,l,d])=>`<button data-v='${v}'${d?' disabled':''}>${l}</button>`).join('')}</div></div>`;
+const dlg=mk(`<div class='xo' id='xo' hidden role='dialog' aria-modal='true' aria-label='Export video'><div class='xd'><div id='xmain'><h3>Export</h3><p class='xs'>Length is the scene length, 5 s.</p>${grp('sz','Size',[['hd','HD'],['fhd','Full HD'],['uhd','4K']])}${grp('fps','Frame rate',[[24,'24 fps'],[30,'30 fps'],[60,'60 fps']])}${grp('out','Output',[['webm','WebM video'],['png','PNG frames']])}${grp('eng','Render',[['exact','Exact'],['quick','Quick record']])}<p class='xn' id='xnote'></p><div class='xa'><span class='sum' id='xsum'></span><span><button id='xcx'>Cancel</button> <button class='go' id='xgo'>Export</button></span></div></div><div id='xprog' hidden><h3>Exporting</h3><p class='xs' id='xpt'>Preparing</p><div class='xb'><i id='xbi'></i></div><div class='xa'><span></span><button id='xstop'>Cancel</button></div></div></div></div>`);
+document.body.appendChild(dlg);
+function paint(){dlg.querySelectorAll('.xr').forEach(r=>[...r.children].forEach(b=>b.setAttribute('aria-pressed',String(S[r.dataset.g])===b.dataset.v)));
+const q=dlg.querySelector('[data-g=eng] [data-v=exact]');q.disabled=!canExact;if(S.out==='png'&&S.eng==='quick'){S.eng='exact'}
+dlg.querySelector('[data-g=out] [data-v=png]').disabled=!canExact;const d=dims();
+$('xsum').textContent=S.eng==='exact'?`${d.w} × ${d.h} · ${S.fps} fps · ${Math.round(5*S.fps)} frames`:'Real time · 5 s';
+$('xnote').textContent=!canExact?'This browser can’t render exact frames. Quick record is used.':S.eng==='quick'?'Quick record plays the scene and records it live. Frame rate and size follow the screen.':'Exact renders every frame itself, so timing never drifts. No audio yet.';
+dlg.querySelectorAll('[data-g=sz] button,[data-g=fps] button').forEach(b=>b.disabled=S.eng==='quick')}
+dlg.addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(b&&!b.disabled){const g=b.parentElement.dataset.g;S[g]=g==='fps'?+b.dataset.v:b.dataset.v;paint()}else if(e.target===dlg||e.target.id==='xcx')close()});
+const open=()=>{dlg.hidden=false;$('xmain').hidden=false;$('xprog').hidden=true;paint()},close=()=>{if(!busy)dlg.hidden=true};
+// ---- progress
+const prog=(i,N,t0)=>{const p=Math.round(i/N*100),left=i>3?Math.max(0,Math.round((performance.now()-t0)/i*(N-i)/1000)):null;$('xbi').style.width=p+'%';$('xpt').textContent=`Frame ${i} of ${N}`+(left!=null?` · about ${left} s left`:'')};
+const save=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)};
+async function runExact(){const fps=S.fps,N=Math.round(maxDuration/1000*fps),W0=canvas.width,H0=canvas.height,d=dims(),png=S.out==='png',sel=selectedLayerId;
+pauseTimeline();selectLayer(null);busy=true;cancel=false;$('xmain').hidden=true;$('xprog').hidden=false;$('xbi').style.width='0';$('xpt').textContent='Preparing';
+let enc=null,codec='',failed=null;const chunks=[],files=[];
+try{if(!png){const base={width:d.w,height:d.h,bitrate:Math.round(d.w*d.h*fps*.12),framerate:fps};
+for(const c of['vp09.00.50.08','vp09.00.40.08','vp09.00.10.08','vp8']){try{const r=await VideoEncoder.isConfigSupported({codec:c,...base});if(r.supported){codec=c;break}}catch(e){}}
+if(!codec)throw new Error('This browser can’t encode WebM here');
+enc=new VideoEncoder({output:c=>{const u=new Uint8Array(c.byteLength);c.copyTo(u);chunks.push({t:Math.round(c.timestamp/1000),key:c.type==='key',data:u})},error:e=>{failed=e}});enc.configure({codec,...base})}
+canvas.width=d.w;canvas.height=d.h;const t0=performance.now();
+for(let i=0;i<N;i++){if(cancel)throw new Error('cancelled');if(failed)throw failed;
+currentTime=Math.max(i*1000/fps,.001);ctx.setTransform(d.w/W0,0,0,d.h/H0,0,0);render();
+if(png){const b=await new Promise(r=>canvas.toBlob(r,'image/png'));files.push({name:'frame-'+String(i+1).padStart(5,'0')+'.png',data:new Uint8Array(await b.arrayBuffer())})}
+else{const fr=new VideoFrame(canvas,{timestamp:Math.round(i*1e6/fps),duration:Math.round(1e6/fps)});enc.encode(fr,{keyFrame:i%fps===0});fr.close();while(enc.encodeQueueSize>6)await sleep(4)}
+prog(i+1,N,t0);if(i%2===0)await sleep(0)}
+$('xpt').textContent='Finishing';
+if(png){save(zip(files),'reel-parallax-frames.zip')}else{await enc.flush();enc.close();enc=null;save(muxWebm(chunks,{durMs:N*1000/fps,fps,codec:codec.startsWith('vp09')?'V_VP9':'V_VP8',w:d.w,h:d.h}),'reel-parallax.webm')}
+toast('Exported '+(png?'reel-parallax-frames.zip':'reel-parallax.webm'))}
+catch(e){if(e.message!=='cancelled')toast('Export failed: '+e.message);else toast('Export cancelled')}
+finally{try{enc&&enc.close()}catch(e){}canvas.width=W0;canvas.height=H0;ctx.setTransform(1,0,0,1,0,0);currentTime=0;updatePlayheadUI();if(sel)selectLayer(sel);else render();busy=false;dlg.hidden=true}}
+$('xgo').onclick=()=>{if(S.eng==='quick'){dlg.hidden=true;bypass=true;document.querySelector('#expMenu [data-a=webm]').click();bypass=false}else runExact()};
+$('xstop').onclick=()=>{cancel=true;$('xpt').textContent='Cancelling'};
+// ---- hook the Export menu
+const wb=document.querySelector('#expMenu [data-a=webm]');wb.innerHTML='Video or frames…<small>Size, fps, exact render</small>';
+$('expMenu').addEventListener('click',e=>{if(e.target.closest('[data-a=webm]')&&!bypass){e.stopImmediatePropagation();open()}},true);
+addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+})();
+</script>
+</body>
+</html>

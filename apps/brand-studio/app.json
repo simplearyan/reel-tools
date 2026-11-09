@@ -1,0 +1,14 @@
+{
+  "name": "brand-studio",
+  "slug": "brand-studio",
+  "tagline": "Design a logo, favicon set and social share image with full control over text, fonts, colors and layout. Download as PN…",
+  "description": "Design a logo, favicon set and social share image with full control over text, fonts, colors and layout. Download as PNG, WebP, JPG or SVG.",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

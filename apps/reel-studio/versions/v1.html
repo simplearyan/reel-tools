@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reel — edit video, mark it up</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Kalam:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--bg:#FBFBFD;--ink:#14161F;--mute:#636879;--line:#E6E8F0;--blue:#6965DB;--blue-ink:#4B47B5;--pink:#FF4D8D;--yel:#FFD84D;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(72px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;overflow-x:hidden}
+.hand{font-family:'Kalam','Comic Sans MS',cursive;font-weight:400;letter-spacing:-.01em}
+.muted{color:var(--mute)}
+.scr{position:absolute;pointer-events:none;overflow:visible;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.scr path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--d,.9s) var(--ease) var(--delay,0s)}
+.in .scr path,.scr.in path{stroke-dashoffset:0}
+.hl{position:relative;display:inline-block;white-space:nowrap}
+.note{opacity:0;transform:translateY(8px) rotate(var(--r,-4deg));transition:all var(--d3) var(--ease) var(--delay,1s)}
+.in .note,.note.in{opacity:1}
+.in .note,.note.in{transform:rotate(var(--r,-4deg))}
+.rv{opacity:0;transform:translateY(28px);transition:opacity var(--d4) var(--ease) var(--delay,0s),transform var(--d4) var(--ease-out) var(--delay,0s)}
+.rv.in{opacity:1;transform:none}
+.w{display:inline-block;opacity:0;transform:translateY(40px) rotate(3deg);animation:wup .8s var(--ease-out) forwards;animation-delay:calc(var(--i)*90ms + .1s)}
+@keyframes wup{to{opacity:1;transform:none}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.9rem 1.5rem;border-radius:999px;font-weight:600;position:relative;overflow:hidden;isolation:isolate}
+
+.btn-p{background:var(--blue);color:#fff}.btn-d{background:var(--ink);color:#fff}.btn-t{background:#F0EFFC;color:var(--blue-ink)}
+.btn-g{border:1.5px solid var(--ink)}
+.vid{background:linear-gradient(180deg,#171B4F 0%,#4B3AA0 28%,#B24A9A 55%,#FF7F6B 78%,#FFB36B 100%);position:relative;overflow:hidden}
+.sun{position:absolute;width:15%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 40% 40%,#FFF6D0,#FFE29A 55%,#FFC873);box-shadow:0 0 70px 24px rgba(255,205,130,.4);right:18%;top:16%;animation:bob 6s ease-in-out infinite}
+.hill{position:absolute;bottom:-30%;border-radius:50%;background:linear-gradient(180deg,#4A3B8C 0%,#1B1F4A 35%,#14173A 100%);animation:sway 9s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(14px)}}
+@keyframes sway{50%{transform:translateX(18px)}}
+@keyframes float{50%{transform:translateY(-12px)}}
+@keyframes play{from{left:0}to{left:100%}}
+.float{animation:float 7s ease-in-out infinite}
+.tl{position:relative;height:46px;border-radius:12px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.clip{position:absolute;top:6px;height:32px;border-radius:8px;color:#fff;font-size:11px;padding:9px 10px;transform-origin:left;animation:grow 1s var(--ease-out) both}
+@keyframes grow{from{transform:scaleX(0)}}
+.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--pink);animation:play 9s linear infinite}
+.pin{position:absolute;top:4px;width:10px;height:10px;background:var(--yel);border:2px solid var(--ink);border-radius:50% 50% 50% 0;transform:rotate(-45deg) scale(0);animation:pop .5s var(--ease-out) forwards;animation-delay:var(--pd)}
+@keyframes pop{to{transform:rotate(-45deg) scale(1)}}
+.pen{position:absolute;width:22px;height:22px;left:0;top:0;pointer-events:none;opacity:0;transition:opacity var(--d2);filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+#draw{touch-action:none;cursor:crosshair}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);transition:transform var(--d1) var(--ease-out)}
+.sw.on{box-shadow:0 0 0 2px var(--ink);transform:scale(1.2)}
+.ico{height:84px;border-radius:var(--r-l);background:#fff;border:1px solid var(--line);position:relative;overflow:hidden}
+.bar{position:absolute;bottom:0;width:6px;border-radius:3px;background:var(--blue);animation:eq 1.2s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes eq{50%{height:20%}}
+.sw2{position:absolute;top:18px;width:46px;height:46px;border-radius:12px;animation:slide 4s ease-in-out infinite}
+@keyframes slide{50%{transform:translateX(var(--x))}}
+.handle{position:absolute;top:18px;height:46px;width:8px;border-radius:4px;background:var(--ink);animation:trim 4s ease-in-out infinite}
+@keyframes trim{50%{transform:translateX(-44px)}}
+.sp{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.pin2{position:absolute;top:4px;width:10px;height:10px;background:var(--yel);border:2px solid var(--ink);border-radius:50% 50% 50% 0;transform:rotate(-45deg) scale(0);transition:transform var(--d2) var(--ease-out)}
+.pin2.on{transform:rotate(-45deg) scale(1)}
+.ph{position:absolute;top:0;bottom:0;width:2px;background:var(--pink)}
+.ph:before{content:"";position:absolute;top:-1px;left:-5px;width:12px;height:10px;border-radius:3px;background:var(--pink)}
+
+
+
+.tin{position:absolute;background:transparent;border:0;border-bottom:2px dashed currentColor;outline:0;font-family:'Kalam',cursive;font-weight:400;font-size:24px;min-width:120px;transform:translateY(-100%)}
+#ba input{-webkit-appearance:none;appearance:none;background:transparent}
+.pinb{position:absolute;width:26px;height:26px;border-radius:50%;background:var(--yel);border:2.5px solid var(--ink);transform:translate(-50%,-50%);display:grid;place-items:center;font-size:11px;font-weight:800;transition:background var(--d2),transform var(--d2) var(--ease-out);animation:ring 2s ease-out infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(255,216,77,.8)}100%{box-shadow:0 0 0 16px rgba(255,216,77,0)}}
+.pinb.act{background:var(--pink);color:#fff;transform:translate(-50%,-50%) scale(1.15);animation:none}
+.pinb svg{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;overflow:visible;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;pointer-events:none}
+.pinb svg path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--d3) var(--ease)}
+.pinb.act svg path{stroke-dashoffset:0}
+.msg{opacity:0;transform:translateY(10px);animation:wup .45s var(--ease-out) forwards;animation-delay:calc(var(--i,0)*120ms)}
+.av{width:32px;height:32px;border-radius:50%;color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center;flex:none}
+@media (prefers-reduced-motion:reduce){.msg{opacity:1;transform:none}}
+.ico{transition:transform var(--d2) var(--ease-out),box-shadow var(--d2)}
+
+.cap{display:inline-block;padding:0 6px;border-radius:6px;animation:hi 3.2s infinite;animation-delay:calc(var(--i)*.55s)}
+@keyframes hi{0%,15%{background:var(--yel)}16%,100%{background:transparent}}
+.tr1,.tr2{position:absolute;inset:14px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:800}
+.tr1{background:var(--blue)}.tr2{background:#FF8A5B;animation:wipe 3.6s ease-in-out infinite alternate}
+@keyframes wipe{0%,12%{clip-path:inset(0 100% 0 0)}88%,100%{clip-path:inset(0 0 0 0)}}
+.kfl{position:absolute;left:18%;right:18%;top:70%;height:2px;background:var(--line)}
+.kfd{position:absolute;top:70%;width:12px;height:12px;background:var(--yel);border:2px solid var(--ink);transform:translate(-50%,-50%) rotate(45deg)}
+.kfs{position:absolute;top:34%;width:24px;height:24px;border-radius:7px;background:var(--blue);animation:kf 4s ease-in-out infinite}
+@keyframes kf{0%,100%{left:18%;transform:translate(-50%,-50%) scale(1)}33%{left:50%;transform:translate(-50%,-50%) scale(1.45) rotate(10deg)}66%{left:82%;transform:translate(-50%,-50%) scale(.75)}}
+.stf{position:absolute;inset:12px 30%;border:2px dashed var(--mute);border-radius:12px}
+.stb{position:absolute;inset:24px calc(30% + 14px);border-radius:8px;background:var(--blue);animation:shk 3.6s ease-in-out infinite}
+@keyframes shk{0%{transform:translate(-5px,3px) rotate(-4deg)}6%{transform:translate(6px,-4px) rotate(3deg)}12%{transform:translate(-4px,-3px) rotate(-2deg)}18%{transform:translate(5px,4px) rotate(4deg)}24%{transform:translate(-3px,2px) rotate(-3deg)}30%{transform:translate(3px,-2px) rotate(2deg)}40%,100%{transform:none}}
+.exb{position:absolute;left:24px;right:24px;top:24px;height:12px;border-radius:6px;background:var(--bg);overflow:hidden;border:1px solid var(--line)}
+.exb i{position:absolute;inset:0;background:var(--blue);transform-origin:left;animation:fill 3.8s ease-in-out infinite}
+@keyframes fill{0%{transform:scaleX(0)}80%,100%{transform:scaleX(1)}}
+.vc{position:absolute;top:0;bottom:0;border-radius:9px;color:#fff;font-size:11px;font-weight:600;padding:6px 10px;transform-origin:left;overflow:hidden;animation:grow .9s var(--ease-out) both;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.16) 0 1px,transparent 1px 44px),linear-gradient(135deg,var(--a),var(--b))}
+.ac{position:absolute;left:.5%;right:.5%;top:0;bottom:0;border-radius:9px;background:rgba(30,158,106,.1);display:flex;align-items:center;gap:2px;padding:0 8px;transform-origin:left;animation:grow .9s .45s var(--ease-out) both}
+.ac i{flex:1;max-width:4px;border-radius:2px;background:#B9D8CB;transition:background var(--d2)}
+.ac i.on{background:#1E9E6A}
+.mk{position:absolute;top:2px;transform:translateX(-50%) scale(0);display:flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--line);border-radius:var(--r-s);padding:2px 9px 2px 5px;font-size:10px;font-weight:700;white-space:nowrap;transition:transform var(--d3) var(--ease-out)}
+.mk.on{transform:translateX(-50%) scale(1)}
+.mk:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--yel);border:1.5px solid var(--ink)}
+.rul i{position:absolute;bottom:0;width:1px;background:var(--line)}
+.rul span{position:absolute;top:3px;font-size:10px;color:var(--mute);font-variant-numeric:tabular-nums}
+.pn{border-radius:var(--r-xl);padding:12px;background:#fff;border:1px solid var(--line);}
+.fx{position:absolute;inset:0;transition:filter var(--d3) var(--ease)}
+.th{min-width:0;border-radius:12px;font-size:11px;font-weight:600;transition:transform var(--d2) var(--ease-out)}
+
+.th i{display:block;aspect-ratio:16/10;border-radius:var(--r-m);background:linear-gradient(180deg,#171B4F 0%,#4B3AA0 28%,#B24A9A 55%,#FF7F6B 78%,#FFB36B 100%);position:relative;overflow:hidden;transition:filter var(--d2)}
+.th i:after{content:"";position:absolute;width:26%;aspect-ratio:1;border-radius:50%;background:#FFE29A;right:18%;top:16%}
+.th i.add{display:grid;place-items:center;background:var(--bg);border:2px dashed var(--line);font-size:22px;color:var(--mute)}.th i.add:after{display:none}
+.th span{display:block;margin-top:5px}
+.th.on i{outline:2.5px solid var(--blue);outline-offset:2px}
+.mtl{margin-top:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:8px 10px 10px;position:relative}
+.mrow{display:flex;align-items:center;gap:8px;margin-top:6px}.mrow:first-child{margin-top:0}
+.mlab{width:44px;font-size:10px;color:var(--mute);font-weight:600;flex:none}
+.mtr{position:relative;flex:1;height:26px}
+.bar2{position:absolute;top:0;bottom:0;border-radius:8px;color:#fff;font-size:10px;font-weight:600;padding:6px 9px;white-space:nowrap;overflow:hidden;transition:opacity var(--d2)}
+.vcl{box-shadow:inset 0 5px 0 var(--pc,transparent);transition:box-shadow var(--d3)}
+.mph{position:absolute;top:8px;bottom:8px;left:62px;right:10px;pointer-events:none}
+.mph i{position:absolute;top:0;bottom:0;width:2px;background:var(--pink);left:0;animation:play 8s linear infinite}
+.sl{margin-top:18px}
+.sh{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;margin-bottom:8px}
+.sh b{font-variant-numeric:tabular-nums;font-size:12px;color:var(--blue-ink);background:#F0EFFC;border-radius:var(--r-s);padding:3px 10px;font-weight:600;min-width:52px;text-align:center}
+.sl input{-webkit-appearance:none;appearance:none;width:100%;height:34px;background:transparent;margin:0;cursor:pointer;display:block;outline:none}
+.sl input::-webkit-slider-runnable-track{height:14px;border-radius:8px;background:linear-gradient(90deg,var(--blue) 0 calc(var(--v,50%) - 6px),transparent 0 calc(var(--v,50%) + 6px),#E3E6F5 0)}
+.sl input::-moz-range-track{height:14px;border-radius:8px;background:linear-gradient(90deg,var(--blue) 0 calc(var(--v,50%) - 6px),transparent 0 calc(var(--v,50%) + 6px),#E3E6F5 0)}
+.sl input::-webkit-slider-thumb{-webkit-appearance:none;width:4px;height:34px;margin-top:-10px;border-radius:2px;background:var(--blue);border:0;transition:width var(--d1)}
+.sl input::-moz-range-thumb{width:4px;height:34px;border:0;border-radius:2px;background:var(--blue)}
+.sl input:active::-webkit-slider-thumb{width:2px}
+.sl input:focus-visible::-webkit-slider-thumb{outline:3px solid rgba(105,101,219,.25);outline-offset:3px}
+.sl input:focus-visible::-moz-range-thumb{outline:3px solid rgba(105,101,219,.25);outline-offset:3px}
+
+.chp{padding:6px 14px;border-radius:var(--r-s);border:1.5px solid var(--line);background:#fff;font-size:13px;font-weight:600;transition:all var(--d2)}
+.chp.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.code{background:#14161F;color:#E8EAF2;border-radius:var(--r-m);padding:14px;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;min-height:220px;overflow:auto;white-space:pre}
+.cs{color:#FF8FB8}.ck{color:#B3B0FF}
+.caret{display:inline-block;width:6px;height:13px;background:#FF8FB8;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.dmd{position:absolute;top:50%;width:11px;height:11px;background:var(--yel);border:2px solid var(--ink);transform:translate(-50%,-50%) rotate(45deg) scale(0);transition:transform var(--d2) var(--ease-out)}
+.dmd.on{transform:translate(-50%,-50%) rotate(45deg) scale(1)}
+
+#nav nav a,.ft a{transition:color var(--d1)}#nav nav a:hover{color:var(--ink)}
+#steps{position:relative}#steps:before{content:"";position:absolute;left:13px;top:14px;bottom:14px;width:2px;background:var(--line)}
+#steps li{display:flex;gap:16px;align-items:flex-start;position:relative;opacity:.4;transition:opacity var(--d2)}
+#steps li.done{opacity:.75}#steps li.on{opacity:1}
+.sdot{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;transition:all var(--d2) var(--ease-out)}
+#steps li.on .sdot{background:var(--ink);color:#fff;border-color:var(--ink);transform:scale(1.12)}
+#steps li.done .sdot{background:var(--blue);color:#fff;border-color:var(--blue)}
+.kc{display:flex;flex-direction:column;align-items:center;gap:12px;font-size:13px;font-weight:600}
+.kc span{color:var(--mute);animation:kl 4.8s infinite;animation-delay:calc(var(--i)*.8s)}
+@keyframes kl{0%,10%{color:var(--ink)}14%,100%{color:var(--mute)}}
+.key{width:64px;height:64px;border-radius:var(--r-m);display:grid;place-items:center;font-size:22px;font-weight:800;background:#fff;color:var(--ink);border:1px solid var(--line);animation:kp 4.8s infinite;animation-delay:calc(var(--i)*.8s)}
+@keyframes kp{0%,10%{transform:translateY(5px);background:var(--blue);color:#fff;border-color:var(--blue)}14%,100%{transform:translateY(0);background:#fff;color:var(--ink);border-color:var(--line)}}
+.fa{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--d2) var(--ease-out)}.fa>div{overflow:hidden}.fq.open .fa{grid-template-rows:1fr}
+.fp{width:22px;height:22px;position:relative;flex:none}
+.fp:before,.fp:after{content:"";position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px 0 0 -7px;background:var(--ink);border-radius:2px;transition:transform var(--d2)}
+.fp:after{transform:rotate(90deg)}.fq.open .fp:after{transform:rotate(0)}
+.ft{background:#0A0B0F;color:#F2F3F8}
+.ft h4{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8A90A5;font-weight:600}
+.ft li a:hover{text-decoration:underline;text-underline-offset:4px}
+.tg{margin-left:8px;font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.14);vertical-align:1px}
+.so{width:36px;height:36px;border-radius:50%;background:#26272D;display:grid;place-items:center;color:#F2F3F8;transition:background var(--d1)}.so:hover{background:#3A3C45}
+.vid::before{content:"";position:absolute;top:0;bottom:0;left:0;width:200%;pointer-events:none;background:radial-gradient(ellipse 14% 7% at 12% 24%,rgba(255,255,255,.2),transparent 70%),radial-gradient(ellipse 18% 6% at 36% 38%,rgba(255,190,215,.22),transparent 70%),radial-gradient(ellipse 12% 5% at 58% 20%,rgba(255,255,255,.14),transparent 70%),radial-gradient(ellipse 16% 6% at 80% 44%,rgba(255,200,170,.2),transparent 70%);animation:cl 70s linear infinite alternate}
+@keyframes cl{to{transform:translateX(-50%)}}
+.vid::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 12% 9%,#fff,transparent),radial-gradient(1px 1px at 28% 15%,#fff,transparent),radial-gradient(1.5px 1.5px at 47% 7%,#fff,transparent),radial-gradient(1px 1px at 63% 13%,#fff,transparent),radial-gradient(1.5px 1.5px at 82% 8%,#fff,transparent),radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(8,8,30,.4) 100%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.vid:has(>.fx)::after{display:none}
+.birds{position:absolute;left:-10%;top:13%;width:56px;height:20px;opacity:.75;animation:fly 28s linear infinite}
+@keyframes fly{to{left:105%}}
+.bp{background:radial-gradient(ellipse at 50% 42%,rgba(255,255,255,.14),transparent 62%),linear-gradient(rgba(255,255,255,.2) 1px,transparent 1px) var(--gx,0) var(--gy,0)/10cqw 10cqw,linear-gradient(90deg,rgba(255,255,255,.2) 1px,transparent 1px) var(--gx,0) var(--gy,0)/10cqw 10cqw,linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px) var(--gx,0) var(--gy,0)/2cqw 2cqw,linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px) var(--gx,0) var(--gy,0)/2cqw 2cqw,#5651CC}
+.cm{position:absolute;width:3cqw;height:3cqw;border:0 solid rgba(255,255,255,.75)}
+.bl{display:flex;align-items:baseline;justify-content:space-between;gap:2cqw}
+.lt{color:#fff;white-space:nowrap;line-height:1.1}
+.l1 .lt,.l3 .lt{font-family:'Instrument Serif',Georgia,serif;font-size:7.6cqw}.l3 .lt{font-style:italic}
+.l2 .lt,.l4 .lt{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;letter-spacing:-.02em;font-size:6.2cqw}
+.bn{font:500 1.5cqw/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase;opacity:0}
+.wd{display:inline-block}.w4{transform-origin:50% 85%}.ch{display:inline-block;font-style:normal}
+.em{position:relative;display:inline-block;isolation:isolate}
+.ems{position:absolute;overflow:visible;pointer-events:none}.ems path{stroke-dasharray:1;stroke-dashoffset:1}
+.tx{position:absolute;top:0;bottom:0;border-radius:8px;background:#E9E8FB;color:#4B47B5;font-size:10px;font-weight:700;padding:8px;white-space:nowrap;overflow:hidden;transition:background var(--d2),color var(--d2)}
+.tx.on{background:var(--blue);color:#fff}
+/* tokens: shape, motion, type */
+:root{--r-s:8px;--r-m:12px;--r-l:20px;--r-xl:28px;--ease:cubic-bezier(.2,0,0,1);--ease-out:cubic-bezier(.05,.7,.1,1);--ease-in:cubic-bezier(.3,0,.8,.15);--d1:150ms;--d2:300ms;--d3:450ms;--d4:700ms;--tint:#E6E5FA}
+.chip-s{border-radius:var(--r-s)}.rounded-xl{border-radius:var(--r-m)!important}.rounded-2xl{border-radius:var(--r-l)!important}.rounded-3xl{border-radius:var(--r-xl)!important}
+h1{font-size:clamp(44px,7vw,76px)!important;line-height:1.02!important;letter-spacing:-.03em!important}
+section h2{font-size:clamp(32px,4.4vw,52px)!important;line-height:1.08!important;letter-spacing:-.025em!important}
+#cta h2{font-size:clamp(38px,6vw,64px)!important}
+h3{font-size:20px!important;line-height:28px!important;letter-spacing:-.01em}
+.muted.text-lg{font-size:18px!important;line-height:28px!important}
+/* state layers + focus */
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.sl input:focus-visible{outline:none}
+.btn::before,.tool::before{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity var(--d1) var(--ease);pointer-events:none;z-index:-1}
+.btn:hover::before,.tool:hover::before{opacity:.08}.btn:focus-visible::before{opacity:.12}.btn:active::before,.tool:active::before{opacity:.14}
+.ico{transition:background var(--d2) var(--ease),border-color var(--d2) var(--ease)}.ico:hover{background:#F7F7FE;border-color:#D9D7F3}.ico:active{background:#F0EFFC}
+#nav nav a{padding:8px 12px;border-radius:var(--r-s)}#nav nav a:hover{background:rgba(20,22,31,.05)}
+.fq button{border-radius:var(--r-m);margin:0 -12px;padding-left:12px;padding-right:12px;width:calc(100% + 24px);position:relative;overflow:hidden;transition:background var(--d1) var(--ease)}
+.fq button:hover{background:rgba(105,101,219,.05)}.fq button:active{background:rgba(105,101,219,.1)}
+.ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.16;transform:scale(0);animation:rip .55s var(--ease) forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+/* segmented control */
+.seg{display:inline-flex;border:1px solid #C9CDE0;border-radius:999px;overflow:hidden;background:#fff}
+.tool{border:0;position:relative;overflow:hidden;width:46px;height:38px;display:grid;place-items:center;color:var(--ink);background:transparent;isolation:isolate;transition:background var(--d1) var(--ease),color var(--d1) var(--ease)}
+.tool+.tool{border-left:1px solid #C9CDE0}.tool.on{background:var(--tint);color:var(--blue-ink)}
+/* selectable chips */
+.th{background:none;border:0;padding:0;text-align:left}
+.th i:before{content:"";position:absolute;left:6px;top:6px;width:20px;height:20px;border-radius:50%;z-index:2;background:var(--blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/13px no-repeat;transform:scale(0);transition:transform var(--d2) var(--ease-out)}
+.th.on i:before{transform:scale(1)}.th i.add:before{display:none}
+.th span{display:inline-flex;align-items:center;margin-top:7px;padding:4px 10px;border-radius:var(--r-s);border:1px solid var(--line);background:#fff;font-size:11px;font-weight:600;transition:background var(--d1) var(--ease),color var(--d1) var(--ease)}
+.th:hover span{background:rgba(105,101,219,.06)}.th:active span{background:rgba(105,101,219,.12)}
+.th.on span{background:var(--tint);border-color:transparent;color:var(--blue-ink)}
+.th.on i{outline:2px solid var(--blue);outline-offset:-2px}
+.chp{position:relative;overflow:hidden;display:inline-flex;align-items:center}
+.chp:hover{background:rgba(105,101,219,.06)}.chp:active{background:rgba(105,101,219,.12)}
+.chp.on{background:var(--tint);color:var(--blue-ink);border-color:transparent}.chp.on::before{content:"\2713";margin-right:6px;font-weight:800}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.scr path{stroke-dashoffset:0}.note,.rv,.w,.pin{opacity:1;transform:none}.pin{transform:rotate(-45deg)}}
+</style>
+</head>
+<body>
+
+<div id="nav" class="sticky top-0 z-50" style="background:rgba(251,251,253,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color var(--d2)">
+<header class="max-w-6xl mx-auto px-5 h-[68px] flex items-center justify-between">
+  <a href="#" class="flex items-center gap-2.5 font-extrabold text-xl tracking-tight"><svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#6965DB"/><path d="M12.6 9.8L23 16l-10.4 6.2z" fill="#fff" stroke="#fff" stroke-width="2.8" stroke-linejoin="round"/><circle cx="24.6" cy="7.6" r="2.6" fill="#FFD84D"/></svg>Reel</a>
+  <nav class="hidden md:flex gap-8 text-sm font-medium muted"><a href="#scrub">Annotate</a><a href="#edit">Edit</a><a href="#grade">Grade</a><a href="#ai">AI</a></nav>
+  <div class="flex items-center gap-2"><a href="#" class="hidden sm:block text-sm font-medium px-4 py-2 muted hover:text-[var(--ink)]">Log in</a><a href="#cta" class="btn btn-d text-sm !py-2.5">Get Reel</a></div>
+</header></div>
+
+<!-- HERO -->
+<section class="max-w-6xl mx-auto px-5 pt-12 md:pt-20 text-center">
+  <h1 class="font-extrabold tracking-tight leading-[1.03] text-5xl sm:text-6xl md:text-7xl max-w-4xl mx-auto">
+    <span class="w" style="--i:0">Cut</span> <span class="w" style="--i:1">your</span> <span class="w" style="--i:2">video.</span>
+    <span class="w" style="--i:3">Then</span>
+    <span class="hl px-3 rv" id="circ" style="--delay:.6s"><span class="w" style="--i:4">draw</span> <span class="w" style="--i:5">on</span> <span class="w" style="--i:6">it.</span>
+      <svg class="scr" viewBox="0 0 300 90" preserveAspectRatio="none" style="inset:-14% -4%;width:108%;height:128%;stroke:var(--pink);stroke-width:4;--d:1.3s;--delay:1.2s"><path pathLength="1" d="M150 6C70 2 8 20 10 46c2 30 80 40 150 38 80-2 134-18 130-46C286 12 214 4 132 10"/></svg>
+    </span>
+  </h1>
+  <p class="rv muted text-lg md:text-xl max-w-lg mx-auto mt-8" style="--delay:1.1s">A video editor with annotation built in. Edit on the timeline, mark up the frame, all in one place.</p>
+  <div class="rv flex gap-3 justify-center mt-8" style="--delay:1.3s">
+    <a href="#try" class="btn btn-p">Start editing free</a>
+    <a href="#markup" class="btn btn-g">See it draw</a>
+  </div>
+
+  <div class="relative mt-20 max-w-5xl mx-auto text-left rv" style="--delay:1.5s">
+    <div class="float">
+      <div id="tilt" class="rounded-3xl p-3 md:p-4 bg-white" style="border:1px solid var(--line);transition:transform var(--d2) var(--ease);transform-style:preserve-3d">
+        <div class="vid rounded-2xl aspect-video" id="stage"><div id="hdusk" class="absolute inset-0" style="background:linear-gradient(160deg,#FF8A5B,#C2417A);opacity:0"></div>
+          <div class="sun"></div><div class="hill" style="left:18%;width:95%;height:44%;bottom:-26%;background:linear-gradient(180deg,#8A55B0,#3A2F7A 65%);opacity:.8;animation-delay:-2s"></div><svg class="birds" viewBox="0 0 56 20" fill="none" stroke="#1B1F4A" stroke-width="1.6" stroke-linecap="round"><path d="M2 10q4-5 8 0q4-5 8 0M26 4q3-4 6 0q3-4 6 0M40 14q3-4 6 0q3-4 6 0"/></svg><div class="hill" style="left:-10%;width:70%;height:60%"></div><div class="hill" style="right:-15%;width:80%;height:50%;background:linear-gradient(180deg,#2A2468,#0F1233 40%);animation-delay:-4s"></div>
+          <svg viewBox="0 0 800 450" class="absolute inset-0 w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path id="a1" pathLength="1" stroke="#FFD84D" stroke-width="6" d="M600 54C536 52 502 92 512 138c9 46 72 68 124 52 50-15 82-60 64-102-14-34-58-44-104-34"/>
+            <path id="a2" pathLength="1" stroke="#fff" stroke-width="5" d="M540 260C490 295 440 310 372 308M372 308l26-22M372 308l24 24"/>
+          </svg>
+          <div id="a3" class="hand absolute text-white text-xl md:text-3xl" style="left:22%;top:66%;opacity:0;transition:opacity var(--d3),transform var(--d3);transform:translateY(8px) rotate(-4deg)">warmer sky here</div>
+          <svg id="pen" class="pen" viewBox="0 0 24 24"><path d="M3 21l3-1 13-13-2-2L4 18z" fill="#fff" stroke="#14161F" stroke-width="1.5"/></svg>
+        </div>
+        <div id="ht" class="mt-3 select-none">
+          <div class="flex items-center justify-between px-1 pb-2.5">
+            <div class="flex items-center gap-3">
+              <button id="htp" class="w-8 h-8 rounded-full grid place-items-center text-white" style="background:var(--ink)" aria-label="Play or pause"></button>
+              <span id="htc" class="text-sm font-semibold" style="font-variant-numeric:tabular-nums">00:00:00</span><span class="text-sm muted" style="font-variant-numeric:tabular-nums">/ 00:10:00</span>
+            </div>
+            <span class="text-xs muted chip-s px-3 py-1" style="border:1px solid var(--line)"><b id="htn" class="text-[var(--ink)]">0</b> marks</span>
+          </div>
+          <div id="htl" class="relative rounded-xl overflow-hidden" style="background:var(--bg);border:1px solid var(--line);cursor:ew-resize;touch-action:pan-y">
+            <div id="hin" class="relative mx-[18px]">
+              <div id="rul" class="rul relative h-7"></div>
+              <div class="relative h-11">
+                <div class="vc" style="left:.5%;width:33%;--a:#6965DB;--b:#9895EE">Intro</div>
+                <div class="vc" style="left:34.5%;width:28%;--a:#7B3FA8;--b:#C25FD0;animation-delay:.15s">Drone</div>
+                <div class="vc" style="left:63.5%;width:36%;--a:#E0603F;--b:#FF9A6B;animation-delay:.3s">Interview</div>
+              </div>
+              <div class="relative h-8 mt-1.5"><div class="ac" id="hac"></div></div>
+              <div class="relative h-6 mt-1.5 mb-3">
+                <span class="mk" data-at=".14">Circle</span><span class="mk" data-at=".34">Arrow</span><span class="mk" data-at=".5">Note</span>
+              </div>
+              <div id="hph" class="absolute top-0 bottom-0 w-[2px] pointer-events-none" style="left:0;background:var(--pink);margin-left:-1px">
+                <span id="hpb" class="absolute left-1/2 top-[3px] -translate-x-1/2 text-[10px] font-bold text-white rounded-md px-1.5 py-0.5" style="background:var(--pink)">0:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCRUB -->
+<section id="scrub" class="relative" style="height:420vh">
+ <div class="sticky top-0" style="height:100vh;padding-top:72px;box-sizing:border-box">
+  <div class="max-w-6xl mx-auto px-5 h-full grid md:grid-cols-5 gap-8 md:gap-12 items-center content-center">
+   <div class="md:col-span-2">
+    <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">Scroll to scrub <span class="hl rv">the timeline.
+     <svg class="scr" viewBox="0 0 300 20" preserveAspectRatio="none" style="left:0;bottom:-10px;width:100%;height:14px;stroke:var(--blue);stroke-width:4"><path pathLength="1" d="M3 12C60 4 120 16 180 8s90 6 117 2"/></svg></span></h2>
+    <p id="scap" class="muted text-lg mt-5 md:hidden"></p>
+    <ol id="steps" class="hidden md:block mt-12 space-y-7"></ol>
+   </div>
+   <div class="md:col-span-3 justify-self-center w-full" style="width:min(100%,calc((100vh - 330px)*1.7778))">
+    <div class="pn">
+     <div class="rounded-2xl aspect-video relative overflow-hidden" style="container-type:inline-size">
+      <div id="sv" class="bp absolute inset-0">
+       <i class="cm" style="left:3cqw;top:3cqw;border-width:1px 0 0 1px"></i><i class="cm" style="right:3cqw;top:3cqw;border-width:1px 1px 0 0"></i><i class="cm" style="left:3cqw;bottom:3cqw;border-width:0 0 1px 1px"></i><i class="cm" style="right:3cqw;bottom:3cqw;border-width:0 1px 1px 0"></i>
+       <span class="bn" style="opacity:1;position:absolute;left:7cqw;top:3.4cqw">Scene 04 · Title card</span>
+       <span class="bn" style="opacity:1;position:absolute;right:7cqw;top:3.4cqw">1920 × 1080</span>
+       <span class="bn" id="tc" style="opacity:1;position:absolute;left:7cqw;bottom:3.4cqw">00:00:00</span>
+       <div class="absolute inset-0 flex flex-col justify-center" style="padding:0 9cqw;gap:1.8cqw"><div class="bl l1"><div class="lt"><span class="wd w1">Edit</span> <span class="wd w1">with</span> <span class="em"><span class="wd w1">intent.</span><svg class="sp ems" viewBox="0 0 300 32" preserveAspectRatio="none" style="left:0;bottom:-.12em;width:100%;height:.3em;stroke:#FFD84D;stroke-width:6.5"><path id="p1a" pathLength="1" d="M4 18C60 8 120 24 180 12s90 8 116 2"/><path id="p1b" pathLength="1" d="M30 27C100 22 180 28 270 23"/></svg></span></div><span class="bn" id="n1">01 underline</span></div>
+<div class="bl l2"><div class="lt" id="t2"></div><span class="bn" id="n2">02 circle</span></div>
+<div class="bl l3"><div class="lt" id="t3">Box the <span class="em">details.<svg class="sp ems" viewBox="0 0 200 80" preserveAspectRatio="none" style="left:-6%;top:-6%;width:112%;height:112%;stroke:#fff;stroke-width:2.6"><path id="p3a" pathLength="1" d="M8 14L190 8L196 68L6 73L10 12"/><path id="p3b" pathLength="1" d="M14 7L197 14L190 74L10 68L16 9"/></svg></span></div><span class="bn" id="n3">03 box</span></div>
+<div class="bl l4"><div class="lt"><span class="wd w4">Highlight</span> <span class="wd w4">the</span> <span class="em" id="hw" style="transition:color var(--d2)"><span class="wd w4">rest.</span><svg class="sp ems" viewBox="0 0 200 56" preserveAspectRatio="none" style="left:-6%;top:12%;width:112%;height:80%;z-index:-1;stroke:#FFD84D;stroke-width:44"><path id="p4" pathLength="1" d="M8 30C50 22 100 38 150 27s40 4 44 2"/></svg></span></div><span class="bn" id="n4">04 highlight</span></div></div>
+      </div>
+     </div>
+     <div class="flex items-center justify-between px-1 pt-3 text-xs muted"><span>Scroll or drag the playhead</span><span class="chip-s px-3 py-1" style="border:1px solid var(--line)"><b id="scn" style="color:var(--ink)">0</b> marks</span></div>
+     <div id="stl" class="relative rounded-xl overflow-hidden mt-2" style="background:var(--bg);border:1px solid var(--line);cursor:ew-resize;touch-action:pan-y"><div id="sin" class="relative mx-[18px]"></div></div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- MARKUP -->
+<section id="markup" class="max-w-6xl mx-auto px-5 py-24 grid md:grid-cols-5 gap-14 items-center">
+  <div class="md:col-span-2 rv">
+    <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">Feedback goes <span class="hl rv" id="u2">on the frame.
+      <svg class="scr" viewBox="0 0 300 20" preserveAspectRatio="none" style="left:0;bottom:-12px;width:100%;height:16px;stroke:var(--yel);stroke-width:6"><path pathLength="1" d="M3 10C50 3 90 15 140 8s100 4 157 3"/></svg></span></h2>
+    <p class="muted text-lg mt-8">Draw, highlight and leave notes right on the video. Every mark lands on the timeline at the moment you made it, and never burns into your export.</p>
+  </div>
+  <div class="md:col-span-3 rv" style="--delay:.15s" id="try">
+    <div class="pn">
+      <div class="vid aspect-video rounded-2xl"><div class="sun"></div><div class="hill" style="left:-10%;width:70%;height:60%"></div><div class="hill" style="right:-15%;width:80%;height:50%;background:linear-gradient(180deg,#2A2468,#0F1233 40%);animation-delay:-4s"></div>
+        <canvas id="draw" class="absolute inset-0 w-full h-full"></canvas>
+        <span id="m-tc" class="absolute text-white text-xs bg-black/35 chip-s px-3 py-1 backdrop-blur pointer-events-none top-3 left-3" style="font-variant-numeric:tabular-nums">00:00:00</span>
+        <span id="m-hint" class="absolute text-white text-xs bg-black/35 chip-s px-3 py-1 backdrop-blur pointer-events-none bottom-3 left-3" style="transition:opacity var(--d2)">Draw on the frame</span>
+      </div>
+      <div class="flex items-center justify-between gap-3 px-2 pt-4 flex-wrap">
+        <div class="seg" role="group" aria-label="Tools"><button class="tool on" data-t="pen" aria-label="Pen" title="Pen"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l1-4 9-9 3 3-9 9z"/></svg></button><button class="tool" data-t="marker" aria-label="Highlighter" title="Highlighter"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h12" stroke-width="7" opacity=".45"/><path d="M4 14h12"/></svg></button><button class="tool" data-t="circle" aria-label="Circle" title="Circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="10" cy="10" rx="7.5" ry="5.5"/></svg></button><button class="tool" data-t="arrow" aria-label="Arrow" title="Arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16L16 4M16 4h-6M16 4v6"/></svg></button><button class="tool" data-t="text" aria-label="Text note" title="Text note"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h10M10 5v11"/></svg></button></div>
+        <div class="flex items-center gap-3" role="group" aria-label="Color">
+          <button class="sw on" data-c="#FFD84D" style="background:#FFD84D" aria-label="Yellow"></button>
+          <button class="sw" data-c="#FF4D8D" style="background:#FF4D8D" aria-label="Pink"></button>
+          <button class="sw" data-c="#FFFFFF" style="background:#fff" aria-label="White"></button>
+          <button class="sw" data-c="#6965DB" style="background:#6965DB" aria-label="Blue"></button>
+        </div>
+        <div class="flex gap-2"><button id="undo" class="btn btn-g !py-1.5 !px-4 text-sm">Undo</button><button id="clear" class="btn btn-g !py-1.5 !px-4 text-sm">Clear</button></div>
+      </div>
+
+      <div id="m-tl"></div>
+    </div>
+  </div>
+</section>
+
+<!-- EDIT -->
+<section id="edit" class="max-w-6xl mx-auto px-5 py-24">
+  <h2 class="rv text-4xl md:text-5xl font-extrabold tracking-tight max-w-xl">A real editor, <span class="hl rv in" id="u1">kept simple.
+    <svg class="scr" viewBox="0 0 300 20" preserveAspectRatio="none" style="left:0;bottom:-10px;width:100%;height:14px;stroke:var(--blue);stroke-width:4"><path pathLength="1" d="M3 12C60 4 120 16 180 8s90 6 117 2"/></svg></span></h2>
+  <div class="grid md:grid-cols-3 gap-x-10 gap-y-14 mt-16">
+    <div class="rv">
+      <div class="ico"><div class="sw2" style="left:20px;width:150px;background:var(--blue);--x:0px"></div><div class="handle" style="left:164px"></div></div>
+      <h3 class="text-xl font-semibold mt-5">Trim by touch</h3><p class="muted mt-1">Drag edges, ripple delete, snap to the beat.</p>
+    </div>
+    <div class="rv" style="--delay:.12s">
+      <div class="ico"><div class="sw2" style="left:20px;background:#FF8A5B;--x:30px"></div><div class="sw2" style="left:76px;background:#FFD84D;--x:30px;animation-delay:.3s"></div><div class="sw2" style="left:132px;background:#7B3FA8;--x:30px;animation-delay:.6s"></div></div>
+      <h3 class="text-xl font-semibold mt-5">Color that sticks</h3><p class="muted mt-1">One-click looks, then curves when you want them.</p>
+    </div>
+    <div class="rv" style="--delay:.24s">
+      <div class="ico" id="eq"></div>
+      <h3 class="text-xl font-semibold mt-5">Clean audio</h3><p class="muted mt-1">Duck music under voice. Remove noise in one pass.</p>
+    </div>
+<div class="rv" style="--delay:0.0s"><div class="ico"><div class="absolute inset-0 grid place-items-center text-center font-semibold text-[17px] leading-8"><div><span class="cap" style="--i:0">Captions</span> <span class="cap" style="--i:1">that</span><br><span class="cap" style="--i:2">write</span> <span class="cap" style="--i:3">themselves</span></div></div></div><h3 class="text-xl font-semibold mt-5">Auto captions</h3><p class="muted mt-1">Transcribe in one click, then style every word.</p></div><div class="rv" style="--delay:0.12s"><div class="ico"><svg viewBox="0 0 286 84" class="absolute inset-0 w-full h-full"><path id="rmp" d="M24 62C84 62 84 24 143 24C202 24 202 62 262 62" fill="none" stroke="#14161F" stroke-width="2.5" stroke-linecap="round"/><text x="143" y="15" text-anchor="middle" class="hand" font-size="18" fill="#FF4D8D">2×</text><circle r="7" fill="#6965DB"><animateMotion dur="3.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines=".5 0 .5 1"><mpath href="#rmp"/></animateMotion></circle></svg></div><h3 class="text-xl font-semibold mt-5">Speed ramps</h3><p class="muted mt-1">Slow down the big moment, speed through the rest.</p></div><div class="rv" style="--delay:0.24s"><div class="ico"><div class="tr1">A</div><div class="tr2">B</div></div><h3 class="text-xl font-semibold mt-5">Smooth transitions</h3><p class="muted mt-1">Wipes, fades and dissolves you can retime.</p></div><div class="rv" style="--delay:0.0s"><div class="ico"><div class="kfl"></div><i class="kfd" style="left:18%"></i><i class="kfd" style="left:50%"></i><i class="kfd" style="left:82%"></i><div class="kfs"></div></div><h3 class="text-xl font-semibold mt-5">Keyframes</h3><p class="muted mt-1">Animate position, scale and opacity with a click.</p></div><div class="rv" style="--delay:0.12s"><div class="ico"><div class="stf"></div><div class="stb"></div></div><h3 class="text-xl font-semibold mt-5">Steady footage</h3><p class="muted mt-1">Smooth out shaky handheld shots automatically.</p></div><div class="rv" style="--delay:0.24s"><div class="ico"><div class="exb"><i></i></div><div class="absolute left-6 right-6 top-[46px] flex justify-between text-xs muted"><span>Exporting 4K</span><span>H.265</span></div></div><h3 class="text-xl font-semibold mt-5">Background export</h3><p class="muted mt-1">Render in 4K while you keep editing.</p></div>  </div>
+</section>
+
+<div id="grade" style="background:#F3F3FB;padding:24px 0">
+<section id="filters" class="max-w-6xl mx-auto px-5 py-20 grid md:grid-cols-5 gap-12 items-center">
+  <div class="md:col-span-2 rv"><h2 class="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">One click, a whole <span class="hl rv" style="isolation:isolate">new look.<svg class="scr" viewBox="0 0 300 20" preserveAspectRatio="none" style="left:0;bottom:-10px;width:100%;height:14px;stroke:var(--blue);stroke-width:4"><path pathLength="1" d="M3 12C60 4 120 16 180 8s90 6 117 2"/></svg></span></h2><p class="muted text-lg mt-6">Try a filter on the frame, watch it land on the timeline, and change your mind as often as you like.</p></div>
+  <div class="md:col-span-3 rv" style="--delay:.12s"><div class="pn"><div class="vid rounded-2xl aspect-video"><div class="fx vid" id="f-fx" data-scene></div><span class="absolute top-3 left-3 text-white text-xs bg-black/35 chip-s px-3 py-1 backdrop-blur" id="f-chip">Original</span></div><div id="f-row" class="grid grid-cols-4 sm:grid-cols-7 gap-2 mt-3"></div><div id="f-tl"></div></div></div>
+</section>
+
+<section id="color" class="max-w-6xl mx-auto px-5 py-20 grid md:grid-cols-5 gap-12 items-center">
+  <div class="md:col-span-2 rv md:order-2"><h2 class="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">Dial in the <span class="hl rv" style="isolation:isolate">color.<svg class="scr" viewBox="0 0 300 20" preserveAspectRatio="none" style="left:0;bottom:-10px;width:100%;height:14px;stroke:var(--pink);stroke-width:4"><path pathLength="1" d="M3 12C60 4 120 16 180 8s90 6 117 2"/></svg></span></h2><p class="muted text-lg mt-6">Exposure, contrast, saturation and temperature, with a live preview on every frame.</p></div>
+  <div class="md:col-span-3 rv md:order-1" style="--delay:.12s"><div class="pn"><div class="vid rounded-2xl aspect-video"><div class="fx vid" id="c-fx" data-scene></div></div><div class="px-2 pb-1"><div id="c-sl"></div><div class="flex justify-end mt-2"><button id="c-reset" class="btn btn-t !py-2 !px-5 text-sm">Reset</button></div></div><div id="c-tl"></div></div></div>
+</section>
+
+<section id="presets" class="max-w-6xl mx-auto px-5 py-20 grid md:grid-cols-5 gap-12 items-center">
+  <div class="md:col-span-2 rv"><h2 class="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">Save a look once, use it <span class="hl rv" style="isolation:isolate">everywhere.<svg class="scr" viewBox="0 0 300 16" preserveAspectRatio="none" style="left:-2%;bottom:2px;width:104%;height:16px;stroke:var(--yel);stroke-width:12;z-index:-1;opacity:.85"><path pathLength="1" d="M6 8C70 4 140 11 210 7s70 2 88 1"/></svg></span></h2><p class="muted text-lg mt-6">Turn any grade into a preset, then apply it to every clip in one click. Save your own and it joins the row.</p></div>
+  <div class="md:col-span-3 rv" style="--delay:.12s"><div class="pn"><div class="vid rounded-2xl aspect-video"><div class="fx vid" id="p-fx" data-scene></div><span class="absolute top-3 left-3 text-white text-xs bg-black/35 chip-s px-3 py-1 backdrop-blur" id="p-chip">No preset</span></div><div id="p-row" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-3"></div><div id="p-tl"></div></div></div>
+</section>
+
+<!-- COMPARE -->
+<section class="max-w-4xl mx-auto px-5 py-24 text-center">
+  <h2 class="rv text-4xl md:text-5xl font-extrabold tracking-tight">Grade it, then <span class="hl rv">compare.
+    <svg class="scr" viewBox="0 0 300 20" preserveAspectRatio="none" style="left:0;bottom:-10px;width:100%;height:14px;stroke:var(--pink);stroke-width:4"><path pathLength="1" d="M3 12C60 4 120 16 180 8s90 6 117 2"/></svg></span></h2>
+  <div class="rv relative mt-14 text-left" style="--delay:.15s">
+    <div class="rounded-3xl p-3 bg-white" style="border:1px solid var(--line);">
+      <div id="ba" class="relative aspect-video rounded-2xl overflow-hidden select-none" style="--pos:50%">
+        <div class="vid absolute inset-0"><div class="sun"></div><div class="hill" style="left:-10%;width:70%;height:60%"></div><div class="hill" style="right:-15%;width:80%;height:50%;background:linear-gradient(180deg,#2A2468,#0F1233 40%);animation-delay:-4s"></div></div>
+        <div class="vid absolute inset-0" style="filter:saturate(.15) contrast(.7) brightness(1.2);clip-path:inset(0 calc(100% - var(--pos)) 0 0)"><div class="sun"></div><div class="hill" style="left:-10%;width:70%;height:60%"></div><div class="hill" style="right:-15%;width:80%;height:50%;background:linear-gradient(180deg,#2A2468,#0F1233 40%);animation-delay:-4s"></div></div>
+        <span class="absolute top-3 text-white text-xs bg-black/35 chip-s px-3 py-1 backdrop-blur left-3">Raw</span><span class="absolute top-3 text-white text-xs bg-black/35 chip-s px-3 py-1 backdrop-blur right-3">Graded</span>
+        <div class="absolute top-0 bottom-0 w-[3px] bg-white pointer-events-none" style="left:var(--pos);margin-left:-1.5px;box-shadow:0 0 12px rgba(0,0,0,.3)">
+          <div class="absolute top-1/2 left-1/2 w-11 h-11 -mt-[22px] -ml-[22px] rounded-full bg-white grid place-items-center text-lg font-bold" style="box-shadow:0 6px 18px rgba(0,0,0,.3)">‹›</div></div>
+        <input id="bar" type="range" min="0" max="100" value="50" aria-label="Compare raw and graded footage" class="absolute inset-0 w-full h-full opacity-0" style="cursor:ew-resize">
+      </div>
+    </div>
+    <div id="bahint" class="hand absolute text-2xl hidden md:block" style="left:-14px;top:-48px;color:var(--blue);transform:rotate(-5deg);transition:opacity var(--d2)">drag me
+      <svg width="64" height="52" viewBox="0 0 64 52" class="scr in" style="left:66px;top:22px;stroke:var(--blue);stroke-width:3"><path pathLength="1" d="M4 6C30 4 50 20 52 42M52 42l-14-8M52 42l4-16" style="--delay:.8s"/></svg>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<section id="ai" class="max-w-6xl mx-auto px-5 py-24 grid md:grid-cols-5 gap-12 items-center">
+  <div class="md:col-span-2 rv md:order-2"><h2 class="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">Animate with <span class="hl rv" style="isolation:isolate;padding:0 .3em">a sentence.<svg class="scr" viewBox="0 0 220 90" preserveAspectRatio="none" style="inset:-18% -4%;width:108%;height:136%;stroke:var(--pink);stroke-width:3.5;--d:1.2s"><path pathLength="1" d="M110 6C50 4 8 20 10 46c2 28 60 38 110 36 56-2 92-14 90-40C208 16 160 6 100 10"/></svg></span></h2><p class="muted text-lg mt-6">Describe the motion. Reel writes the animation code, drops keyframes on the timeline, and you can edit either one.</p><div id="a-chips" class="flex flex-wrap gap-2 mt-8"><button class="chp">Bounce in</button><button class="chp">Slide in</button><button class="chp">Spin in</button></div></div>
+  <div class="md:col-span-3 rv md:order-1" style="--delay:.12s"><div class="pn"><div class="flex items-center gap-3 rounded-xl px-4 py-2.5 mb-3" style="background:var(--bg);border:1px solid var(--line)"><span id="a-p" class="flex-1 text-sm truncate">&nbsp;</span><span id="a-s" class="text-xs font-semibold chip-s px-3 py-1 text-white whitespace-nowrap" style="background:var(--blue)">Ready</span></div>
+<div class="grid md:grid-cols-2 gap-3"><div class="vid rounded-2xl aspect-video md:aspect-auto md:min-h-[220px]"><div class="fx vid" data-scene></div><div class="absolute inset-0 grid place-items-center"><div class="relative"><div id="a-t" class="font-extrabold text-white text-3xl md:text-4xl tracking-tight" style="opacity:0">Summer cut</div><svg class="sp absolute" viewBox="0 0 200 14" preserveAspectRatio="none" style="left:0;bottom:-10px;width:100%;height:12px;stroke:#FFD84D;stroke-width:4"><path id="a-u" pathLength="1" d="M2 8C40 2 90 12 130 6s60 2 68 2" style="stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--d4) var(--ease)"/></svg></div></div></div><pre id="a-code" class="code"></pre></div><div id="a-tl"></div></div></div>
+</section>
+
+<!-- KEYS -->
+<section id="keys" class="max-w-4xl mx-auto px-5 py-24 text-center">
+  <h2 class="rv text-4xl md:text-5xl font-extrabold tracking-tight">Built for your <span class="hl rv">keyboard.<svg class="scr" viewBox="0 0 300 20" preserveAspectRatio="none" style="left:0;bottom:-10px;width:100%;height:14px;stroke:var(--blue);stroke-width:4"><path pathLength="1" d="M3 12C60 4 120 16 180 8s90 6 117 2"/></svg></span></h2>
+  <p class="rv muted text-lg mt-6 max-w-lg mx-auto">Cut, mark and move without leaving the home row.</p>
+  <div class="rv flex flex-wrap justify-center gap-5 md:gap-7 mt-14" style="--delay:.1s"><div class="kc" style="--i:0"><b class="key">J</b><span>Rewind</span></div><div class="kc" style="--i:1"><b class="key">K</b><span>Pause</span></div><div class="kc" style="--i:2"><b class="key">L</b><span>Forward</span></div><div class="kc" style="--i:3"><b class="key">I</b><span>Mark in</span></div><div class="kc" style="--i:4"><b class="key">O</b><span>Mark out</span></div><div class="kc" style="--i:5"><b class="key">M</b><span>Drop a mark</span></div></div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="max-w-3xl mx-auto px-5 py-24">
+  <h2 class="rv text-4xl md:text-5xl font-extrabold tracking-tight text-center">Questions, <span class="hl rv">answered.<svg class="scr" viewBox="0 0 300 20" preserveAspectRatio="none" style="left:0;bottom:-10px;width:100%;height:14px;stroke:var(--pink);stroke-width:4"><path pathLength="1" d="M3 12C60 4 120 16 180 8s90 6 117 2"/></svg></span></h2>
+  <div class="rv mt-14" style="border-top:1px solid var(--line);--delay:.1s"><div class="fq open" style="border-bottom:1px solid var(--line)"><button class="w-full flex items-center justify-between gap-6 py-6 text-left text-lg font-semibold" aria-expanded="true"><span>Do annotations end up in my export?</span><span class="fp"></span></button><div class="fa"><div><p class="muted pb-6 max-w-xl">No. Marks live on their own layer, pinned to timecodes, so your final video stays clean unless you choose to burn them in.</p></div></div></div><div class="fq" style="border-bottom:1px solid var(--line)"><button class="w-full flex items-center justify-between gap-6 py-6 text-left text-lg font-semibold" aria-expanded="false"><span>Can I edit and annotate on one timeline?</span><span class="fp"></span></button><div class="fa"><div><p class="muted pb-6 max-w-xl">Yes. Marks appear on a track right next to video and audio, so you can trim and comment in the same pass.</p></div></div></div><div class="fq" style="border-bottom:1px solid var(--line)"><button class="w-full flex items-center justify-between gap-6 py-6 text-left text-lg font-semibold" aria-expanded="false"><span>Does Reel work offline?</span><span class="fp"></span></button><div class="fa"><div><p class="muted pb-6 max-w-xl">Yes. Reel runs on your machine and renders in the background while you keep editing.</p></div></div></div><div class="fq" style="border-bottom:1px solid var(--line)"><button class="w-full flex items-center justify-between gap-6 py-6 text-left text-lg font-semibold" aria-expanded="false"><span>Which platforms and formats are supported?</span><span class="fp"></span></button><div class="fa"><div><p class="muted pb-6 max-w-xl">Mac, Windows and Linux, with 4K export and presets for wide, vertical and square.</p></div></div></div></div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="max-w-4xl mx-auto px-5 py-28 text-center">
+  <h2 class="rv text-4xl md:text-6xl font-extrabold tracking-tight">Make your next cut in <span class="hl px-3 rv" id="u3">Reel.
+    <svg class="scr" viewBox="0 0 220 90" preserveAspectRatio="none" style="inset:-16% -4%;width:108%;height:132%;stroke:var(--pink);stroke-width:4;--d:1.2s"><path pathLength="1" d="M110 6C50 4 8 20 10 46c2 28 60 38 110 36 56-2 92-14 90-40C208 16 160 6 100 10"/></svg></span></h2>
+  <p class="rv muted text-lg mt-6">Free on Mac, Windows and Linux.</p>
+  <a href="#" class="rv btn btn-d mt-8">Download Reel</a>
+</section>
+
+<footer class="ft">
+ <div class="max-w-6xl mx-auto px-5 pt-20 pb-14 grid grid-cols-2 md:grid-cols-6 gap-x-8 gap-y-12">
+  <div class="col-span-2">
+   <a href="#" class="flex items-center gap-3 font-extrabold text-3xl tracking-tight"><svg width="38" height="38" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#6965DB"/><path d="M12.6 9.8L23 16l-10.4 6.2z" fill="#fff" stroke="#fff" stroke-width="2.8" stroke-linejoin="round"/><circle cx="24.6" cy="7.6" r="2.6" fill="#FFD84D"/></svg>Reel</a>
+   <div class="flex gap-3 mt-8"><a href="#" class="so" aria-label="X"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" stroke="none" d="M18.2 3h3l-6.6 7.5L22.4 21h-6.1l-4.8-6.2L6 21H3l7.1-8.1L2.6 3h6.2l4.3 5.7L18.2 3zm-1 16.2h1.7L7.9 4.7H6.1l11.1 14.5z"/></svg></a><a href="#" class="so" aria-label="YouTube"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path fill="currentColor" d="M10 9.5v5l4.5-2.5z"/></svg></a><a href="#" class="so" aria-label="Instagram"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor"/></svg></a></div>
+  </div>
+  <div><h4>Product</h4><ul class="mt-6 space-y-3.5 text-[15px]"><li><a href="#scrub">Annotate</a></li><li><a href="#edit">Edit</a></li><li><a href="#grade">Grade</a></li><li><a href="#ai">AI animation</a><span class="tg">NEW</span></li><li><a href="#keys">Shortcuts</a></li></ul></div>
+  <div><h4>Use cases</h4><ul class="mt-6 space-y-3.5 text-[15px]"><li><a href="#">Filmmakers</a></li><li><a href="#">Creators</a></li><li><a href="#">Agencies</a></li><li><a href="#">Education</a></li><li><a href="#">Review &amp; approval</a></li></ul></div>
+  <div><h4>Resources</h4><ul class="mt-6 space-y-3.5 text-[15px]"><li><a href="#">Docs</a></li><li><a href="#">Presets library</a><span class="tg">BETA</span></li><li><a href="#">Changelog</a></li><li><a href="#">Support</a></li></ul></div>
+  <div><h4>Company</h4><ul class="mt-6 space-y-3.5 text-[15px]"><li><a href="#">About</a></li><li><a href="#">Customers</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li></ul></div>
+ </div>
+ <div class="max-w-6xl mx-auto px-5 pb-10"><div class="pt-6 flex flex-wrap items-center justify-between gap-4 text-sm" style="border-top:1px solid rgba(255,255,255,.12);color:#8A90A5"><span>© 2026 Reel. All rights reserved.</span><span class="flex gap-6"><a href="#" class="hover:text-white">Privacy</a><a href="#" class="hover:text-white">Terms</a></span></div></div>
+</footer>
+
+<script>
+// scroll reveal (also triggers scribble drawing)
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.3});
+document.querySelectorAll('.rv,.hl').forEach(el=>io.observe(el));
+
+// equalizer bars
+document.getElementById('eq').innerHTML=Array.from({length:18},(_,i)=>`<i class="bar" style="left:${14+i*10}px;height:${30+Math.abs(Math.sin(i*1.7))*60}%;--d:${i*-.13}s"></i>`).join('');
+
+// hero: one master clock drives playhead, waveform, marks, annotation and sky
+(function(){
+  const $=id=>document.getElementById(id),a1=$('a1'),a2=$('a2'),a3=$('a3'),pen=$('pen'),stage=$('stage'),dusk=$('hdusk'),
+  ph=$('hph'),pb=$('hpb'),tc=$('htc'),cnt=$('htn'),btn=$('htp'),hl=$('htl'),hin=$('hin'),ac=$('hac'),rul=$('rul'),marks=[...document.querySelectorAll('#ht .mk')];
+  const N=64,DUR=11000,seg=(p,a,b)=>Math.min(Math.max((p-a)/(b-a),0),1),ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  ac.innerHTML=Array.from({length:N},(_,i)=>`<i style="height:${28+Math.abs(Math.sin(i*1.3)*Math.sin(i*.37+1))*68}%"></i>`).join('');
+  const bars=[...ac.children];
+  rul.innerHTML=Array.from({length:21},(_,i)=>{const L=i*5,big=i%4===0;return `<i style="left:${L}%;height:${big?10:5}px"></i>`+(big?`<span style="left:${L}%;${i===0?'margin-left:4px':i===20?'transform:translateX(-100%);margin-left:-4px':'transform:translateX(-50%)'}">0:${String(i/2).padStart(2,'0')}</span>`:'')}).join('');
+  [a1,a2].forEach(p=>{p.style.strokeDasharray=1;p.style.strokeDashoffset=1});
+  const L1=a1.getTotalLength(),L2=a2.getTotalLength();
+  const icon=on=>btn.innerHTML=on?'<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><rect x="1.5" y="1" width="3.2" height="10" rx="1"/><rect x="7.3" y="1" width="3.2" height="10" rx="1"/></svg>':'<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2.5 1l8.5 5-8.5 5z"/></svg>';
+  let p=0,playing=false,drag=false,vis=true,last=performance.now(),lastIdx=-1;
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function render(){
+    ph.style.left=p*100+'%';
+    const t=p*10,ss=Math.floor(t),ff=Math.floor(t%1*24);
+    tc.textContent='00:'+String(ss).padStart(2,'0')+':'+String(ff).padStart(2,'0');pb.textContent='0:'+String(ss).padStart(2,'0');
+    const idx=Math.floor(p*N);if(idx!==lastIdx){lastIdx=idx;bars.forEach((b,i)=>b.classList.toggle('on',i<idx))}
+    let n=0;marks.forEach(m=>{const on=p>=+m.dataset.at;m.classList.toggle('on',on);n+=on});cnt.textContent=n;
+    dusk.style.opacity=seg(p,.25,1)*.55;
+    const g=1-seg(p,.93,.99),k1=seg(p,.14,.26),k2=seg(p,.34,.44);
+    a1.style.strokeDashoffset=1-k1;a2.style.strokeDashoffset=1-k2;a1.style.opacity=a2.style.opacity=g;
+    const on3=p>.5;a3.style.opacity=on3?g:0;a3.style.transform=on3?'rotate(-4deg)':'translateY(8px) rotate(-4deg)';
+    const s=stage.clientWidth/800;let q=null;
+    if(k1>0&&k1<1)q=a1.getPointAtLength(L1*ease(k1));else if(k2>0&&k2<1)q=a2.getPointAtLength(L2*ease(k2));
+    pen.style.opacity=q?1:0;if(q)pen.style.transform=`translate(${q.x*s-3}px,${q.y*s-20}px)`;
+  }
+  function frame(n){const dt=n-last;last=n;if(vis&&playing&&!drag){p+=dt/DUR;if(p>=1)p=0}render();requestAnimationFrame(frame)}
+  const fromX=e=>{const r=hin.getBoundingClientRect();p=Math.min(Math.max((e.clientX-r.left)/r.width,0),.999)};
+  hl.addEventListener('pointerdown',e=>{drag=true;hl.setPointerCapture(e.pointerId);fromX(e)});
+  hl.addEventListener('pointermove',e=>{if(drag)fromX(e)});
+  ['pointerup','pointercancel'].forEach(t=>hl.addEventListener(t,()=>drag=false));
+  btn.onclick=()=>{playing=!playing;icon(playing)};
+  new IntersectionObserver(([e])=>vis=e.isIntersecting).observe(stage);
+  icon(false);
+  if(reduce){p=.62;render();return}
+  setTimeout(()=>{playing=true;last=performance.now();icon(true)},2300);
+  requestAnimationFrame(frame);
+})();
+
+// gentle 3D tilt on pointer
+(function(){const t=document.getElementById('tilt');if(!matchMedia('(hover:hover)').matches)return;
+  t.parentElement.addEventListener('pointermove',e=>{const r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    t.style.transform=`perspective(1200px) rotateY(${x*5}deg) rotateX(${-y*4}deg)`});
+  t.parentElement.addEventListener('pointerleave',()=>t.style.transform='')})();
+
+// scroll-linked scrub: blueprint text animation
+(function(){
+  const $=id=>document.getElementById(id),sec=$('scrub'),seg=(p,a,b)=>Math.min(Math.max((p-a)/(b-a),0),1);
+  const eo=t=>1-Math.pow(1-t,3),eb=t=>{const c=1.70158;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)};
+  const ST=[['Underline it','Draw a line under the phrase.'],['Circle it','Ring the word that matters.'],['Box it','Frame the detail.'],['Highlight it','Sweep a marker behind it.']];
+  const MK=[['Underline',.19],['Circle',.4],['Box',.62],['Highlight',.84]];
+  const TX=[['Edit with intent',4,25],['Mark what matters',26,49],['Box the details',50,71],['Highlight the rest',72,96]];
+  $('steps').innerHTML='<i id="sfill" style="position:absolute;left:13px;top:14px;width:2px;height:0;background:var(--blue)"></i>'+ST.map((x,i)=>`<li><span class="sdot">${i+1}</span><div><div class="font-semibold">${x[0]}</div><div class="muted text-sm">${x[1]}</div></div></li>`).join('');
+  const lis=[...$('steps').querySelectorAll('li')];
+  // line 2 is split into letters
+  const wd=w=>`<span class="wd">${[...w].map(c=>`<i class="ch">${c}</i>`).join('')}</span>`;
+  $('t2').innerHTML=wd('Mark')+' '+wd('what')+' <span class="em">'+wd('matters.')+'<svg class="sp ems" viewBox="0 0 240 72" preserveAspectRatio="none" style="left:-8%;top:-14%;width:116%;height:128%;stroke:#FF8FB1;stroke-width:3.6"><path id="p2" pathLength="1" d="M120 5C54 3 8 16 8 36c0 20 52 30 112 29 62-1 112-12 112-31C232 14 176 5 112 9"/></svg></span>';
+  // timeline
+  $('sin').innerHTML='<div class="rul relative h-7" id="srul"></div><div class="relative h-11"><div class="vc" style="left:.5%;width:33%;--a:#6965DB;--b:#9895EE;animation:none">Title card</div><div class="vc" style="left:34.5%;width:28%;--a:#7B3FA8;--b:#C25FD0;animation:none">Overlay</div><div class="vc" style="left:63.5%;width:36%;--a:#E0603F;--b:#FF9A6B;animation:none">Outro</div></div><div class="relative h-8 mt-1.5">'+TX.map(t=>`<div class="tx" style="left:${t[1]}%;width:${t[2]-t[1]}%">${t[0]}</div>`).join('')+'</div><div class="relative h-6 mt-1.5 mb-3">'+MK.map(m=>`<span class="mk" data-at="${m[1]}" style="left:${m[1]*100}%">${m[0]}</span>`).join('')+'</div><div id="sph" class="absolute top-0 bottom-0 w-[2px] pointer-events-none" style="left:0;background:var(--pink);margin-left:-1px"><span id="spb" class="absolute left-1/2 top-[3px] -translate-x-1/2 text-[10px] font-bold text-white rounded-md px-1.5 py-0.5" style="background:var(--pink)">0:00</span></div>';
+  $('srul').innerHTML=Array.from({length:21},(_,i)=>{const L=i*5,big=i%4===0;return `<i style="left:${L}%;height:${big?10:5}px"></i>`+(big?`<span style="left:${L}%;${i===0?'margin-left:4px':i===20?'transform:translateX(-100%);margin-left:-4px':'transform:translateX(-50%)'}">0:${String(i/2).padStart(2,'0')}</span>`:'')}).join('');
+  const pins=[...sec.querySelectorAll('.mk')],txs=[...sec.querySelectorAll('.tx')],w1=[...sec.querySelectorAll('.w1')],w4=[...sec.querySelectorAll('.w4')],chs=[...$('t2').querySelectorAll('.ch')],t3=$('t3'),sv=$('sv'),hw=$('hw');
+  const P=id=>$(id),p1a=P('p1a'),p1b=P('p1b'),p2=P('p2'),p3a=P('p3a'),p3b=P('p3b'),p4=P('p4'),ns=[1,2,3,4].map(i=>$('n'+i));let lastStep=-1;
+  function upd(){
+    const r=sec.getBoundingClientRect(),p=Math.min(Math.max(-r.top/(r.height-innerHeight),0),1);
+    sv.style.setProperty('--gx',-p*8+'cqw');sv.style.setProperty('--gy',-p*4+'cqw');
+    // 1 · words rise, then a double hand underline
+    w1.forEach((w,i)=>{const k=eo(seg(p,.04+i*.03,.12+i*.03));w.style.opacity=k;w.style.transform=`translateY(${(1-k)*70}%)`});
+    p1a.style.strokeDashoffset=1-seg(p,.16,.22);p1b.style.strokeDashoffset=1-seg(p,.2,.26);
+    // 2 · letters blur in, then a loose circle
+    chs.forEach((c,i)=>{const k=eo(seg(p,.26+i*.005,.34+i*.005));c.style.opacity=k;c.style.filter=k<1?`blur(${(1-k)*8}px)`:'none';c.style.transform=`translateY(${(1-k)*40}%)`});
+    p2.style.strokeDashoffset=1-seg(p,.38,.47);
+    // 3 · line wipes in from the left, then a sketched box
+    const k3=eo(seg(p,.5,.58));t3.style.clipPath=`inset(-30% ${(1-k3)*110-10}% -30% -10%)`;t3.style.transform=`translateX(${-(1-k3)*3}cqw)`;
+    p3a.style.strokeDashoffset=1-seg(p,.6,.65);p3b.style.strokeDashoffset=1-seg(p,.63,.69);
+    // 4 · words pop with overshoot, then a marker sweep
+    w4.forEach((w,i)=>{const k=seg(p,.72+i*.025,.78+i*.025);w.style.opacity=Math.min(k*3,1);w.style.transform=`scale(${.4+.6*eb(k)}) rotate(${-(1-k)*8}deg)`});
+    const hk=seg(p,.8,.9);p4.style.strokeDashoffset=1-hk;hw.style.color=hk>.3?'#14161F':'#fff';
+    [.16,.38,.6,.8].forEach((a,i)=>ns[i].style.opacity=seg(p,a,a+.04));
+    const t=p*10,ss=Math.floor(t);$('tc').textContent='00:'+String(ss).padStart(2,'0')+':'+String(Math.floor(t%1*24)).padStart(2,'0');
+    $('sph').style.left=p*100+'%';$('spb').textContent='0:'+String(ss).padStart(2,'0');
+    let c=0;pins.forEach(x=>{const on=p>=+x.dataset.at;x.classList.toggle('on',on);c+=on});$('scn').textContent=c;
+    const st=p<.26?0:p<.5?1:p<.72?2:3;
+    if(st!==lastStep){lastStep=st;lis.forEach((li,i)=>{li.classList.toggle('on',i===st);li.classList.toggle('done',i<st);li.querySelector('.sdot').textContent=i<st?'\u2713':i+1});txs.forEach((x,i)=>x.classList.toggle('on',i===st));$('scap').textContent=ST[st][0]+'. '+ST[st][1]}
+    $('sfill').style.height=`calc((100% - 28px) * ${Math.min(p*1.15,1)})`;
+  }
+  const stl=$('stl'),sin=$('sin');let drag=false;
+  const jump=e=>{const b=sin.getBoundingClientRect(),q=Math.min(Math.max((e.clientX-b.left)/b.width,0),1),top=sec.getBoundingClientRect().top+scrollY;scrollTo({top:top+q*(sec.offsetHeight-innerHeight),behavior:'instant'})};
+  stl.addEventListener('pointerdown',e=>{drag=true;stl.setPointerCapture(e.pointerId);jump(e)});
+  stl.addEventListener('pointermove',e=>{if(drag)jump(e)});
+  ['pointerup','pointercancel'].forEach(t=>stl.addEventListener(t,()=>drag=false));
+  addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true});addEventListener('resize',upd);upd();
+})();
+
+// nav hairline once scrolled
+(function(){const n=document.getElementById('nav'),f=()=>n.style.borderBottomColor=scrollY>8?'var(--line)':'transparent';addEventListener('scroll',f,{passive:true});f()})();
+
+// markup timeline: each mark pins to the playhead
+const mtl=document.getElementById('m-tl');mtl.className='mtl';
+mtl.innerHTML='<div class="mrow"><span class="mlab">Video</span><div class="mtr"><div class="bar2 vcl" style="left:1%;width:33%;background:linear-gradient(135deg,#6965DB,#9895EE)">Intro</div><div class="bar2 vcl" style="left:34.5%;width:28%;background:linear-gradient(135deg,#7B3FA8,#C25FD0)">Drone</div><div class="bar2 vcl" style="left:63.5%;width:36%;background:linear-gradient(135deg,#E0603F,#FF9A6B)">Interview</div></div></div><div class="mrow"><span class="mlab">Marks</span><div class="mtr" id="m-marks"></div></div><div class="mph"><i id="m-ph" style="animation:none"></i></div>';
+const marksEl=document.getElementById('m-marks'),mph=document.getElementById('m-ph'),mtc=document.getElementById('m-tc'),mchips=[],LBL={pen:'Pen',marker:'Highlight',circle:'Circle',arrow:'Arrow',text:'Note'};
+let mp=0,mvis=true,mlast=performance.now();
+const hideHint=()=>{const h=document.getElementById('m-hint');if(h)h.style.opacity=0};
+function mrender(){mph.style.left=mp*100+'%';const t=mp*10;mtc.textContent='00:'+String(Math.floor(t)).padStart(2,'0')+':'+String(Math.floor(t%1*24)).padStart(2,'0')}
+new IntersectionObserver(([e])=>mvis=e.isIntersecting).observe(mtl);
+if(matchMedia('(prefers-reduced-motion:reduce)').matches){mp=.4;mrender()}
+else(function loop(n){const dt=n-mlast;mlast=n;if(mvis){mp=(mp+dt/9000)%1;mrender()}requestAnimationFrame(loop)})(mlast);
+function addMark(k){const m=document.createElement('span');m.className='mk';m.style.left=Math.min(Math.max(mp*100,7),93)+'%';m.textContent=LBL[k];marksEl.appendChild(m);mchips.push(m);requestAnimationFrame(()=>requestAnimationFrame(()=>m.classList.add('on')));hideHint()}
+function rmMark(){const m=mchips.pop();if(m){m.classList.remove('on');setTimeout(()=>m.remove(),350)}}
+function clrMarks(){while(mchips.length)rmMark()}
+
+// drawing canvas with tools
+const cv=document.getElementById('draw'),ctx=cv.getContext('2d'),host=cv.parentElement;
+let col='#FFD84D',tool='pen',strokes=[],cur=null;
+function fit(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);redraw()}
+function paint(s,W,H){
+  ctx.save();ctx.strokeStyle=ctx.fillStyle=s.c;ctx.lineCap=ctx.lineJoin='round';ctx.lineWidth=5;
+  const P=s.p.map(([x,y])=>[x*W,y*H]);
+  if(s.k==='text'){ctx.font=`400 ${W*.045}px Kalam, cursive`;ctx.fillText(s.s,P[0][0],P[0][1])}
+  else if(s.k==='circle'){const[a,b]=[P[0],P[P.length-1]],cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2,rx=Math.abs(a[0]-b[0])/2,ry=Math.abs(a[1]-b[1])/2;
+    ctx.beginPath();for(let i=0;i<=70;i++){const t=i/70,an=t*Math.PI*2.15-Math.PI/2,k=1+.05*t;ctx[i?'lineTo':'moveTo'](cx+Math.cos(an)*rx*k,cy+Math.sin(an)*ry*k)}ctx.stroke()}
+  else if(s.k==='arrow'){const[a,b]=[P[0],P[P.length-1]],an=Math.atan2(b[1]-a[1],b[0]-a[0]),h=Math.min(22,Math.hypot(b[0]-a[0],b[1]-a[1])/2);
+    ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);[-.5,.5].forEach(d=>{ctx.moveTo(...b);ctx.lineTo(b[0]-Math.cos(an+d)*h,b[1]-Math.sin(an+d)*h)});ctx.stroke()}
+  else{if(s.k==='marker'){ctx.globalAlpha=.4;ctx.lineWidth=22}
+    ctx.beginPath();P.forEach((q,i)=>ctx[i?'lineTo':'moveTo'](...q));ctx.stroke()}
+  ctx.restore()}
+function redraw(){const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);[...strokes,...(cur?[cur]:[])].forEach(s=>paint(s,r.width,r.height))}
+const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]};
+function textAt(e){
+  const r=host.getBoundingClientRect(),[nx,ny]=pt(e),i=document.createElement('input');
+  i.className='tin';i.placeholder='type a note';i.maxLength=40;i.style.cssText=`left:${e.clientX-r.left}px;top:${e.clientY-r.top}px;color:${col}`;
+  let done=false;const fin=()=>{if(done)return;done=true;if(i.value.trim()){strokes.push({k:'text',c:col,p:[[nx,ny]],s:i.value.trim()});addMark('text');redraw()}i.remove()};
+  i.onkeydown=k=>{if(k.key==='Enter')fin();if(k.key==='Escape'){i.value='';fin()}};i.onblur=fin;host.appendChild(i);setTimeout(()=>i.focus(),0)}
+cv.addEventListener('pointerdown',e=>{hideHint();
+  if(tool==='text'){e.preventDefault();textAt(e);return}
+  cv.setPointerCapture(e.pointerId);cur={k:tool,c:col,p:[pt(e)]};redraw()});
+cv.addEventListener('pointermove',e=>{if(!cur)return;const q=pt(e);
+  if(cur.k==='pen'||cur.k==='marker')cur.p.push(q);else cur.p=[cur.p[0],q];redraw()});
+['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>{if(cur){if(cur.p.length>1||cur.k==='pen'||cur.k==='marker'){if(cur.p.length<2)cur.p.push(cur.p[0]);strokes.push(cur);addMark(cur.k)}cur=null;redraw()}}));
+document.querySelectorAll('.sw').forEach(b=>b.onclick=()=>{col=b.dataset.c;document.querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
+document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{tool=b.dataset.t;document.querySelectorAll('.tool').forEach(x=>x.classList.remove('on'));b.classList.add('on');cv.style.cursor=tool==='text'?'text':'crosshair'});
+document.getElementById('undo').onclick=()=>{strokes.pop();rmMark();redraw()};
+document.getElementById('clear').onclick=()=>{strokes=[];clrMarks();redraw()};
+addEventListener('resize',fit);fit();
+
+// before / after slider (with one intro wiggle)
+(function(){
+  const ba=document.getElementById('ba'),bar=document.getElementById('bar'),hint=document.getElementById('bahint');let touched=false;
+  const set=v=>ba.style.setProperty('--pos',v+'%');
+  bar.addEventListener('input',()=>{touched=true;set(bar.value);hint.style.opacity=0});
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  new IntersectionObserver(([e],o)=>{if(!e.isIntersecting)return;o.disconnect();const t0=performance.now()+900;
+    (function f(n){if(touched)return;const t=Math.max(n-t0,0)/2200;if(t>=1){set(50);return}
+      const v=50+Math.sin(t*Math.PI*2)*Math.pow(1-t,.5)*28;set(v);bar.value=v;requestAnimationFrame(f)})(performance.now())},{threshold:.6}).observe(ba)
+})();
+
+
+// ---- feature demos: filters, color, presets, AI animation
+(function(){
+const $=id=>document.getElementById(id),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const SC='<div class="sun"></div><div class="hill" style="left:-10%;width:70%;height:60%"></div><div class="hill" style="right:-15%;width:80%;height:50%;background:linear-gradient(180deg,#2A2468,#0F1233 40%);animation-delay:-4s"></div>';
+document.querySelectorAll('[data-scene]').forEach(e=>e.innerHTML=SC);
+const VC=[[1,33,'linear-gradient(135deg,#6965DB,#9895EE)','Intro'],[34.5,28,'linear-gradient(135deg,#7B3FA8,#C25FD0)','Drone'],[63.5,36,'linear-gradient(135deg,#E0603F,#FF9A6B)','Interview']];
+const tl=(id,rows)=>{const el=$(id);el.className='mtl';el.innerHTML=rows.map(([lab,items])=>`<div class="mrow"><span class="mlab">${lab}</span><div class="mtr">${items.map(([l,w,bg,t,i])=>`<div class="bar2${bg.startsWith('linear')?' vcl':''}"${i?` id="${i}"`:''} style="left:${l}%;width:${w}%;background:${bg}">${t||''}</div>`).join('')}</div></div>`).join('')+'<div class="mph"><i></i></div>'};
+const onView=(el,fn)=>new IntersectionObserver(([e],o)=>{if(e.isIntersecting){o.disconnect();fn()}},{threshold:.4}).observe(el);
+const mark=(row,i)=>[...row.children].forEach((b,k)=>b.classList.toggle('on',k===i));
+const thumb=(f,i)=>`<button class="th" aria-label="${f[0]}"><i style="filter:${f[1]}"></i><span>${f[0]}</span></button>`;
+
+// filters
+const F=[['Original','none'],['Warm','sepia(.35) saturate(1.3) brightness(1.05)'],['Cool','hue-rotate(-25deg) saturate(1.1) brightness(1.05)'],['Vivid','saturate(1.8) contrast(1.1)'],['Mono','grayscale(1) contrast(1.1)'],['Noir','grayscale(1) contrast(1.5) brightness(.8)'],['Fade','saturate(.6) contrast(.8) brightness(1.15)']];
+tl('f-tl',[['Video',VC],['Filter',[[1,62,'#14161F','No filter','f-bar']]]]);
+const fr=$('f-row');fr.innerHTML=F.map(thumb).join('');let ft=false;
+function setF(i,u){if(u)ft=true;$('f-fx').style.filter=F[i][1];$('f-chip').textContent=F[i][0];mark(fr,i);const b=$('f-bar');b.textContent=i?F[i][0]:'No filter';b.style.opacity=i?1:.45}
+[...fr.children].forEach((b,i)=>b.onclick=()=>setF(i,1));setF(0);
+onView($('f-fx'),()=>{let k=0;setInterval(()=>{if(!ft){k=(k+1)%F.length;setF(k)}},2400)});
+
+// color
+const S=[['Exposure','e',-.5,.5,.01,0,.18],['Contrast','c',.6,1.6,.01,1,.22],['Saturation','s',0,2,.01,1,.5],['Temperature','t',-30,30,1,0,20]],cv={e:0,c:1,s:1,t:0};let ct=false;
+tl('c-tl',[['Video',VC],['Color',[[1,98,'linear-gradient(90deg,#2EC4B6,#FFB347)','Color adjust']]]]);
+$('c-sl').innerHTML=S.map(([n,k,a,b,st,d])=>`<div class="sl"><div class="sh"><label for="c-${k}">${n}</label><b id="c-${k}v"></b></div><input type="range" id="c-${k}" min="${a}" max="${b}" step="${st}" value="${d}"></div>`).join('');
+function cf(){$('c-fx').style.filter=`brightness(${1+cv.e}) contrast(${cv.c}) saturate(${cv.s}) sepia(${Math.max(cv.t,0)/50}) hue-rotate(${Math.min(cv.t,0)*.8}deg)`;
+  S.forEach(([n,k,a,b,st,d])=>{const x=cv[k]-d;$('c-'+k).value=cv[k];$('c-'+k).style.setProperty('--v',((cv[k]-a)/(b-a)*100)+'%');$('c-'+k+'v').textContent=(x>0?'+':'')+(k==='t'?Math.round(x):x.toFixed(2))})}
+S.forEach(([n,k])=>$('c-'+k).oninput=e=>{ct=true;cv[k]=+e.target.value;cf()});
+$('c-reset').onclick=()=>{ct=true;S.forEach(x=>cv[x[1]]=x[5]);cf()};cf();
+onView($('c-fx'),()=>{const t0=performance.now();(function f(n){if(ct)return;const t=Math.min((n-t0)/2800,1);S.forEach(x=>cv[x[1]]=x[5]+x[6]*Math.sin(t*Math.PI)*1);cf();if(t<1)requestAnimationFrame(f)})(t0)});
+
+// presets
+const P=[['Golden hour','sepia(.45) saturate(1.5) brightness(1.1) contrast(1.05)','#FFB347'],['Teal & orange','hue-rotate(-18deg) saturate(1.6) contrast(1.15)','#2EC4B6'],['Clean white','brightness(1.2) saturate(.8) contrast(.9)','#BFC7D9'],['Night city','hue-rotate(20deg) saturate(1.3) brightness(.75) contrast(1.3)','#6C5CE7'],['Film fade','sepia(.2) saturate(.7) contrast(.85) brightness(1.1)','#C9A27A']];
+tl('p-tl',[['Video',VC],['Preset',[[1,98,'#14161F','No preset','p-bar']]]]);
+const pr=$('p-row');let pt=false,pi=-1,mine=0;
+function setP(i,u){if(u)pt=true;pi=i;$('p-fx').style.filter=P[i][1];$('p-chip').textContent=P[i][0];$('p-tl').style.setProperty('--pc',P[i][2]);$('p-bar').textContent=P[i][0]+' · applied to 3 clips';mark(pr,i)}
+function rp(){pr.innerHTML=P.map(thumb).join('')+'<button class="th" id="p-add" aria-label="Save current look"><i class="add">+</i><span>Save look</span></button>';
+  [...pr.children].forEach((b,i)=>{if(i<P.length)b.onclick=()=>setP(i,1)});
+  $('p-add').onclick=()=>{pt=true;const h=Math.round(Math.random()*60-30);P.push(['My look '+(++mine),`hue-rotate(${h}deg) saturate(${(1+Math.random()).toFixed(2)}) contrast(${(.9+Math.random()*.4).toFixed(2)})`,`hsl(${180+h*3},70%,60%)`]);rp();setP(P.length-1,1)}}
+rp();
+onView($('p-fx'),()=>{let k=-1;const step=()=>{if(pt)return;k=(k+1)%5;setP(k);setTimeout(step,2400)};step()});
+
+// AI animation
+const V=[{c:'Bounce in',p:'Bounce the title in, then underline it with a hand-drawn stroke',kf:[{transform:'translateY(-120%)',opacity:0},{transform:'translateY(0)',opacity:1,offset:.6},{transform:'translateY(-14%)',offset:.8},{transform:'translateY(0)'}],o:{duration:900,easing:'ease-out'}},
+ {c:'Slide in',p:'Slide the title in from the left and fade it up',kf:[{transform:'translateX(-60%)',opacity:0},{transform:'translateX(0)',opacity:1}],o:{duration:700,easing:'cubic-bezier(.2,.8,.2,1)'}},
+ {c:'Spin in',p:'Spin the title in with a little zoom, then underline it',kf:[{transform:'rotate(-180deg) scale(.2)',opacity:0},{transform:'rotate(-8deg) scale(1.1)',offset:.7},{transform:'rotate(0) scale(1)',opacity:1}],o:{duration:800,easing:'ease-out'}}];
+const val=x=>typeof x==='string'?`'${x}'`:x,obj=k=>'{ '+Object.entries(k).map(([a,b])=>`${a}: ${val(b)}`).join(', ')+' }';
+const gen=v=>`title.animate([\n${v.kf.map(k=>'  '+obj(k)).join(',\n')}\n], {\n  duration: ${v.o.duration},\n  easing: '${v.o.easing}'\n})`;
+const hi=t=>t.replace(/('[^']*')|\b([a-z]+)(?=:)/gi,(m,a,b)=>a?`<span class="cs">${a}</span>`:`<span class="ck">${b}</span>`);
+tl('a-tl',[['Video',VC],['Title',[[4,50,'#7B3FA8','Summer cut']]]]);
+const ac=$('a-chips'),tr=$('a-tl').querySelectorAll('.mtr')[1];let run=0,picked=false;
+const st=t=>$('a-s').textContent=t;
+async function go(i){const id=++run,v=V[i],t=$('a-t');mark(ac,i);
+  t.getAnimations().forEach(a=>a.cancel());t.style.opacity=0;$('a-u').style.strokeDashoffset=1;tr.querySelectorAll('.dmd').forEach(d=>d.remove());$('a-code').innerHTML='';$('a-p').textContent='\u00a0';st('Typing prompt');
+  for(const ch of v.p){if(id!==run)return;$('a-p').textContent+=ch;await sleep(20)}
+  st('Writing code');await sleep(250);const code=gen(v);
+  for(let k=0;k<=code.length;k+=3){if(id!==run)return;$('a-code').innerHTML=hi(code.slice(0,k))+'<span class="caret"></span>';await sleep(9)}
+  $('a-code').innerHTML=hi(code);if(id!==run)return;st('Playing');
+  await t.animate(v.kf,{...v.o,fill:'forwards'}).finished.catch(()=>0);if(id!==run)return;
+  $('a-u').style.strokeDashoffset=0;
+  v.kf.forEach((k,j)=>{const d=document.createElement('i');d.className='dmd';d.style.left=(4+(k.offset??j/(v.kf.length-1))*50)+'%';tr.appendChild(d);setTimeout(()=>d.classList.add('on'),120*j+60)});
+  st(v.kf.length+' keyframes added');await sleep(3800);if(id===run&&!picked)go((i+1)%V.length)}
+[...ac.children].forEach((b,i)=>b.onclick=()=>{picked=true;go(i)});
+onView($('a-code'),()=>go(0));
+})();
+
+// faq accordion
+document.querySelectorAll('.fq button').forEach(b=>b.onclick=()=>{const f=b.parentElement,o=f.classList.toggle('open');b.setAttribute('aria-expanded',o)});
+
+// ripple on press
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches)document.addEventListener('pointerdown',e=>{
+  const t=e.target.closest('.btn,.tool,.chp,.fq button');if(!t)return;
+  const r=t.getBoundingClientRect(),d=Math.max(r.width,r.height)*2.2,x=document.createElement('span');
+  x.className='ripple';x.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;
+  t.appendChild(x);x.addEventListener('animationend',()=>x.remove())});
+</script>
+</body>
+</html>

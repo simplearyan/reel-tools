@@ -1,0 +1,16 @@
+{
+  "name": "reel-editor",
+  "slug": "reel-editor",
+  "tagline": "Media Editor",
+  "description": "Media Editor",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

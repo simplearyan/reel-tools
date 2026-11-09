@@ -1,0 +1,13 @@
+{
+  "name": "Reel Cover",
+  "slug": "reel-cover",
+  "tagline": "Thumbnails and covers for your Reel videos",
+  "description": "Thumbnails and covers for your Reel videos",
+  "icon": "icon.svg",
+  "tags": [
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}

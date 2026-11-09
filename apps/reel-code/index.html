@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reel Code — make videos with code</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Kalam:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#111016;--s1:#1A1920;--s2:#23222B;--s3:#2D2C37;--line:#3A3946;--on:#E8E6F2;--mute:#A9A7BA;--p:#B8B5FF;--pc:#6965DB;--tint:#34325F;--pink:#FF8FB1;--yel:#FFD84D;--mint:#8BE8C2;--ease:cubic-bezier(.2,0,0,1);--eo:cubic-bezier(.05,.7,.1,1);--rs:8px;--rm:12px;--rl:20px;--rx:28px;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{background:var(--bg);color:var(--on);font:16px/1.5 'Bricolage Grotesque',system-ui,sans-serif;overflow-x:hidden;padding-top:env(safe-area-inset-top,0)}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--p);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}.hand{font-family:'Kalam',cursive}.mute{color:var(--mute)}
+/* top app bar */
+.bar{position:sticky;top:0;z-index:50;background:rgba(17,16,22,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar-in{height:64px;display:flex;align-items:center;gap:32px}.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+.tag{font-size:11px;font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:var(--rs);background:var(--tint);color:var(--p)}
+.bar nav{display:flex;gap:4px;margin-right:auto}.bar nav a{padding:8px 14px;border-radius:var(--rs);color:var(--mute);font-weight:600;font-size:15px;transition:background .15s,color .15s}.bar nav a:hover{background:rgba(255,255,255,.07);color:var(--on)}
+.bar-r{display:flex;gap:8px}
+/* buttons with state layers */
+.btn{position:relative;overflow:hidden;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:15px;transition:transform .3s var(--eo)}
+.btn::before{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s;z-index:-1}.btn:hover::before{opacity:.08}.btn:active::before{opacity:.14}
+.fill{background:var(--pc);color:#fff}.tonal{background:var(--tint);color:var(--p)}.out{border:1px solid var(--line);color:var(--on)}
+.cmd{display:inline-flex;align-items:center;gap:14px;padding:12px 20px;border-radius:var(--rm);background:var(--s2);border:1px solid var(--line);font:500 14px 'JetBrains Mono',monospace;position:relative;overflow:hidden}
+.cmd:hover{background:var(--s3)}
+/* hero */
+.hero{position:relative;text-align:center;padding:104px 24px 72px}
+.strokes{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.strokes path{fill:none;stroke:var(--pc);stroke-width:46;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.1s var(--eo) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.hero>*:not(svg){position:relative}
+h1{font-size:clamp(46px,8.4vw,92px);line-height:1;letter-spacing:-.035em;font-weight:800}
+h2{font-size:clamp(32px,4.4vw,52px);line-height:1.08;letter-spacing:-.025em;font-weight:800}
+.lead{max-width:560px;margin:28px auto 0;font-size:18px;line-height:28px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:36px}
+/* ways */
+.sec{padding:88px 0}.ways{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.il{height:220px;border-radius:var(--rl);background:var(--s1);border:1px solid var(--line);position:relative;overflow:hidden;padding:22px;transition:background .3s}
+.way:hover .il{background:var(--s2)}
+.way small{display:block;color:var(--mute);font-size:22px;margin-top:22px;font-weight:600}.way h3{font-size:26px;line-height:30px;letter-spacing:-.02em}
+.way p{margin:14px 0 18px;max-width:300px}.lk{display:flex;align-items:center;gap:6px;color:var(--mute);font-size:14px;font-weight:600;margin-top:6px}.lk:hover{color:var(--on);text-decoration:underline;text-underline-offset:4px}
+.cl{display:grid;gap:11px}.cl i{display:block;height:9px;border-radius:5px;background:var(--p);width:0;animation:typ 4.4s var(--ease) infinite;animation-delay:calc(var(--i)*.35s)}
+@keyframes typ{0%{width:0}40%,88%{width:var(--w)}100%{width:0}}
+.tlm{position:absolute;left:22px;right:22px;top:36px;display:grid;gap:14px}.tlm div{height:26px;border-radius:8px;background:var(--s3);position:relative}.tlm div b{position:absolute;top:0;bottom:0;border-radius:8px;background:var(--pc)}
+.dmn{position:absolute;top:50%;width:14px;height:14px;background:var(--yel);transform:translate(-50%,-50%) rotate(45deg);border-radius:3px;animation:slide 3.6s var(--ease) infinite alternate}
+@keyframes slide{from{left:12%}to{left:78%}}
+.askb{background:var(--s3);border-radius:var(--rm);padding:12px 14px;font-size:14px;display:flex;align-items:center;gap:8px}.askb::after{content:"";width:2px;height:16px;background:var(--p);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.shim{height:10px;border-radius:5px;margin-top:12px;background:linear-gradient(90deg,var(--s3) 0,var(--tint) 50%,var(--s3) 100%);background-size:200% 100%;animation:sh 1.6s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+/* demo */
+.demo{position:relative;margin-top:84px}
+.note{position:absolute;display:flex;gap:6px;color:var(--on);font-size:19px;line-height:1.15;opacity:0;transition:opacity .8s var(--eo) .4s}.in .note{opacity:1}
+.note svg{width:26px;height:44px;fill:none;stroke:var(--on);stroke-width:2.4;stroke-linecap:round}
+.panel{background:var(--s1);border:1px solid var(--line);border-radius:var(--rx);overflow:hidden}
+.pgrid{display:grid;grid-template-columns:1fr 1fr}.pcol{padding:18px;min-width:0}.pcol+.pcol{border-left:1px solid var(--line)}
+.ask{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 16px}
+.ask svg{flex:none;color:var(--p)}.ask input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--on);font:inherit;font-size:14px}
+.ask .btn{padding:8px 16px;font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{position:relative;overflow:hidden;display:inline-flex;align-items:center;padding:6px 14px;border-radius:var(--rs);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--on);transition:background .15s}
+.chip:hover{background:rgba(255,255,255,.06)}.chip.on{background:var(--tint);border-color:transparent;color:var(--p)}.chip.on::before{content:"\2713";margin-right:6px;font-weight:800}
+.edh{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px;font-size:13px;color:var(--mute)}
+.edh b{color:var(--on);font:500 13px 'JetBrains Mono',monospace;padding:4px 10px;background:var(--s2);border-radius:var(--rs)}
+.ed{position:relative;height:288px;background:#0D0C12;border-radius:var(--rm);overflow:hidden;border:1px solid var(--line)}
+.ed pre,.ed textarea{position:absolute;inset:0;margin:0;padding:14px 16px;font:13px/1.7 'JetBrains Mono',ui-monospace,monospace;white-space:pre;overflow:auto;tab-size:2;border:0}
+.ed pre{pointer-events:none;color:#D9D7E6}.ed textarea{width:100%;height:100%;resize:none;background:transparent;color:transparent;caret-color:#fff;outline:0}
+.ck{color:var(--p)}.cs{color:#FFB4CC}.cn{color:var(--mint)}.cf{color:var(--yel)}
+.stage{position:relative;aspect-ratio:16/9;border-radius:var(--rm);overflow:hidden;background:linear-gradient(180deg,#171B4F 0%,#4B3AA0 28%,#B24A9A 55%,#FF7F6B 78%,#FFB36B 100%)}
+.stage .sun{position:absolute;width:13%;aspect-ratio:1;right:16%;top:14%;border-radius:50%;background:radial-gradient(circle at 40% 40%,#FFF6D0,#FFE29A 55%,#FFC873);box-shadow:0 0 60px 20px rgba(255,205,130,.4)}
+.stage .h1,.stage .h2{position:absolute;border-radius:50%;bottom:-32%}.h1{left:-10%;width:70%;height:60%;background:linear-gradient(180deg,#4A3B8C,#1B1F4A 35%,#14173A)}.h2{right:-15%;width:80%;height:50%;background:linear-gradient(180deg,#2A2468,#0F1233 40%)}
+.tc{position:absolute;inset:0;display:grid;place-items:center}.tw{position:relative;text-align:center}
+#title{font-size:clamp(26px,4.2vw,46px);font-weight:800;letter-spacing:-.02em;color:#fff;white-space:nowrap;line-height:1.1}
+.tw svg{position:absolute;left:0;bottom:-10px;width:100%;height:14px;overflow:visible;fill:none;stroke:var(--yel);stroke-width:4.5;stroke-linecap:round}.tw path{stroke-dasharray:1;stroke-dashoffset:1}
+.ctl{display:grid;gap:16px;margin-top:16px}.lab{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.sg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}.sg button{position:relative;padding:8px 16px;font-size:13px;font-weight:600;transition:background .15s,color .15s}.sg button+button{border-left:1px solid var(--line)}.sg button:hover{background:rgba(255,255,255,.06)}.sg button.on{background:var(--tint);color:var(--p)}
+.sl{display:flex;align-items:center;gap:14px}.sl input{-webkit-appearance:none;appearance:none;flex:1;height:34px;background:transparent;margin:0;cursor:pointer;outline:none}
+.sl input::-webkit-slider-runnable-track{height:14px;border-radius:8px;background:linear-gradient(90deg,var(--pc) 0 calc(var(--v,50%) - 6px),transparent 0 calc(var(--v,50%) + 6px),var(--s3) 0)}
+.sl input::-moz-range-track{height:14px;border-radius:8px;background:linear-gradient(90deg,var(--pc) 0 calc(var(--v,50%) - 6px),transparent 0 calc(var(--v,50%) + 6px),var(--s3) 0)}
+.sl input::-webkit-slider-thumb{-webkit-appearance:none;width:4px;height:34px;margin-top:-10px;border-radius:2px;background:var(--p);border:0}.sl input::-moz-range-thumb{width:4px;height:34px;border:0;border-radius:2px;background:var(--p)}
+.sl b{font:500 12px 'JetBrains Mono',monospace;min-width:64px;text-align:center;padding:4px 8px;border-radius:var(--rs);background:var(--tint);color:var(--p)}
+.tf{position:relative;display:block}.tf input{width:100%;background:transparent;border:1px solid var(--line);border-radius:var(--rm);padding:15px 14px 9px;color:var(--on);font:inherit;outline:0;transition:border-color .15s}
+.tf input:focus{border-color:var(--p);box-shadow:inset 0 0 0 1px var(--p)}.tf span{position:absolute;left:14px;top:7px;font-size:11px;color:var(--mute);pointer-events:none}
+.tl{border-top:1px solid var(--line);background:var(--s1)}.tb{display:flex;align-items:center;gap:14px;padding:12px 18px}
+.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--tint);color:var(--p);position:relative;overflow:hidden;transition:background .15s}.ib:hover{background:#403E73}
+.time{font:500 13px 'JetBrains Mono',monospace;color:var(--mute);margin-right:auto}
+.tlw{position:relative;padding:0 12px 16px;margin:0 6px;cursor:ew-resize;touch-action:pan-y;user-select:none}
+.row{display:flex;gap:12px;align-items:center;margin-top:8px}.row .l{width:64px;flex:none;font-size:11px;color:var(--mute);font-weight:600}.lane{position:relative;flex:1;height:30px}
+.lane.rl{height:22px}.rl i{position:absolute;bottom:0;width:1px;height:7px;background:var(--line)}.rl span{position:absolute;top:0;transform:translateX(-50%);font:10px 'JetBrains Mono',monospace;color:var(--mute)}
+.rl span:first-of-type{transform:none}
+.bar1{position:absolute;left:0;top:0;bottom:0;border-radius:var(--rs);background:var(--pc);font-size:11px;font-weight:600;padding:7px 12px;white-space:nowrap;overflow:hidden;transition:width .3s var(--eo)}
+.bar1.u{background:#8A6F00;color:#FFE79A}
+.dk{position:absolute;top:50%;width:11px;height:11px;background:var(--yel);border:2px solid #111016;transform:translate(-50%,-50%) rotate(45deg);border-radius:2px;transition:left .3s var(--eo)}
+.ph{position:absolute;top:0;bottom:8px;width:2px;background:var(--pink);pointer-events:none;margin-left:-1px}.ph span{position:absolute;top:0;left:50%;transform:translateX(-50%);background:var(--pink);color:#2B0A18;font:600 10px 'JetBrains Mono',monospace;padding:1px 5px;border-radius:5px}
+/* features */
+.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}.fc .il{height:200px}.fc h3{font-size:24px;margin-top:22px;letter-spacing:-.02em}.fc p{margin:10px 0 14px;color:var(--on)}
+.kv{display:grid;gap:10px}.kv div{display:flex;justify-content:space-between;align-items:center;background:var(--s3);border-radius:var(--rm);padding:10px 14px;font-size:14px}.kv code{font:500 12px 'JetBrains Mono',monospace;color:var(--p)}
+.sw{width:18px;height:18px;border-radius:50%;background:var(--pink);display:inline-block;vertical-align:-4px;margin-right:6px;animation:hue 5s linear infinite}@keyframes hue{50%{background:var(--yel)}}
+.fl{display:flex;align-items:center;justify-content:space-between;background:var(--s3);border-radius:var(--rm);padding:11px 14px;font:500 13px 'JetBrains Mono',monospace;margin-bottom:10px}
+.fl em{width:56px;height:6px;border-radius:3px;background:var(--line);position:relative;overflow:hidden;font-style:normal}.fl em::after{content:"";position:absolute;inset:0;background:var(--mint);transform-origin:left;animation:fillb 3s var(--ease) infinite;animation-delay:var(--d)}@keyframes fillb{0%{transform:scaleX(0)}70%,100%{transform:scaleX(1)}}
+.df{font:500 13px/1.9 'JetBrains Mono',monospace;background:#0D0C12;border-radius:var(--rm);padding:14px 16px}.df div{border-radius:4px;padding:0 8px}.df .a{background:rgba(139,232,194,.12);color:var(--mint)}.df .r{background:rgba(255,143,177,.12);color:var(--pink)}
+.close{text-align:center;padding:96px 0 112px}.close p{margin:20px 0 32px;font-size:18px}
+footer{background:#0B0A0F;border-top:1px solid var(--line)}.ft{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;padding:64px 24px 40px}
+.ft h4{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-weight:600;margin-bottom:20px}.ft li{list-style:none;margin-bottom:12px;font-size:15px}.ft ul{padding:0}.ft li a:hover{text-decoration:underline;text-underline-offset:4px}
+.fb{padding:20px 24px 36px;border-top:1px solid var(--line);color:var(--mute);font-size:14px;display:flex;justify-content:space-between}
+.snack{position:fixed;left:50%;bottom:28px;transform:translate(-50%,24px);background:#E8E6F2;color:#1A1920;padding:13px 20px;border-radius:var(--rs);font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:all .3s var(--eo);z-index:90}.snack.show{opacity:1;transform:translate(-50%,0)}
+.rv{opacity:0;transform:translateY(24px);transition:opacity .7s var(--eo),transform .7s var(--eo)}.rv.in{opacity:1;transform:none}
+@media (max-width:900px){.ways,.fg{grid-template-columns:1fr}.pgrid{grid-template-columns:1fr}.pcol+.pcol{border-left:0;border-top:1px solid var(--line)}.ft{grid-template-columns:1fr 1fr}.bar nav,.note{display:none}.bar-r .tonal{display:none}.hero{padding-top:72px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.strokes path{stroke-dashoffset:0}.rv,.note{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap bar-in">
+  <a class="logo" href="#"><svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="10" fill="#6965DB"/><path d="M12.6 9.8L23 16l-10.4 6.2z" fill="#fff" stroke="#fff" stroke-width="2.8" stroke-linejoin="round"/><circle cx="24.6" cy="7.6" r="2.6" fill="#FFD84D"/></svg>Reel <span class="tag">CODE</span></a>
+  <nav><a href="#ways">Overview</a><a href="#demo">Demo</a><a href="#more">Features</a><a href="#">Docs</a></nav>
+  <div class="bar-r"><a class="btn tonal" href="#demo">Try the demo</a><a class="btn fill" href="#">Get Reel</a></div>
+</div></header>
+
+<section class="hero wrap">
+  <svg class="strokes" viewBox="0 0 1100 560" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M236 -10L232 112" style="animation-delay:.1s"/><path pathLength="1" d="M900 -10L980 100" style="animation-delay:.3s"/><path pathLength="1" d="M236 482C430 450 660 340 850 214" style="animation-delay:.5s;opacity:.95"/></svg>
+  <h1>Make videos<br>with code.</h1>
+  <p class="lead">Every keyframe on the Reel timeline is code you can read, edit, diff and ask AI to write. Change either side and the other follows.</p>
+  <div class="cta">
+    <button class="cmd" id="cmd" aria-label="Copy install command"><span>$ npx reel init</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button>
+    <a class="btn tonal" href="#">Docs</a><a class="btn out" href="#demo">Live demo</a>
+  </div>
+</section>
+
+<section class="sec wrap" id="ways">
+  <div class="ways">
+    <div class="way rv"><div class="il"><div class="cl"><i style="--w:62%;--i:0"></i><i style="--w:38%;--i:1;background:var(--pink)"></i><i style="--w:74%;--i:2"></i><i style="--w:48%;--i:3;background:var(--mint)"></i><i style="--w:66%;--i:4"></i><i style="--w:30%;--i:5;background:var(--yel)"></i></div></div>
+      <small>Animate</small><h3>in code</h3><p>Describe scenes as plain, typed functions. Readable, reviewable and version controlled.</p><a class="lk" href="#">Code reference →</a><a class="lk" href="#">Examples →</a></div>
+    <div class="way rv" style="transition-delay:.1s"><div class="il"><div class="tlm"><div><b style="left:6%;width:52%"></b><i class="dmn"></i></div><div><b style="left:30%;width:44%;background:var(--tint)"></b></div><div><b style="left:12%;width:30%;background:#8A6F00"></b></div></div></div>
+      <small>Animate</small><h3>by hand</h3><p>Drag keyframes on the timeline. Reel writes the code for you and keeps it tidy.</p><a class="lk" href="#">Timeline guide →</a><a class="lk" href="#">Shortcuts →</a></div>
+    <div class="way rv" style="transition-delay:.2s"><div class="il"><div class="askb">Bounce the title in…</div><div class="shim" style="width:92%;margin-top:22px"></div><div class="shim" style="width:70%"></div><div class="shim" style="width:82%"></div></div>
+      <small>Animate</small><h3>by asking</h3><p>Say what you want. AI writes the keyframes and you edit them like any other code.</p><a class="lk" href="#">AI prompts →</a><a class="lk" href="#">Agent skills →</a></div>
+  </div>
+</section>
+
+<section class="sec wrap" id="demo" style="padding-top:24px">
+  <h2 style="text-align:center">Interactive demo</h2>
+  <div class="demo rv" id="demoin">
+    <div class="note" style="left:2%;top:-62px"><span class="hand">Edit the code…</span><svg viewBox="0 0 26 44"><path d="M4 4C3 18 8 32 20 40M20 40l-11-2M20 40l1-11"/></svg></div>
+    <div class="note" style="right:2%;top:-62px;text-align:right"><svg viewBox="0 0 26 44" style="transform:scaleX(-1)"><path d="M4 4C3 18 8 32 20 40M20 40l-11-2M20 40l1-11"/></svg><span class="hand">…or ask AI to<br>write it!</span></div>
+    <div class="panel">
+      <div class="pgrid">
+        <div class="pcol">
+          <div class="ask"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.2L20.5 10l-6.3 1.8L12 18l-2.2-6.2L3.5 10l6.3-1.8z"/></svg><input id="q" placeholder="Describe the motion…" aria-label="Describe the motion"><button class="btn fill" id="go">Generate</button></div>
+          <div class="chips" id="sug"><button class="chip">Bounce the title in</button><button class="chip">Slide in from the left</button><button class="chip">Spin and zoom</button><button class="chip">Fade up slowly</button></div>
+          <div class="edh"><b>scene.ts</b><span id="st">Ready</span></div>
+          <div class="ed"><pre id="hl" aria-hidden="true"></pre><textarea id="code" spellcheck="false" aria-label="Scene code"></textarea></div>
+        </div>
+        <div class="pcol">
+          <div class="stage"><div class="sun"></div><div class="h1"></div><div class="h2"></div><div class="tc"><div class="tw" id="tw"><div id="title">Summer cut</div><svg viewBox="0 0 200 14" preserveAspectRatio="none"><path id="ul" pathLength="1" d="M2 8C40 2 90 12 130 6s60 2 68 2"/></svg></div></div></div>
+          <div class="ctl">
+            <div><div class="lab">Preset</div><div class="sg" id="pre"><button data-p="bounce">Bounce</button><button data-p="slide">Slide</button><button data-p="spin">Spin</button><button data-p="fade">Fade</button></div></div>
+            <div><div class="lab">Easing</div><div class="chips" style="margin:0" id="eas"><button class="chip" data-e="ease-out">ease-out</button><button class="chip" data-e="ease-in-out">ease-in-out</button><button class="chip" data-e="linear">linear</button><button class="chip" data-e="overshoot">overshoot</button></div></div>
+            <div><div class="lab">Duration</div><div class="sl"><input type="range" id="dur" min="300" max="2000" step="50" aria-label="Duration"><b id="durv"></b></div></div>
+            <label class="tf"><input id="txt" maxlength="22" placeholder=" "><span>Title text</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="tl">
+        <div class="tb"><button class="ib" id="play" aria-label="Play or pause"></button><span class="time" id="time">0.00 / 2.00s</span><button class="ib" id="exp" aria-label="Export video"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg></button></div>
+        <div class="tlw" id="tlw">
+          <div class="row"><span class="l"></span><div class="lane rl" id="ruler"></div></div>
+          <div class="row"><span class="l">title</span><div class="lane"><div class="bar1" id="bar1">transform · opacity</div><b class="dk" id="dk1"></b><b class="dk" id="dk2"></b></div></div>
+          <div class="row"><span class="l">underline</span><div class="lane"><div class="bar1 u" id="bar2" style="left:75%">stroke</div></div></div>
+          <div class="ph" id="ph"><span id="phb">0.00</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="right:3%;bottom:-62px"><span class="hand">Export the video!</span><svg viewBox="0 0 26 44" style="transform:scaleY(-1) scaleX(-1)"><path d="M4 4C3 18 8 32 20 40M20 40l-11-2M20 40l1-11"/></svg></div>
+  </div>
+</section>
+
+<section class="sec wrap" id="more">
+  <h2 class="rv" style="text-align:center;margin-bottom:56px">Built for developers</h2>
+  <div class="fg">
+    <div class="fc rv"><div class="il"><div class="kv"><div><span>title</span><code>"Summer cut"</code></div><div><span>accent</span><code><i class="sw"></i>#FF8FB1</code></div><div><span>speed</span><code>1.2×</code></div></div></div><h3>Parameters</h3><p>Turn any value into a variable and connect your own data.</p><a class="lk" href="#">Parameters →</a><a class="lk" href="#">Data sources →</a></div>
+    <div class="fc rv" style="transition-delay:.1s"><div class="il"><div class="fl">variant-001.mp4<em style="--d:0s"></em></div><div class="fl">variant-002.mp4<em style="--d:.4s"></em></div><div class="fl">variant-003.mp4<em style="--d:.8s"></em></div></div><h3>Batch rendering</h3><p>Render hundreds of variants from one scene, locally or in the cloud.</p><a class="lk" href="#">Render CLI →</a><a class="lk" href="#">Cloud render →</a></div>
+    <div class="fc rv" style="transition-delay:.2s"><div class="il"><div class="df"><div>scene("title", {</div><div class="r">-  duration: 600,</div><div class="a">+  duration: 900,</div><div class="a">+  easing: "overshoot",</div><div>})</div></div></div><h3>Version control</h3><p>Motion lives in plain files, so reviews and diffs just work.</p><a class="lk" href="#">Git workflow →</a><a class="lk" href="#">Team review →</a></div>
+  </div>
+</section>
+
+<section class="close wrap rv"><h2>Write your first scene.</h2><p class="mute">Free on Mac, Windows and Linux.</p><a class="btn fill" href="#">Get Reel</a></section>
+
+<footer><div class="wrap ft">
+  <div><a class="logo" href="#"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="10" fill="#6965DB"/><path d="M12.6 9.8L23 16l-10.4 6.2z" fill="#fff" stroke="#fff" stroke-width="2.8" stroke-linejoin="round"/><circle cx="24.6" cy="7.6" r="2.6" fill="#FFD84D"/></svg>Reel</a><p class="mute" style="margin-top:16px;max-width:260px">The video editor with annotation built in, and now motion as code.</p></div>
+  <div><h4>Product</h4><ul><li><a href="#">Editor</a></li><li><a href="#">Reel Code</a></li><li><a href="#">AI animation</a></li></ul></div>
+  <div><h4>Resources</h4><ul><li><a href="#">Docs</a></li><li><a href="#">Examples</a></li><li><a href="#">Changelog</a></li></ul></div>
+  <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#">Contact</a></li></ul></div>
+</div><div class="wrap fb"><span>© 2026 Reel. All rights reserved.</span><span>Privacy · Terms</span></div></footer>
+<div class="snack" id="snack" role="status"></div>
+
+<script>
+const $=id=>document.getElementById(id),sleep=ms=>new Promise(r=>setTimeout(r,ms)),seg=(p,a,b)=>Math.min(Math.max((p-a)/(b-a),0),1),clone=o=>JSON.parse(JSON.stringify(o));
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.2});
+document.querySelectorAll('.rv').forEach(e=>io.observe(e));
+let snT;const snack=t=>{const s=$('snack');s.textContent=t;s.classList.add('show');clearTimeout(snT);snT=setTimeout(()=>s.classList.remove('show'),2400)};
+$('cmd').onclick=async()=>{try{await navigator.clipboard.writeText('npx reel init')}catch(e){}snack('Copied: npx reel init')};
+
+// ---- scene model ----
+const EZ={'ease-out':'ease-out','ease-in-out':'ease-in-out','linear':'linear','overshoot':'cubic-bezier(.34,1.56,.64,1)'};
+const Z={x:0,y:0,scale:1,rotate:0,opacity:1};
+const PRE={bounce:{from:{...Z,y:-120,scale:.9,opacity:0},to:Z,duration:900,easing:'overshoot'},slide:{from:{...Z,x:-160,opacity:0},to:Z,duration:700,easing:'ease-out'},spin:{from:{...Z,scale:.2,rotate:-180,opacity:0},to:Z,duration:800,easing:'ease-out'},fade:{from:{...Z,y:24,opacity:0},to:Z,duration:1200,easing:'ease-in-out'}};
+let S={text:'Summer cut',underline:true,preset:'bounce',...clone(PRE.bounce)};
+const o=v=>`{ x: ${v.x}, y: ${v.y}, scale: ${v.scale}, rotate: ${v.rotate}, opacity: ${v.opacity} }`;
+const toCode=()=>`import { scene } from "reel"\n\nscene("title", {\n  text: "${S.text}",\n  from: ${o(S.from)},\n  to: ${o(S.to)},\n  duration: ${S.duration},\n  easing: "${S.easing}",\n  underline: ${S.underline},\n})`;
+function parse(c){
+  const t=/text:\s*"([^"]*)"/.exec(c),d=/duration:\s*(\d+)/.exec(c),e=/easing:\s*"([^"]*)"/.exec(c),u=/underline:\s*(true|false)/.exec(c),fi=c.indexOf('from:'),ti=c.indexOf('to:');
+  if(fi<0||ti<fi||!t||!d||!e||+d[1]<100)return null;
+  const blk=s=>{const r={};for(const k of ['x','y','scale','rotate','opacity']){const m=new RegExp('\\b'+k+':\\s*(-?[\\d.]+)').exec(s);if(!m)return null;r[k]=+m[1]}return r};
+  const f=blk(c.slice(fi,ti)),to=blk(c.slice(ti));if(!f||!to)return null;
+  return{text:t[1].slice(0,24),underline:!u||u[1]==='true',preset:null,from:f,to,duration:Math.min(+d[1],4000),easing:e[1]};
+}
+// ---- editor with syntax highlight ----
+const ta=$('code'),hl=$('hl');
+const hi=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/("[^"]*")|(\b[a-zA-Z]+(?=:))|(\b(?:import|from)\b)|(\bscene\b)|(-?\b\d+\.?\d*\b)/g,(m,s,k,kw,f,n)=>s?`<span class="cs">${s}</span>`:k?`<span class="ck">${k}</span>`:kw?`<span class="cf">${kw}</span>`:f?`<span class="cf">${f}</span>`:`<span class="cn">${n}</span>`)+'\n';
+const paint=()=>{hl.innerHTML=hi(ta.value);hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft};
+ta.addEventListener('scroll',()=>{hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft});
+// ---- animation + timeline ----
+let anim,cycle=2000,playing=true,drag=false;
+const tw=$('tw'),tf=v=>`translate(${v.x}px,${v.y}px) scale(${v.scale}) rotate(${v.rotate}deg)`;
+function drawTimeline(){
+  const secs=cycle/1000,step=secs>3?1:.5;let h='';
+  for(let s=0;s<=secs+1e-6;s+=step){const L=s/secs*100;h+=`<i style="left:${L}%"></i><span style="left:${L}%">${s.toFixed(1)}s</span>`}
+  $('ruler').innerHTML=h;const w=S.duration/cycle*100;
+  $('bar1').style.width=w+'%';$('dk1').style.left='0%';$('dk2').style.left=w+'%';
+  const b=$('bar2');b.style.left=w*.75+'%';b.style.width=w*.25+'%';b.style.visibility=S.underline?'visible':'hidden';
+}
+function apply(){
+  const tt=anim?anim.currentTime:0,paused=anim&&anim.playState==='paused';anim&&anim.cancel();
+  $('title').textContent=S.text||'\u00a0';
+  anim=tw.animate([{transform:tf(S.from),opacity:S.from.opacity},{transform:tf(S.to),opacity:S.to.opacity}],{duration:S.duration,easing:EZ[S.easing]||S.easing,endDelay:1100,iterations:Infinity,fill:'both'});
+  cycle=S.duration+1100;anim.currentTime=(tt||0)%cycle;if(paused||!playing)anim.pause();
+  $('ul').parentNode.style.display=S.underline?'':'none';drawTimeline();
+}
+const pi=on=>$('play').innerHTML=on?'<svg width="18" height="18" viewBox="0 0 12 12" fill="currentColor"><rect x="1.5" y="1" width="3.2" height="10" rx="1"/><rect x="7.3" y="1" width="3.2" height="10" rx="1"/></svg>':'<svg width="18" height="18" viewBox="0 0 12 12" fill="currentColor"><path d="M2.5 1l8.5 5-8.5 5z"/></svg>';
+$('play').onclick=()=>{playing=!playing;playing?anim.play():anim.pause();pi(playing)};pi(true);
+(function loop(){if(anim){const t=(anim.currentTime||0)%cycle,p=t/cycle;
+  $('ph').style.left=`calc(88px + (100% - 100px) * ${p})`;$('phb').textContent=(t/1000).toFixed(2);
+  $('time').textContent=(t/1000).toFixed(2)+' / '+(cycle/1000).toFixed(2)+'s';$('ul').style.strokeDashoffset=1-seg(t,S.duration*.75,S.duration)}
+  requestAnimationFrame(loop)})();
+const scrub=e=>{const r=document.querySelector('#tlw .lane').getBoundingClientRect();anim.pause();anim.currentTime=Math.min(Math.max((e.clientX-r.left)/r.width,0),.999)*cycle};
+$('tlw').addEventListener('pointerdown',e=>{drag=true;$('tlw').setPointerCapture(e.pointerId);scrub(e)});
+$('tlw').addEventListener('pointermove',e=>{if(drag)scrub(e)});
+['pointerup','pointercancel'].forEach(t=>$('tlw').addEventListener(t,()=>{if(drag){drag=false;if(playing)anim.play()}}));
+$('exp').onclick=async()=>{snack('Rendering 1920×1080 · 30 fps…');await sleep(1500);snack('Saved scene.mp4 (demo)')};
+// ---- controls <-> code ----
+function syncUI(fromCode){
+  document.querySelectorAll('#pre button').forEach(b=>b.classList.toggle('on',b.dataset.p===S.preset));
+  document.querySelectorAll('#eas .chip').forEach(b=>b.classList.toggle('on',b.dataset.e===S.easing));
+  $('dur').value=S.duration;$('dur').style.setProperty('--v',(S.duration-300)/1700*100+'%');$('durv').textContent=S.duration+' ms';
+  if(document.activeElement!==$('txt'))$('txt').value=S.text;
+  if(!fromCode){ta.value=toCode();paint()}
+}
+function change(){syncUI();apply()}
+document.querySelectorAll('#pre button').forEach(b=>b.onclick=()=>{S={...S,...clone(PRE[b.dataset.p]),preset:b.dataset.p};change()});
+document.querySelectorAll('#eas .chip').forEach(b=>b.onclick=()=>{S.easing=b.dataset.e;S.preset=null;change()});
+$('dur').oninput=e=>{S.duration=+e.target.value;S.preset=null;change()};
+$('txt').oninput=e=>{S.text=e.target.value.replace(/"/g,'');change()};
+let pt;ta.addEventListener('input',()=>{paint();clearTimeout(pt);pt=setTimeout(()=>{const n=parse(ta.value);if(n){S={...S,...n};syncUI(true);apply();$('st').textContent='Live'}else $('st').textContent='Waiting for valid code…'},250)});
+// ---- "AI" writes the code ----
+const AI=[[/spin|rotate|zoom/i,'spin'],[/slide|left|right/i,'slide'],[/fade|soft|slow|up/i,'fade'],[/bounce|drop|fall|pop/i,'bounce']];let run=0;
+async function ask(q){
+  const id=++run,key=(AI.find(a=>a[0].test(q))||[0,'bounce'])[1];S={...S,...clone(PRE[key]),preset:key};const code=toCode();
+  $('st').textContent='Writing code…';
+  for(let i=0;i<=code.length;i+=5){if(id!==run)return;ta.value=code.slice(0,i);paint();await sleep(10)}
+  ta.value=code;paint();syncUI(true);apply();$('st').textContent='Generated · '+PRE[key].duration+' ms';
+}
+const go=()=>{const v=$('q').value.trim();if(v)ask(v)};$('go').onclick=go;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')go()});
+document.querySelectorAll('#sug .chip').forEach(b=>b.onclick=()=>{$('q').value=b.textContent;ask(b.textContent)});
+syncUI();apply();
+</script>
+</body>
+</html>

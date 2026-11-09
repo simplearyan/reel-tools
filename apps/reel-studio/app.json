@@ -1,0 +1,16 @@
+{
+  "name": "Reel",
+  "slug": "reel-studio",
+  "tagline": "Reel is a family of free, open-source browser tools for animation, video and sound editing. No install, no account.",
+  "description": "Reel is a family of free, open-source browser tools for animation, video and sound editing. No install, no account.",
+  "icon": "icon.svg",
+  "tags": [
+    "animation",
+    "video",
+    "audio",
+    "design"
+  ],
+  "status": "stable",
+  "order": 10,
+  "license": "MIT"
+}
